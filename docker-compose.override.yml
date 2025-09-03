@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  tbc-front:
+    build:
+      context: ./tbc-front
+      dockerfile: Dockerfile.dev
+    container_name: tbc-front
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./tbc-front:/app
+      - /app/node_modules
+    networks:
+      - tbc-net
+    stdin_open: true
+    tty: true
+    depends_on:
+      - tbc-back
+
