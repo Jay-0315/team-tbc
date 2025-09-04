@@ -27,4 +27,9 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String nickname;
+
+    // OAuth 연동용
+    private String provider;
+    @Column(unique = true)
+    private String providerId;
 }
