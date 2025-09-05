@@ -3,41 +3,38 @@ package com.tbc.tbc.config;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
+    @org.springframework.core.annotation.Order(0) // ★ 최우선 체인
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println(">>> SecurityFilterChain LOADED");
-
         http
-                .csrf(csrf -> csrf.disable())
-
-                // ★ 여기서 두 방식 모두로 /payments/** 허용 (안전빵)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/payments/**", "/actuator/**", "/__probe").permitAll()
-                        .anyRequest().authenticated()
-                )
-
-
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 인증 안 된 요청은 401 JSON (permitAll이면 이 블록이 호출되지 않음)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> {
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    res.setContentType("application/json;charset=UTF-8");
-                    res.getWriter().write("{\"error\":\"unauthorized\"}");
-                }));
-
+                .csrf(csrf -> csrf.disable())                    // CSRF 완전 끔
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) // 모든 경로 임시 허용
+                .formLogin(f -> f.disable())
+                .httpBasic(b -> b.disable());
         return http.build();
     }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://localhost:5173"); // React 개발 서버
+        config.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
+        config.addAllowedHeader("*"); // 모든 헤더 허용
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
 }

@@ -1,13 +1,13 @@
 package com.tbc.tbc.payments.domain.payment;
 
+import com.tbc.tbc.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.Instant;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 @Entity
-@Table(name = "payments", uniqueConstraints = @UniqueConstraint(columnNames = "order_id"))
-public class Payment {
+@Table(name = "payments")
+public class Payment extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,18 +22,15 @@ public class Payment {
     private Long amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
-    private PaymentState state;
+    @Column(nullable=false, length=32)
+    private PaymentState state; // INIT/PAID/REFUND_REQUESTED/REFUNDED
 
+    @Column(length=64)
     private String paymentKey;
+
+    @Column(length=64)
     private String failureCode;
+
+    @Column(length=255)
     private String failureMsg;
-
-    @Column(nullable=false, updatable=false)
-    private Instant createdAt = Instant.now();
-
-    @Column(nullable=false)
-    private Instant updatedAt = Instant.now();
-
-    @PreUpdate void onUpdate() { this.updatedAt = Instant.now(); }
 }
