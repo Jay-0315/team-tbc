@@ -39,30 +39,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http,
+                                    OAuth2LoginSuccessHandler success) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/signup",
-                                "/api/auth/login",
-                                "/api/auth/refresh",
-                                "/api/auth/find-id",
-                                "/api/auth/reset-password",
-                                "/api/users/check-email",
-                                "/api/users/check-phone",
-                                "/api/users/check-username",
-                                "/oauth2/**",
-                                "/login/oauth2/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/public/**", "/", "/index.html").permitAll()
+                        .anyRequest().permitAll()
                 )
-                .oauth2Login(o -> o.successHandler(oAuth2LoginSuccessHandler));
-
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/oauth2/authorization/google") // 직접 진입 URL
+                        .successHandler(success)                    // 토큰 발급/리다이렉트 등
+                );
         return http.build();
     }
 

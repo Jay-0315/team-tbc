@@ -34,10 +34,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String access  = jwtTokenProvider.createAccessToken(subject);
         String refresh = jwtTokenProvider.createRefreshToken(subject);
 
-        String redirect = frontendBaseUrl
-                + "/oauth-success?access=" + URLEncoder.encode(access, StandardCharsets.UTF_8)
+        String redirect = "http://localhost:5173/oauth-callback"
+                + "?access=" + URLEncoder.encode(access, StandardCharsets.UTF_8)
                 + "&refresh=" + URLEncoder.encode(refresh, StandardCharsets.UTF_8);
-
         getRedirectStrategy().sendRedirect(request, response, redirect);
     }
 }
