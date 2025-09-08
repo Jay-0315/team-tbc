@@ -1,13 +1,15 @@
 package com.tbcback.tbcback.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class LoginRequest {
-    @NotBlank
+    // 아이디
+    @NotBlank(message = "아이디는 필수입니다.")
     private String username;
 
-    @NotBlank
+    // 비밀번호
+    @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 }

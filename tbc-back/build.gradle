@@ -45,13 +45,14 @@ dependencies {
     runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.11.5'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-// ✅ plain.jar 생성 방지
+// plain.jar 생성 방지
 tasks.named('jar') {
     enabled = false
 }
