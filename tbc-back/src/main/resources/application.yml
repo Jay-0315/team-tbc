@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.219.70:3306/tbc_db?
+    serverTimezone: Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: tbc
+    password: EjrqhR21!
+
+  jpa:
+    hibernate:
+      ddl-auto: update    # 개발용: 스키마 자동 갱신
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true  # 로그 가독성
+
+# (테스트 중 핸드셰이크 로그 보고 싶을 때)
+logging:
+  level:
+    org.springframework.web.socket: DEBUG
+    org.springframework.web.socket.server: DEBUG
+
+chat:
+  max-content-length: 1000
+  max-qps-per-session: 10
+
+
+    #properties
+    #spring.datasource.url=jdbc:mysql://192.168.219.70:3306/tbc_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    #spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    #spring.datasource.username=tbc
+    #spring.datasource.password=EjrqhR21!
+    #
+    #spring.jpa.hibernate.ddl-auto=update
+    #spring.jpa.show-sql=true
+    #
+
