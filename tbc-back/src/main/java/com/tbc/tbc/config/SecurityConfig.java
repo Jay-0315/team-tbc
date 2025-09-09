@@ -18,7 +18,22 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())                    // CSRF 완전 끔
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) // 모든 경로 임시 허용
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                // Toss webhook (PG 서버 → 우리 서버 호출)
+                                "/payments/webhook/**",
+                                // 결제 API (프론트에서 직접 호출)
+                                "/payments/**",
+                                // Swagger / 문서
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                // Actuator (헬스체크, 모니터링)
+                                "/actuator/**",
+                                // 관리자 및 모니터링
+                                "/monitoring/**", "/admin/**"
+                        ).permitAll()
+                        // 나머지는 인증 필요
+                        .anyRequest().authenticated()
+                )
                 .formLogin(f -> f.disable())
                 .httpBasic(b -> b.disable());
         return http.build();
