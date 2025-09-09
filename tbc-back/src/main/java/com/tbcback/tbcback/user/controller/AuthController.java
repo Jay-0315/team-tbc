@@ -3,9 +3,10 @@ package com.tbcback.tbcback.user.controller;
 import com.tbcback.tbcback.security.JwtTokenProvider;
 import com.tbcback.tbcback.user.dto.*;
 import com.tbcback.tbcback.user.entity.User;
-import com.tbcback.tbcback.user.service.UserService;
+import com.tbcback.tbcback.user.service.UserService;  // ← 빠졌던 import 추가
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.time.Duration;
 
@@ -106,14 +106,14 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.message("로그아웃 완료"));
     }
 
-    // 아이디 찾기(이메일만) - 실제 메일 발송은 서비스 내부에서 처리
+    // 아이디 찾기(이메일만)
     @PostMapping("/find-id")
     public ResponseEntity<ApiResponse<Void>> findId(@Valid @RequestBody FindIdRequest request) {
         userService.processFindUsername(request.getEmail());
         return ResponseEntity.ok(ApiResponse.message("이메일로 안내를 전송했습니다."));
     }
 
-    // 비밀번호 재설정(이메일만) - 실제 메일 발송은 서비스 내부에서 처리
+    // 비밀번호 재설정(이메일만)
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         userService.processPasswordReset(request.getEmail());

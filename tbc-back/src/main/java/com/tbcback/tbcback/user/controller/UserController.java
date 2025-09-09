@@ -12,16 +12,13 @@ public class UserController {
 
     private final UserService userService;
 
+    // 이메일 중복 체크
     @GetMapping("/check-email")
     public ResponseEntity<?> checkEmail(@RequestParam String email) {
         return ResponseEntity.ok(userService.isEmailAvailable(email));
     }
 
-    @GetMapping("/check-phone")
-    public ResponseEntity<?> checkPhone(@RequestParam String phone) {
-        return ResponseEntity.ok(userService.isPhoneAvailable(phone));
-    }
-
+    // 아이디 중복 체크
     @GetMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestParam String username) {
         return ResponseEntity.ok(userService.isUsernameAvailable(username));

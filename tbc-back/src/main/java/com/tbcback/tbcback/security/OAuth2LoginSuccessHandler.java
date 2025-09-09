@@ -71,13 +71,17 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private String asString(Object value) { return value == null ? null : String.valueOf(value); }
 
     private void addHttpOnlyCookie(HttpServletResponse response, String name, String value, Duration maxAge) {
-        ResponseCookie.Builder builder = ResponseCookie.from(name, value)
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .path("/")
                 .maxAge(maxAge)
                 .sameSite(cookieSameSite);
-        if (cookieDomain != null && !cookieDomain.isBlank()) builder.domain(cookieDomain);
+
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            builder.domain(cookieDomain);
+        }
+
         response.addHeader("Set-Cookie", builder.build().toString());
     }
 }

@@ -124,7 +124,6 @@ public class UserService {
         String normalizedEmail = normalizeEmail(email);
         userRepository.findByEmail(normalizedEmail).ifPresent(user -> {
             // 여기서 이메일 발송 로직을 구현하면 된다
-            // 실제 서비스에서는 user.getUsername()을 일부 마스킹하여 안내 메일 전송
         });
     }
 
@@ -135,6 +134,18 @@ public class UserService {
         userRepository.findByEmail(normalizedEmail).ifPresent(user -> {
             // 여기서 비밀번호 재설정 토큰 생성 및 이메일 전송을 구현하면 된다
         });
-        // 존재 여부와 상관없이 항상 동일 응답을 주기 위해 여기서는 예외를 던지지 않는다
+        // 존재 여부와 상관없이 동일 응답을 유지한다
+    }
+
+    // 이메일 중복 체크
+    @Transactional(readOnly = true)
+    public boolean isEmailAvailable(String email) {
+        return !userRepository.existsByEmail(normalizeEmail(email));
+    }
+
+    // 아이디 중복 체크
+    @Transactional(readOnly = true)
+    public boolean isUsernameAvailable(String username) {
+        return !userRepository.existsByUsername(normalizeUsername(username));
     }
 }
