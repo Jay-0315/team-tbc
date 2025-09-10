@@ -15,6 +15,16 @@ public class MeetupParticipantEntity {
     @EmbeddedId
     private MeetupParticipantId id;
 
+    // 🔥 모임 연관관계 (MeetupEntity)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meetup_id", insertable = false, updatable = false)
+    private MeetupEntity meetup;
+
+    // 🔥 유저 연관관계 (UserEntity)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private UserEntity user;
+
     @Column(name = "role", length = 20, nullable = false)
     private String role = "ATTENDEE";
 

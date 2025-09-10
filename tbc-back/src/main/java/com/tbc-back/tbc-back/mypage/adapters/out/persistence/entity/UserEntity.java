@@ -30,4 +30,10 @@ public class UserEntity {
 
     @Column(name = "created_at")
     private Instant createdAt; // 가입일시
+
+    @Column(name = "profile_image")
+    private String profileImage;
+
+    @Column(name = "intro")
+    private String intro;
 }
