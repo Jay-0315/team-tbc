@@ -1,9 +1,10 @@
-package com.tbcback.tbcback.config;
+package com.tbcback.tbcback.security;
 
-import com.tbcback.tbcback.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 
 @Configuration
 public class JwtBeansConfig {
@@ -11,20 +12,18 @@ public class JwtBeansConfig {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.access-token-valid-seconds}")
-    private long accessSeconds;
+    @Value("${jwt.access-expiration-minutes:15}")
+    private long accessMinutes;
 
-    @Value("${jwt.refresh-token-valid-seconds}")
-    private long refreshSeconds;
-
-    @Value("${jwt.issuer}")
-    private String issuer;
-
-    // aud는 간단히 서비스 식별자 사용
-    private static final String DEFAULT_AUDIENCE = "tbc-app";
+    @Value("${jwt.refresh-expiration-days:14}")
+    private long refreshDays;
 
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
-        return new JwtTokenProvider(secret, accessSeconds, refreshSeconds, issuer, DEFAULT_AUDIENCE, 60);
+        return new JwtTokenProvider(
+                secret,
+                Duration.ofMinutes(accessMinutes),
+                Duration.ofDays(refreshDays)
+        );
     }
 }

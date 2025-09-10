@@ -1,39 +1,49 @@
 package com.tbcback.tbcback.user.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.Instant;
 
 @Entity
-@Table(name = "refresh_tokens",
-        indexes = {
-                @Index(name = "idx_rt_user", columnList = "userId"),
-                @Index(name = "idx_rt_username", columnList = "username")
-        })
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "refresh_tokens")
 public class RefreshToken {
-    // jti를 기본키로 사용
+
     @Id
-    @Column(length = 64)
     private String jti;
 
-    // 사용자 ID
     private Long userId;
-
-    // 사용자명(소문자 정규화 권장)
-    private String username;
-
-    // 만료 시각
+    private String username;   // email (normalized)
     private Instant expiresAt;
-
-    // 폐기 여부
     private boolean revoked;
-
-    // 생성/수정 시각
     private Instant createdAt;
     private Instant updatedAt;
+
+    protected RefreshToken() {}
+
+    public static RefreshToken of(String jti, Long userId, String username,
+                                  Instant expiresAt, boolean revoked,
+                                  Instant createdAt, Instant updatedAt) {
+        RefreshToken rt = new RefreshToken();
+        rt.jti = jti;
+        rt.userId = userId;
+        rt.username = username;
+        rt.expiresAt = expiresAt;
+        rt.revoked = revoked;
+        rt.createdAt = createdAt;
+        rt.updatedAt = updatedAt;
+        return rt;
+    }
+
+    public String getJti() { return jti; }
+    public Long getUserId() { return userId; }
+    public String getUsername() { return username; }
+    public Instant getExpiresAt() { return expiresAt; }
+    public boolean isRevoked() { return revoked; }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
+
+    public void setRevoked(boolean revoked) { this.revoked = revoked; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }

@@ -1,22 +1,15 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.5'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
-group = 'com.tbc'
+group = 'com.tbcback'
 version = '0.0.1-SNAPSHOT'
-description = 'tbc'
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
     }
 }
 
@@ -25,35 +18,34 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // --- Spring 기본 ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // OAuth2 Client (이번 에러 해결 포인트)
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+
+
+    // JWT (jjwt)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly  'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly  'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // DB Driver
+    runtimeOnly  'com.mysql:mysql-connector-j:8.4.0'
+    // (옵션) 로컬 테스트용 H2
+    // runtimeOnly 'com.h2database:h2:2.3.232'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-// plain.jar 생성 방지
-tasks.named('jar') {
-    enabled = false
-}
-

@@ -1,46 +1,40 @@
 package com.tbcback.tbcback.user.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
-@Table(
-        name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_user_email", columnNames = "email"),
-                @UniqueConstraint(name = "uk_user_username", columnNames = "username")
-        }
-)
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "users")
 public class User {
-    // 기본 키
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 이메일은 필수이자 유니크
-    @Column(nullable = false, unique = true)
+    @Column(nullable=false, unique=true, length=191)
     private String email;
 
-    // 사용자 로그인 아이디(유니크)
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(nullable=false)
+    private String realName;
 
-    // 비밀번호 해시
-    @Column(nullable = false)
+    @Column(nullable=false)
     private String password;
 
-    // 닉네임
+    @Column(nullable=false, unique=true, length=50)
     private String nickname;
 
-    // OAuth 연동용
-    private String provider;
+    protected User() {}
 
-    // 공급자별 고유 식별자
-    @Column(unique = true)
-    private String providerId;
+    public static User of(String email, String realName, String encodedPassword, String nickname) {
+        User u = new User();
+        u.email = email;
+        u.realName = realName;
+        u.password = encodedPassword;
+        u.nickname = nickname;
+        return u;
+    }
+
+    public Long getId() { return id; }
+    public String getEmail() { return email; }
+    public String getRealName() { return realName; }
+    public String getPassword() { return password; }
+    public String getNickname() { return nickname; }
 }
