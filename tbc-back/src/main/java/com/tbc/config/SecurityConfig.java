@@ -20,6 +20,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",      // 서브 리소스들
                                 "/api/health/**",
                                 "/chat/**",
+                                "/ws/**",
+                                "/topic/**",
+                                "/app/**",
                                 "/api/health/**"
                         ).permitAll()
                         .anyRequest().permitAll() // 초기엔 전부 오픈
