@@ -258,9 +258,9 @@ function Step2({
 
             {isPaid && (
                 <>
-                    <NumberInput label="참가비 금액(원)" value={form.feeAmount ?? 0} onChange={(v) => onChange("feeAmount", v)} min={0} />
+                    <NumberInput label="참가비는 얼마인가요?" value={form.feeAmount ?? 0} onChange={(v) => onChange("feeAmount", v)} min={0} />
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">참가비 안내(선택)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">참가비의 용도를 알려주세요.</label>
                         <textarea
                             className="w-full rounded-xl border border-gray-200 px-3 py-2"
                             rows={3}
@@ -298,7 +298,7 @@ function Step3({
                         className="flex-1 rounded-xl border border-gray-200 px-3 py-2"
                         value={tagInput}
                         onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+                        onKeyUp={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
                         placeholder="엔터로 추가"
                     />
                     <button type="button" onClick={addTag} className="px-3 py-2 rounded-xl border border-gray-300 hover:bg-gray-50">추가</button>
