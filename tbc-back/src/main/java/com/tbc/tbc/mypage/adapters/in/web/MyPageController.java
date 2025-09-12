@@ -1,10 +1,12 @@
 package com.tbc_back.tbc_back.mypage.adapters.in.web;
 
-import com.tbc_back.tbc_back.mypage.adapters.in.web.dto.*;
 import com.tbc_back.tbc_back.mypage.application.facade.MyPageFacade;
+import com.tbc_back.tbc_back.mypage.adapters.in.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/mypage")
@@ -13,22 +15,21 @@ public class MyPageController {
 
     private final MyPageFacade facade;
 
-    // 프로필
+    // 프로필 조회
     @GetMapping("/profile")
     public ResponseEntity<MyProfileDto> profile(@RequestParam String userId) {
         return ResponseEntity.ok(facade.getProfile(userId));
     }
 
+    // 프로필 수정
     @PutMapping("/profile")
-    public ResponseEntity<MyProfileDto> updateProfile(
-            @RequestParam String userId,
-            @RequestBody UpdateProfileRequest request
-    ) {
-        return ResponseEntity.ok(facade.updateProfile(userId, request));
+    public ResponseEntity<MyProfileDto> updateProfile(@RequestParam String userId,
+                                                      @RequestBody UpdateProfileRequest req) {
+        return ResponseEntity.ok(facade.updateProfile(userId, req));
     }
 
-    // 지갑 요약 (두 경로 모두 허용)
-    @GetMapping({"/wallet", "/wallet/summary"})
+    // 지갑 요약
+    @GetMapping("/wallet")
     public ResponseEntity<WalletSummaryDto> wallet(@RequestParam String userId) {
         return ResponseEntity.ok(facade.getWalletSummary(userId));
     }
@@ -38,8 +39,7 @@ public class MyPageController {
     public ResponseEntity<PagedResponse<WalletTxnDto>> walletTxns(
             @RequestParam String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(facade.getWalletTxns(userId, page, size));
     }
 
@@ -48,18 +48,22 @@ public class MyPageController {
     public ResponseEntity<PagedResponse<MyMeetupItemDto>> myMeetups(
             @RequestParam String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(facade.getMyMeetups(userId, page, size));
     }
 
-    // 내가 진행한 모임 (호스트)
-    @GetMapping("/meetups/hosted")
+    // 내가 진행한 모임
+    @GetMapping("/hosted-meetups")
     public ResponseEntity<PagedResponse<MyMeetupItemDto>> hostedMeetups(
             @RequestParam String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(facade.getHostedMeetups(userId, page, size));
+    }
+
+    // 🔥 열린 모임
+    @GetMapping("/open-meetups")
+    public ResponseEntity<List<MyMeetupItemDto>> openMeetups() {
+        return ResponseEntity.ok(facade.getOpenMeetups());
     }
 }

@@ -157,4 +157,24 @@ public class MyPageFacade {
                 .totalPages(p.getTotalPages())
                 .build();
     }
+
+    // 🔥 열린 모임
+    public List<MyMeetupItemDto> getOpenMeetups() {
+        return meetupRepo.findByStatus("OPEN").stream()
+                .map(m -> MyMeetupItemDto.builder()
+                        .meetupId(m.getId())
+                        .title(m.getTitle())
+                        .startAt(m.getStartAt())
+                        .endAt(m.getEndAt())
+                        .role("GUEST")
+                        .participantStatus(null)
+                        .joinedAt(null)
+                        .meetupStatus(m.getStatus())
+                        .participantCount(m.getParticipants().size())
+                        .pricePoints(m.getPricePoints())
+                        .build()
+                ).toList();
+    }
+
+
 }

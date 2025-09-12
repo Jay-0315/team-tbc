@@ -28,6 +28,15 @@ public class WalletPersistenceAdapter implements WalletRepository {
     @Override
     @Transactional
     public boolean atomicDeduct(String walletId, long amount) {
-        return jpa.deductBalance(walletId, amount) == 1;
+        WalletEntity wallet = jpa.findById(walletId)
+                .orElseThrow(() -> new IllegalArgumentException("Wallet not found: " + walletId));
+
+        if (wallet.getBalancePoints() < amount) {
+            return false; // 차감 불가
+        }
+
+        wallet.setBalancePoints(wallet.getBalancePoints() - amount);
+        jpa.save(wallet);
+        return true;
     }
 }

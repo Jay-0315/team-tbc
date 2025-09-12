@@ -1,35 +1,248 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react"
+import axios from "axios"
+
+// 타입 정의
+interface Profile {
+    userId: string
+    username: string
+    email: string
+    name: string | null
+    profileImage?: string | null
+    intro?: string | null
+}
+
+interface Wallet {
+    walletId: string
+    balancePoints: number
+}
+
+interface WalletTransaction {
+    id: string
+    type: string   // 예: TOPUP, JOIN_DEBIT ...
+    status: string
+    amountPoints: number
+    description: string
+    createdAt: string
+}
+
+interface MeetupItem {
+    meetupId: string
+    title: string
+    startAt: string
+    endAt: string
+    role: string
+    participantStatus: string
+    meetupStatus: string
+    participantCount: number
+    pricePoints: number
+    joinedAt: string | null
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [inputId, setInputId] = useState("YJ4")   // 입력값 (테스트: YJ4)
+    const [userId, setUserId] = useState("YJ4")     // 실제 조회할 값
+    const [profile, setProfile] = useState<Profile | null>(null)
+    const [wallet, setWallet] = useState<Wallet | null>(null)
+    const [transactions, setTransactions] = useState<WalletTransaction[]>([])
+    const [meetups, setMeetups] = useState<MeetupItem[]>([])
+    const [openMeetups, setOpenMeetups] = useState<MeetupItem[]>([])
+    const [error, setError] = useState<string | null>(null)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    useEffect(() => {
+        if (!userId) return
+        setError(null)
+
+        // 프로필 가져오기
+        axios.get<Profile>("/api/mypage/profile", { params: { userId } })
+            .then(res => setProfile(res.data))
+            .catch(() => setProfile(null))
+
+        // 지갑 요약
+        axios.get<Wallet>("/api/mypage/wallet", { params: { userId } })
+            .then(res => setWallet(res.data))
+            .catch(() => setWallet(null))
+
+        // 거래 내역
+        axios.get<{ content: WalletTransaction[] }>("/api/mypage/wallet/txns", { params: { userId } })
+            .then(res => setTransactions(res.data?.content ?? []))
+            .catch(() => setTransactions([]))
+
+        // 내가 참가한 모임
+        axios.get<{ content: MeetupItem[] }>("/api/mypage/meetups", { params: { userId } })
+            .then(res => setMeetups(res.data?.content ?? []))
+            .catch(() => setMeetups([]))
+
+        // 열린 모임
+        axios.get<MeetupItem[]>("/api/mypage/open-meetups")
+            .then(res => setOpenMeetups(res.data ?? []))
+            .catch(() => setOpenMeetups([]))
+    }, [userId])
+
+    // 참가 버튼 핸들러
+    const handleJoin = (meetupId: string) => {
+        axios.post(`/api/meetups/${meetupId}/join`, null, { params: { userId } })
+            .then(() => {
+                alert("참가 성공!")
+                return axios.get<{ content: MeetupItem[] }>("/api/mypage/meetups", { params: { userId } })
+            })
+            .then(res => setMeetups(res.data?.content ?? []))
+            .catch(err => {
+                const msg = err.response?.data || err.message
+                alert("참가 실패: " + msg)
+                setError(msg)
+            })
+    }
+
+    return (
+        <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+            <h1>마이페이지 확인</h1>
+
+            {/* 유저 ID 입력 */}
+            <div style={{ marginBottom: "20px" }}>
+                <input
+                    type="text"
+                    value={inputId}
+                    onChange={e => setInputId(e.target.value)}
+                    placeholder="조회할 userId 입력"
+                    style={{ padding: "5px", marginRight: "10px" }}
+                />
+                <button onClick={() => setUserId(inputId)}>조회</button>
+            </div>
+
+            {error && <p style={{ color: "red" }}>에러: {error}</p>}
+
+            {/* 프로필 */}
+            <section style={{ marginBottom: "20px" }}>
+                <h2>프로필</h2>
+                {!profile ? (
+                    <p>프로필 없음</p>
+                ) : (
+                    <ul>
+                        <li><b>ID:</b> {profile.userId}</li>
+                        <li><b>닉네임:</b> {profile.username}</li>
+                        <li><b>이메일:</b> {profile.email}</li>
+                        <li><b>이름:</b> {profile.name || "미등록"}</li>
+                        <li><b>소개:</b> {profile.intro || "미등록"}</li>
+                    </ul>
+                )}
+            </section>
+
+            {/* 지갑 */}
+            <section style={{ marginBottom: "20px" }}>
+                <h2>지갑 요약</h2>
+                {!wallet ? (
+                    <p>지갑 정보 없음</p>
+                ) : (
+                    <ul>
+                        <li><b>지갑 ID:</b> {wallet.walletId}</li>
+                        <li><b>현재 잔액:</b> {wallet.balancePoints} P</li>
+                    </ul>
+                )}
+            </section>
+
+            {/* 거래 내역 */}
+            <section style={{ marginBottom: "20px" }}>
+                <h2>거래 내역</h2>
+                {transactions.length === 0 ? (
+                    <p>거래 내역 없음</p>
+                ) : (
+                    <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
+                        <thead style={{ backgroundColor: "#f5f5f5" }}>
+                        <tr>
+                            <th>타입</th>
+                            <th>상태</th>
+                            <th>포인트</th>
+                            <th>설명</th>
+                            <th>날짜</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {transactions.map(txn => {
+                            const isIncrease = txn.type === "INCREASE"
+                            return (
+                                <tr key={txn.id}>
+                                    <td>{isIncrease ? "충전" : "사용"}</td>
+                                    <td>{txn.status}</td>
+                                    <td style={{ color: isIncrease ? "green" : "red" }}>
+                                        {isIncrease ? `+${txn.amountPoints}` : `-${txn.amountPoints}`} P
+                                    </td>
+                                    <td>{txn.description}</td>
+                                    <td>{new Date(txn.createdAt).toLocaleString()}</td>
+                                </tr>
+                            )
+                        })}
+                        </tbody>
+                    </table>
+                )}
+            </section>
+
+            {/* 열린 모임 */}
+            <section style={{ marginBottom: "20px" }}>
+                <h2>열린 모임</h2>
+                {openMeetups.length === 0 ? (
+                    <p>열린 모임 없음</p>
+                ) : (
+                    <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
+                        <thead style={{ backgroundColor: "#f5f5f5" }}>
+                        <tr>
+                            <th>제목</th>
+                            <th>참가비</th>
+                            <th>상태</th>
+                            <th>참가</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {openMeetups.map(m => (
+                            <tr key={m.meetupId}>
+                                <td>{m.title}</td>
+                                <td>{m.pricePoints} P</td>
+                                <td>{m.meetupStatus}</td>
+                                <td>
+                                    <button onClick={() => handleJoin(m.meetupId)}>참가하기</button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
+            </section>
+
+            {/* 내가 참가한 모임 */}
+            <section>
+                <h2>내가 참가한 모임</h2>
+                {meetups.length === 0 ? (
+                    <p>참가한 모임 없음</p>
+                ) : (
+                    <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
+                        <thead style={{ backgroundColor: "#f5f5f5" }}>
+                        <tr>
+                            <th>제목</th>
+                            <th>상태</th>
+                            <th>역할</th>
+                            <th>인원</th>
+                            <th>참가비</th>
+                            <th>시작일</th>
+                            <th>참여일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {meetups.map(m => (
+                            <tr key={m.meetupId}>
+                                <td>{m.title}</td>
+                                <td>{m.meetupStatus}</td>
+                                <td>{m.role}</td>
+                                <td>{m.participantCount}명</td>
+                                <td>{m.pricePoints} P</td>
+                                <td>{new Date(m.startAt).toLocaleString()}</td>
+                                <td>{m.joinedAt ? new Date(m.joinedAt).toLocaleString() : "-"}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
+            </section>
+        </div>
+    )
 }
 
 export default App
