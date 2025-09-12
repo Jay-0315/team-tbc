@@ -1,4 +1,4 @@
-package com.tbcback.tbcback.security;
+package com.tbcback.tbcback.login.adapter.out.security;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;

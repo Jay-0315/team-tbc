@@ -1,6 +1,6 @@
-package com.tbcback.tbcback.user.controller;
+package com.tbcback.tbcback.login.adapter.in.controller;
 
-import com.tbcback.tbcback.user.service.UserService;
+import com.tbcback.tbcback.login.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,5 +21,4 @@ public class UserController {
     public ResponseEntity<?> checkNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(userService.isNicknameAvailable(nickname));
     }
-
 }

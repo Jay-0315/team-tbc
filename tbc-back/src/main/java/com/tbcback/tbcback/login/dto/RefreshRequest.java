@@ -1,4 +1,4 @@
-package com.tbcback.tbcback.user.dto;
+package com.tbcback.tbcback.login.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

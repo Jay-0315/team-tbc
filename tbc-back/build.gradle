@@ -25,10 +25,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // OAuth2 Client (이번 에러 해결 포인트)
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-
     // JWT (jjwt)
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly  'io.jsonwebtoken:jjwt-impl:0.11.5'
@@ -36,15 +32,15 @@ dependencies {
 
     // DB Driver
     runtimeOnly  'com.mysql:mysql-connector-j:8.4.0'
-    // (옵션) 로컬 테스트용 H2
-    // runtimeOnly 'com.h2database:h2:2.3.232'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

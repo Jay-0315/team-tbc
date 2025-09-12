@@ -1,10 +1,8 @@
-package com.tbcback.tbcback.user.service;
+package com.tbcback.tbcback.login.domain;
 
-import com.tbcback.tbcback.user.dto.SignupRequest;
-import com.tbcback.tbcback.user.entity.RefreshToken;
-import com.tbcback.tbcback.user.entity.User;
-import com.tbcback.tbcback.user.repository.RefreshTokenRepository;
-import com.tbcback.tbcback.user.repository.UserRepository;
+import com.tbcback.tbcback.login.dto.SignupRequest;
+import com.tbcback.tbcback.login.adapter.out.persistence.RefreshTokenRepository;
+import com.tbcback.tbcback.login.adapter.out.persistence.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,8 +35,10 @@ public class UserService {
     public User signup(SignupRequest request) {
         String email = normalizeEmail(request.getEmail());
 
-        if (userRepository.existsByEmail(email)) throw new IllegalArgumentException("이미 사용 중인 이메일입니다");
-        if (userRepository.existsByNickname(request.getNickname())) throw new IllegalArgumentException("이미 사용 중인 닉네임입니다");
+        if (userRepository.existsByEmail(email))
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다");
+        if (userRepository.existsByNickname(request.getNickname()))
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다");
 
         User user = User.of(
                 email,
@@ -119,22 +119,6 @@ public class UserService {
         return userRepository.findByNickname(nickname);
     }
 
-    @Transactional
-    public void processFindUsername(String email) {
-        String normalizedEmail = normalizeEmail(email);
-        userRepository.findByEmail(normalizedEmail).ifPresent(user -> {
-            // TODO: 이메일 발송 로직
-        });
-    }
-
-    @Transactional
-    public void processPasswordReset(String email) {
-        String normalizedEmail = normalizeEmail(email);
-        userRepository.findByEmail(normalizedEmail).ifPresent(user -> {
-            // TODO: 비밀번호 재설정 이메일 로직
-        });
-    }
-
     @Transactional(readOnly = true)
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(normalizeEmail(email));
@@ -143,11 +127,5 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean isNicknameAvailable(String nickname) {
         return !userRepository.existsByNickname(nickname);
-    }
-
-
-    @Transactional(readOnly = true)
-    public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
     }
 }
