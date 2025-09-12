@@ -1,0 +1,19 @@
+FROM node:20
+
+WORKDIR /app
+
+# package.json과 lock 파일만 먼저 복사 (캐시 활용)
+COPY package*.json ./
+
+# 의존성 설치
+RUN npm install
+
+# 나머지 소스 복사
+COPY . .
+
+# Vite 개발 서버 포트
+EXPOSE 5173
+
+# 컨테이너 실행 시 Vite dev 서버 실행
+CMD ["npm", "run", "dev", "--", "--host"]
+
