@@ -7,21 +7,29 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    "baseUrl": ".",
+    "paths": {"@/*": ["src/*"]},
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+
+    /* JSX → React 17+ 자동 변환 */
     "jsx": "react-jsx",
 
-    /* Linting */
+    /* React + Vite + Tailwind 타입 */
+    "types": ["vite/client", "react", "react-dom", "tailwindcss"],
+
+    /* Linting / 안전 */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "resolveJsonModule": true
   },
   "include": ["src"]
 }
+
