@@ -1,28 +1,28 @@
-import { useState } from 'react'
-import Header from './components/Header'
-import LoginModal from './modals/LoginModal'
-import SignupModal from './modals/SignupModal'
-import FindAccountModal from './modals/FindAccountModal'
+import { useState } from "react";
+import ChatRoom from "@/components/ChatRoom";
+import CreateWizard from "@/pages/groups/CreateWizard";
 
 export default function App() {
-    const [openLogin, setOpenLogin] = useState(false)
-    const [openSignup, setOpenSignup] = useState(false)
-    const [openFind, setOpenFind] = useState(false)
+    const [roomId, setRoomId] = useState<number | null>(null);
+    const [groupId, setGroupId] = useState<number | null>(null);
+
+    // (임시) 로그인 유저 ID. 실제로는 JWT/세션에서 받아 쓰세요.
+    const [userId] = useState<number>(1);
+
+    if (roomId && groupId) {
+        return <ChatRoom roomId={roomId} userId={userId} />;
+    }
 
     return (
-        <div className="page">
-            <Header
-                onOpenLogin={() => setOpenLogin(true)}
-                onOpenSignup={() => setOpenSignup(true)}
-            />
-            {/* ... 나머지 동일 */}
-            <LoginModal
-                isOpen={openLogin}
-                onClose={() => setOpenLogin(false)}
-                onOpenFind={() => setOpenFind(true)}
-            />
-            <SignupModal isOpen={openSignup} onClose={() => setOpenSignup(false)} />
-            <FindAccountModal isOpen={openFind} onClose={() => setOpenFind(false)} />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+            <div className="w-full max-w-3xl">
+                <CreateWizard
+                    onCreated={(gId, rId) => {
+                        setGroupId(gId);
+                        setRoomId(rId);
+                    }}
+                />
+            </div>
         </div>
-    )
+    );
 }
