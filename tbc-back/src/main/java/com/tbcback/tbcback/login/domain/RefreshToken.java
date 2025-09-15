@@ -2,12 +2,14 @@ package com.tbcback.tbcback.login.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Entity
+@Table(name = "refresh_token")
 @Getter
 @NoArgsConstructor
 public class RefreshToken {

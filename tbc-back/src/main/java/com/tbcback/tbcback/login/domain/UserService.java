@@ -1,8 +1,8 @@
 package com.tbcback.tbcback.login.domain;
 
 import com.tbcback.tbcback.login.dto.SignupRequest;
-import com.tbcback.tbcback.login.adapter.out.persistence.RefreshTokenRepository;
 import com.tbcback.tbcback.login.adapter.out.persistence.UserRepository;
+import com.tbcback.tbcback.login.port.out.RefreshTokenRepositoryPort;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,11 +16,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepositoryPort refreshTokenRepository; // ✅ Port 의존
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       RefreshTokenRepository refreshTokenRepository,
+                       RefreshTokenRepositoryPort refreshTokenRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -78,7 +78,7 @@ public class UserService {
         RefreshToken refreshToken = RefreshToken.of(
                 jti, userId, normalizeEmail(email), expiresAt, false, Instant.now(), Instant.now()
         );
-        refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(refreshToken); // ✅ Port 사용
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +95,7 @@ public class UserService {
         refreshTokenRepository.findById(oldJti).ifPresent(rt -> {
             rt.setRevoked(true);
             rt.setUpdatedAt(Instant.now());
-            refreshTokenRepository.save(rt);
+            refreshTokenRepository.save(rt); // ✅ Port 사용
         });
         persistRefreshToken(newJti, userId, email, newExpiresAt);
     }
@@ -105,7 +105,7 @@ public class UserService {
         refreshTokenRepository.findById(jti).ifPresent(rt -> {
             rt.setRevoked(true);
             rt.setUpdatedAt(Instant.now());
-            refreshTokenRepository.save(rt);
+            refreshTokenRepository.save(rt); // ✅ Port 사용
         });
     }
 
