@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  tbc-back:
+    build: ./tbc-back
+    container_name: tbc-back
+    ports:
+      - "8080:8080"
+    networks:
+      - tbc-net
+
+  nginx:   # ✅ 반드시 services: 아래에 위치해야 함
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    container_name: tbc-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - tbc-back
+    networks:
+      - tbc-net
+
+networks:
+  tbc-net:
+    driver: bridge
+
