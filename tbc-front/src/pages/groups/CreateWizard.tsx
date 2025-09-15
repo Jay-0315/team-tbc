@@ -266,7 +266,7 @@ function Step2({
                             rows={3}
                             value={form.feeInfo ?? ""}
                             onChange={(e) => onChange("feeInfo", e.target.value)}
-                            placeholder="입금 계좌, 환불 조건 등"
+                            placeholder="호스트 수고비, 간식비 등"
                         />
                     </div>
                 </>

@@ -102,7 +102,7 @@ export default function ChatRoom({ roomId, userId }: Props) {
                     className="flex-1 border rounded-xl px-3 py-2"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") send(); }}
+                    onKeyUp={(e) => { if (e.key === "Enter") send(); }}
                     placeholder="메시지를 입력하세요"
                 />
                 <button
