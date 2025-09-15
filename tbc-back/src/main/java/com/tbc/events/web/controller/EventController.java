@@ -1,7 +1,7 @@
 package com.tbc.events.web.controller;
 
-import com.tbc.events.domain.EventStatus;
-import com.tbc.events.service.EventService;
+import com.tbc.events.domain.model.EventStatus;
+import com.tbc.events.application.facade.EventFacade;
 import com.tbc.events.web.dto.EventCardDTO;
 import com.tbc.events.web.dto.PageResponse;
 import com.tbc.events.web.dto.EventDetailDTO;
@@ -10,7 +10,6 @@ import com.tbc.events.web.dto.JoinReq;
 import com.tbc.events.web.dto.JoinRes;
 import com.tbc.events.web.dto.ReviewDTO;
 import com.tbc.events.web.dto.ReviewCreateReq;
-import com.tbc.events.service.ReviewService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -36,12 +35,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/events")
 public class EventController {
 
-    private final EventService eventService;
-    private final ReviewService reviewService;
+    private final EventFacade eventFacade;
 
-    public EventController(EventService eventService, ReviewService reviewService) {
-        this.eventService = eventService;
-        this.reviewService = reviewService;
+    public EventController(EventFacade eventFacade) {
+        this.eventFacade = eventFacade;
     }
 
     @GetMapping
@@ -65,7 +62,7 @@ public class EventController {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = PageResponse.class))),
             @ApiResponse(responseCode = "400", description = "요청 오류", content = @Content(
-                    schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class)))
+                    schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
     })
     public PageResponse<EventCardDTO> list(
             @RequestHeader(value = "X-User-Id", required = false) Long userId,
@@ -75,7 +72,7 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "CREATED_DESC") String sort,
             Pageable pageable
     ) {
-        Page<EventCardDTO> page = eventService.list(userId, q, category, status, sort, pageable);
+        Page<EventCardDTO> page = eventFacade.getEventList(q, category, status != null ? status.toString() : null, sort, pageable);
         return PageResponse.from(page);
     }
 
@@ -89,16 +86,14 @@ public class EventController {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = EventDetailDTO.class))),
             @ApiResponse(responseCode = "404", description = "미존재", content = @Content(
-                    schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class)))
+                    schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
     })
     public EventDetailDTO detail(
             @Parameter(name = "id", description = "이벤트 ID", example = "1")
             @PathVariable Long id,
             @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
-        // TODO favorited 계산/hostName/tags 실제 도메인화 예정
-        var event = eventService.getByIdOrThrow(id);
-        return EventDetailDTO.from(event, userId != null ? Boolean.FALSE : null, List.of("react","frontend"), "TEAM-TBC");
+        return eventFacade.getEventDetail(id);
     }
 
     @PostMapping("/{id}/favorite")
@@ -107,9 +102,9 @@ public class EventController {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = FavoriteResponse.class))),
             @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content(
-                    schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class))),
+                    schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "미존재", content = @Content(
-                    schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class)))
+                    schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
     })
     public FavoriteResponse toggleFavorite(
             @Parameter(name = "id", description = "이벤트 ID", example = "1")
@@ -117,8 +112,7 @@ public class EventController {
             @Parameter(name = "X-User-Id", description = "임시 로그인 사용자 ID(헤더)", required = true, example = "1")
             @RequestHeader(value = "X-User-Id", required = true) Long userId
     ) {
-        boolean favorited = eventService.toggleFavorite(userId, id);
-        return new FavoriteResponse(favorited);
+        return eventFacade.toggleFavorite(id, userId);
     }
 
     @GetMapping("/{id}/reviews")
@@ -138,13 +132,13 @@ public class EventController {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = PageResponse.class))),
             @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
     })
     public PageResponse<ReviewDTO> listReviews(
             @Parameter(name = "id", example = "1") @PathVariable Long id,
             Pageable pageable
     ) {
-        Page<ReviewDTO> page = reviewService.list(id, pageable);
+        Page<ReviewDTO> page = eventFacade.getEventReviews(id, pageable);
         return PageResponse.from(page);
     }
 
@@ -163,11 +157,11 @@ public class EventController {
             @ApiResponse(responseCode = "200", description = "후기 작성 성공",
                     content = @Content(schema = @Schema(implementation = ReviewDTO.class))),
             @ApiResponse(responseCode = "400", description = "검증 실패 (평점 범위, 댓글 길이 등)",
-                    content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "인증 필요 (X-User-Id 헤더 누락)",
-                    content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
     })
     public ReviewDTO createReview(
             @Parameter(name = "id", example = "1") @PathVariable Long id,
@@ -194,7 +188,7 @@ public class EventController {
             )
             @RequestBody @jakarta.validation.Valid ReviewCreateReq body
     ) {
-        return reviewService.create(userId, id, body);
+        return eventFacade.createEventReview(id, body, userId);
     }
 
     @PostMapping("/{id}/join")
@@ -202,10 +196,10 @@ public class EventController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = JoinRes.class))),
-            @ApiResponse(responseCode = "400", description = "검증 실패", content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "미존재", content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "좌석 부족 등", content = @Content(schema = @Schema(implementation = com.tbc.events.support.GlobalExceptionHandler.ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "검증 실패", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "미존재", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "좌석 부족 등", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
     })
     public JoinRes join(
             @Parameter(name = "id", description = "이벤트 ID", example = "1")
@@ -216,9 +210,6 @@ public class EventController {
                     content = @Content(schema = @Schema(implementation = JoinReq.class)))
             @RequestBody @jakarta.validation.Valid JoinReq body
     ) {
-        return eventService.join(userId, id, body.getQty());
+        return eventFacade.joinEvent(id, body);
     }
 }
-
-
-

@@ -1,7 +1,7 @@
-package com.tbc.events.repo;
+package com.tbc.events.domain.repository;
 
-import com.tbc.events.domain.Favorite;
-import com.tbc.events.domain.FavoriteId;
+import com.tbc.events.domain.model.Favorite;
+import com.tbc.events.domain.model.FavoriteId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FavoriteRepo extends JpaRepository<Favorite, FavoriteId> {

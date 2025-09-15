@@ -1,4 +1,4 @@
-package com.tbc.events.support;
+package com.tbc.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

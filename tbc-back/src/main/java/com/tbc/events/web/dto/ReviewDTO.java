@@ -1,6 +1,6 @@
 package com.tbc.events.web.dto;
 
-import com.tbc.events.domain.EventReview;
+import com.tbc.events.domain.model.EventReview;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;

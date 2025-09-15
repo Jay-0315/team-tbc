@@ -1,9 +1,9 @@
-package com.tbc.events.service;
+package com.tbc.events.application.service;
 
-import com.tbc.events.domain.Event;
-import com.tbc.events.domain.EventReview;
-import com.tbc.events.repo.EventRepo;
-import com.tbc.events.repo.EventReviewRepo;
+import com.tbc.events.domain.model.Event;
+import com.tbc.events.domain.model.EventReview;
+import com.tbc.events.domain.repository.EventRepo;
+import com.tbc.events.domain.repository.EventReviewRepo;
 import com.tbc.events.web.dto.ReviewCreateReq;
 import com.tbc.events.web.dto.ReviewDTO;
 import org.springframework.data.domain.Page;

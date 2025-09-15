@@ -1,9 +1,9 @@
-package com.tbc.events.service;
+package com.tbc.events.application.service;
 
-import com.tbc.events.domain.EventStatus;
-import com.tbc.events.domain.Event;
-import com.tbc.events.repo.EventRepo;
-import com.tbc.events.repo.FavoriteRepo;
+import com.tbc.events.domain.model.EventStatus;
+import com.tbc.events.domain.model.Event;
+import com.tbc.events.domain.repository.EventRepo;
+import com.tbc.events.domain.repository.FavoriteRepo;
 import com.tbc.events.web.dto.EventCardDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,7 +70,7 @@ public class EventService {
             favoriteRepo.deleteByUserIdAndEventId(userId, eventId);
             return false;
         } else {
-            favoriteRepo.save(new com.tbc.events.domain.Favorite(userId, eventId));
+            favoriteRepo.save(new com.tbc.events.domain.model.Favorite(userId, eventId));
             return true;
         }
     }

@@ -1,6 +1,6 @@
-package com.tbc.events.repo;
+package com.tbc.events.domain.repository;
 
-import com.tbc.events.domain.EventReview;
+import com.tbc.events.domain.model.EventReview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

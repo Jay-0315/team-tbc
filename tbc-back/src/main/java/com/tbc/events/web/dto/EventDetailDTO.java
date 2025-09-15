@@ -1,7 +1,7 @@
 package com.tbc.events.web.dto;
 
-import com.tbc.events.domain.Event;
-import com.tbc.events.domain.EventStatus;
+import com.tbc.events.domain.model.Event;
+import com.tbc.events.domain.model.EventStatus;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 

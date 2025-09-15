@@ -1,10 +1,10 @@
-package com.tbc.events.support;
+package com.tbc.infrastructure.config;
 
-import com.tbc.events.domain.Event;
-import com.tbc.events.domain.EventReview;
-import com.tbc.events.domain.EventStatus;
-import com.tbc.events.repo.EventRepo;
-import com.tbc.events.repo.EventReviewRepo;
+import com.tbc.events.domain.model.Event;
+import com.tbc.events.domain.model.EventReview;
+import com.tbc.events.domain.model.EventStatus;
+import com.tbc.events.domain.repository.EventRepo;
+import com.tbc.events.domain.repository.EventReviewRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

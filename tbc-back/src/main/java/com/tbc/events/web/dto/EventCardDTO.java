@@ -1,8 +1,8 @@
 package com.tbc.events.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.tbc.events.domain.Event;
-import com.tbc.events.domain.EventStatus;
+import com.tbc.events.domain.model.Event;
+import com.tbc.events.domain.model.EventStatus;
 
 import java.time.Instant;
 import java.time.ZoneOffset;

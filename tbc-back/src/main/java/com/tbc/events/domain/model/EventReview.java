@@ -1,4 +1,4 @@
-package com.tbc.events.domain;
+package com.tbc.events.domain.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
