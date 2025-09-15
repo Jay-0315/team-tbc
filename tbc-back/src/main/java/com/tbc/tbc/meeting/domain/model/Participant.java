@@ -1,6 +1,6 @@
-package com.tbc.meeting.domain.model;
+package com.tbc.tbc.meeting.domain.model;
 
-import com.tbc.tbc.common.BaseTimeEntity; // ✅ 공통 엔티티 상속
+import com.tbc.tbc.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

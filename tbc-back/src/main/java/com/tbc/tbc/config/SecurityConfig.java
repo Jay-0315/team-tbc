@@ -30,7 +30,8 @@ public class SecurityConfig {
                                 "/actuator/**",
                                 "/monitoring/**",
                                 "/admin/**",
-                                "/error"
+                                "/error",
+                                "/meetings/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

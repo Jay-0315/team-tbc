@@ -31,8 +31,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    // WebSocket + STOMP + MessageMapping 지원
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-    // ✅ MySQL 드라이버 (Spring Boot 3.x 권장)
+    // MySQL 드라이버 (Spring Boot 3.x 권장)
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
 
     compileOnly 'org.projectlombok:lombok'
@@ -47,7 +49,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// ✅ plain.jar 생성 방지
+// plain.jar 생성 방지
 tasks.named('jar') {
     enabled = false
 }
