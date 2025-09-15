@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: tbc
+  jackson:
+    time-zone: UTC
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  profiles:
+    group:
+      local: local
+
+server:
+  tomcat:
+    threads:
+      max: 200
+  compression:
+    enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: warn
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /v3/api-docs
+  override-with-generic-response: false
+
+app:
+  seed: false
+  seed.always: false
+  seed.reviews: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
