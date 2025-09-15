@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# ====== tbc-front ======
+tbc-front/index.html
+tbc-front/package-lock.json
+tbc-front/package.json
+tbc-front/src/App.tsx
+tbc-front/src/index.css
+tbc-front/src/main.tsx
+tbc-front/tsconfig.app.json
+tbc-front/tsconfig.json
+tbc-front/tsconfig.node.json
+tbc-front/vite.config.ts

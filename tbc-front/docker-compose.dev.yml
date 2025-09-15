@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Next.js 개발 서버
+  nextjs-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: tbc-frontend-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_BASE=http://localhost/api
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - api
+    networks:
+      - tbc-network
+    restart: unless-stopped
+
+  # 백엔드 API (개발용)
+  api:
+    build:
+      context: ../tbc-back  # 백엔드 프로젝트 경로로 수정
+      dockerfile: Dockerfile
+    container_name: tbc-backend-dev
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8080
+    networks:
+      - tbc-network
+    restart: unless-stopped
+
+  # Nginx 프록시 (개발용)
+  nginx:
+    image: nginx:alpine
+    container_name: tbc-nginx-dev
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - nextjs-dev
+      - api
+    networks:
+      - tbc-network
+    restart: unless-stopped
+
+networks:
+  tbc-network:
+    driver: bridge
