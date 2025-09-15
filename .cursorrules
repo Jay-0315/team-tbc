@@ -70,13 +70,83 @@
 - Empty: 명확한 안내 문구
 - 폼/버튼/모달 등 핵심 컴포넌트는 ui 래퍼로 일관성 유지
 
-############################################################
-## 3) 백엔드 (Spring Boot)
-############################################################
-- Java 21, Gradle → bootJar → Dockerfile로 실행.
-- 프로필 분리: dev/prod (DB, CORS, 로그레벨)
-- /actuator/health 노출(선택) → Nginx 헬스 프록시 가능.
-- MySQL 드라이버/연결은 build.gradle 및 application*.yml로 관리.
+  ############################################################
+ ## 3) 백엔드 (Spring Boot)
+ ############################################################
+ - Java 21, Gradle → bootJar → Dockerfile로 실행.
+ - 프로필 분리: dev/prod (DB, CORS, 로그레벨)
+ - /actuator/health 노출(선택) → Nginx 헬스 프록시 가능.
+ - MySQL 드라이버/연결은 build.gradle 및 application*.yml로 관리.
+ 
+-### 아키텍처 원칙
+-- 모든 도메인은 **헥사고날 아키텍처 + 파사드 패턴**으로 구성한다.
+-- 기본 계층 구조:
+-  - domain: model(엔티티), repository(인터페이스), service(순수 로직)
+-  - application: service(유스케이스), facade(외부 인터페이스 단위로 서비스 묶음)
+-  - infrastructure: repository 구현체(JPA 등), config(Spring 설정), adapter(외부 API)
+-  - interface: web/controller, dto, mapper
+-  - common: exception, constants, utils
+-
+-### 서비스 단위 모듈 구조
+-- `com.tbc.<service>` 디렉토리 단위로 기능을 모듈화한다. (예: events, chat, login, main)
+-- 각 모듈은 동일한 구조를 가진다:
+-  ```
+-  com.tbc.<service>
+-   ├── domain
+-   │    ├── model
+-   │    ├── repository
+-   │    └── service
+-   ├── application
+-   │    ├── service
+-   │    └── facade
+-   ├── infrastructure
+-   │    └── repository
+-   └── interface
+-        └── web
+-             ├── controller
+-             ├── dto
+-             └── mapper
+-  ```
+-
+-### 코드 흐름 원칙
+-- Controller → Facade → Application Service → Domain Service/Repository → Infrastructure 구현체
+-- DTO는 interface/web/dto에만 존재하며 Domain 계층으로 침투하지 않는다.
+-- Facade는 반드시 여러 Application Service를 조합하거나 외부에 노출할 유스케이스 단위를 담당한다.
+-- 공통 관심사(예외, 시큐리티, 설정)는 `common` 또는 `infrastructure/config`에서 관리한다.
+-
+-### Branch Scope (중요)
+-- 리팩토링/파일이동/생성 요청이 오면, **현재 체크아웃 브랜치(SJ)에서만** 수행한다.
+-- dev 브랜치나 다른 브랜치의 파일/구조/설정은 절대 변경하지 않는다(참조만 가능).
+-
+-### 서비스 단위 모듈(헥사고날 + 파사드) 규칙
+-- `com.tbc.<service>` 단위로 모듈화(events, chat, login, main 등).
+-- 공통 구조:
+--  com.tbc.<service>/{domain(model,repository,service), application(service,facade), infrastructure(repository), interface/web(controller,dto,mapper)}
+-- 흐름 고정: Controller → Facade → Application Service → Domain(Service/Repository) → Infrastructure 구현체
+-- DTO는 interface/web/dto에만 위치(도메인 침투 금지).
+-- 공통 설정(SecurityConfig, OpenApiConfig, DataSeeder)은 `com.tbc.infrastructure.config` 또는 `com.tbc.common.*`에 배치.
++
++### 아키텍처 원칙 (헥사고날 + 파사드, SJ 브랜치 한정)
++- 모든 서비스 모듈은 `com.tbc.<service>` 단위(events, chat, login, main 등)로 구성한다.
++- 공통 구조:
++  ```
++  com.tbc.<service>
++   ├── domain       (model, repository, service[순수 로직])
++   ├── application  (service[유스케이스], facade[서비스 묶음])
++   ├── infrastructure (repository 구현체, adapter)
++   └── interface/web (controller, dto, mapper)
++  ```
++- 흐름 고정: Controller → Facade → Application Service → Domain(Service/Repository) → Infrastructure 구현체
++- DTO는 `interface/web/dto`에만 위치하며 Domain 계층으로 침투하지 않는다.
++- Facade는 반드시 여러 Application Service를 조합하거나 외부 유스케이스 단위를 담당한다.
++- 공통 관심사(SecurityConfig, OpenApiConfig, DataSeeder, 예외 핸들러 등)는
++  `com.tbc.infrastructure.config` 또는 `com.tbc.common.*`에 배치한다.
++
++### Branch Scope (중요)
++- 리팩토링/파일이동/생성은 **SJ 브랜치에서만** 수행한다.
++- dev 브랜치 및 다른 브랜치는 참조만 가능하고, 절대 변경하지 않는다.
+
+
 
 ############################################################
 ## 4) Nginx (Reverse Proxy)
