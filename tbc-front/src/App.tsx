@@ -5,9 +5,9 @@ function App() {
     <div style={{ padding: "2rem" }}>
       <h1>TBC Front - Toss Payments Test</h1>
       <PaymentButton
-        orderId="ORD-2025-09-05-0002"
-        amount={15000}
-        orderName="충전"
+        orderId={`ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`}
+        amount={50000}
+        orderName="테스트 결제"
         userId={1}
       />
     </div>
