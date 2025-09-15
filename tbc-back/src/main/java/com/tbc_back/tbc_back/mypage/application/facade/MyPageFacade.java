@@ -41,21 +41,35 @@ public class MyPageFacade {
         UserEntity u = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-        if (req.getName() != null) u.setName(req.getName());
-        if (req.getIntro() != null) u.setIntro(req.getIntro());
-        if (req.getProfileImage() != null) u.setProfileImage(req.getProfileImage());
+        // 닉네임(username) 수정 추가 ✅
+        if (req.getUsername() != null && !req.getUsername().isBlank()) {
+            u.setUsername(req.getUsername());
+        }
+
+        if (req.getName() != null && !req.getName().isBlank()) {
+            u.setName(req.getName());
+        }
+
+        if (req.getIntro() != null) {
+            u.setIntro(req.getIntro());
+        }
+
+        if (req.getProfileImage() != null) {
+            u.setProfileImage(req.getProfileImage());
+        }
 
         userRepo.save(u);
 
         return MyProfileDto.builder()
                 .userId(u.getId())
                 .email(u.getEmail())
-                .username(u.getUsername())
+                .username(u.getUsername())   // ✅ 변경된 닉네임 반환
                 .name(u.getName())
                 .profileImage(u.getProfileImage())
                 .intro(u.getIntro())
                 .build();
     }
+
 
     // 2) 지갑 요약
     public WalletSummaryDto getWalletSummary(Long userId) {
