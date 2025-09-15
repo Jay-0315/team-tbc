@@ -4,6 +4,8 @@ services:
   tbc-back:
     build: ./tbc-back
     container_name: tbc-back
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
     ports:
       - "8080:8080"
     networks:
