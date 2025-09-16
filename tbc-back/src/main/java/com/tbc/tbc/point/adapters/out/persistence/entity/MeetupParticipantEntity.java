@@ -3,6 +3,7 @@ package com.tbc.tbc.point.adapters.out.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.tbc.tbc.mypage.adapters.out.persistence.entity.UserEntity;
 
 import java.time.Instant;
 

@@ -9,6 +9,14 @@ export default defineConfig({
         target: 'http://localhost:8080', // 백엔드 서버 주소
         changeOrigin: true,
       },
+      '/payments': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/dev': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
   },
 })

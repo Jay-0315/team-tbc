@@ -1,4 +1,4 @@
-package com.tbc.tbc.point.adapters.out.persistence.entity;
+package com.tbc.tbc.mypage.adapters.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

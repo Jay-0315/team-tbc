@@ -1,11 +1,11 @@
-package com.tbc.tbc.application.facade;
+package com.tbc.tbc.point.application.facade;
 
-import com.tbc.tbc.application.port.in.DeductPointUseCase;
+import com.tbc.tbc.point.application.port.in.DeductPointUseCase;
 import com.tbc.tbc.point.domain.model.Meetup;
 import com.tbc.tbc.point.domain.repository.MeetupRepository;
 import com.tbc.tbc.point.adapters.out.persistence.MeetupParticipantPersistenceAdapter;
-import com.tbc.tbc.adapters.in.web.dto.ParticipantResponse;
-import com.tbc.tbc.application.exception.AlreadyJoinedException;
+import com.tbc.tbc.point.adapters.in.web.dto.ParticipantResponse;
+import com.tbc.tbc.point.application.exception.AlreadyJoinedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

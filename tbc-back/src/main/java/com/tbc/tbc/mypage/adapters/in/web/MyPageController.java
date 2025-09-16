@@ -5,6 +5,7 @@ import com.tbc.tbc.mypage.adapters.in.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,6 +27,26 @@ public class MyPageController {
     public ResponseEntity<MyProfileDto> updateProfile(@RequestParam Long userId,
                                                       @RequestBody UpdateProfileRequest req) {
         return ResponseEntity.ok(facade.updateProfile(userId, req));
+    }
+
+    // 프로필 이미지 업로드(개발 편의용): 파일 저장 후 URL 반환
+    @PostMapping(value = "/profile/image", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> uploadProfileImage(@RequestParam("file") MultipartFile file) throws Exception {
+        // 절대 경로 기반으로 저장 (user.dir/uploads/profile)
+        java.nio.file.Path dir = java.nio.file.Paths.get(System.getProperty("user.dir"), "uploads", "profile");
+        java.nio.file.Files.createDirectories(dir);
+
+        String safeName = file.getOriginalFilename() == null ? "image" : file.getOriginalFilename();
+        String filename = java.time.LocalDateTime.now().toString().replace(":","-") + "-" + safeName;
+        java.nio.file.Path path = dir.resolve(filename).toAbsolutePath();
+
+        // Part.write는 컨테이너 경로 기준이므로 직접 복사해 저장
+        try (java.io.InputStream in = file.getInputStream()) {
+            java.nio.file.Files.copy(in, path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        String url = "/uploads/profile/" + filename;
+        return ResponseEntity.ok(url);
     }
 
     // 지갑 요약

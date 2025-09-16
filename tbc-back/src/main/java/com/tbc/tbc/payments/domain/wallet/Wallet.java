@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-@Entity
-@Table(name="wallets", uniqueConstraints = @UniqueConstraint(columnNames="user_id"))
+@Entity @Table(name="wallets", uniqueConstraints = @UniqueConstraint(columnNames="user_id"))
 public class Wallet extends BaseTimeEntity {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

@@ -1,9 +1,9 @@
 package com.tbc.tbc.point.adapters.out.persistence;
 
-import com.tbc.tbc.adapters.in.web.dto.ParticipantResponse;
+import com.tbc.tbc.point.adapters.in.web.dto.ParticipantResponse;
 import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupParticipantEntity;
 import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupParticipantId;
-import com.tbc.tbc.adapters.out.persistence.jpa.SpringDataMeetupParticipantJpaRepository;
+import com.tbc.tbc.point.adapters.out.persistence.jpa.SpringDataMeetupParticipantJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

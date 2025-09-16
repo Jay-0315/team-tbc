@@ -1,4 +1,4 @@
-package com.tbc.tbc.application.exception;
+package com.tbc.tbc.point.application.exception;
 
 public class InsufficientPointsException extends RuntimeException {
     public InsufficientPointsException(String message) { super(message); }

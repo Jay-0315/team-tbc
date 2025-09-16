@@ -25,7 +25,15 @@ public class SecurityConfig {
                                 // Toss webhook (PG 서버 → 우리 서버 호출)
                                 "/payments/webhook/**",
                                 // 결제 API (프론트에서 직접 호출)
+                                "/payments",
                                 "/payments/**",
+                                // 앱 공개 API (개발용 허용)
+                                "/api/**",
+                                // 개발 편의용 크레딧 API
+                                "/dev/wallet/**",
+                                "/uploads/**",
+                                // 에러 핸들러 (예외 시 /error로 포워딩 되므로 허용)
+                                "/error",
                                 // Swagger / 문서
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                                 // Actuator (헬스체크, 모니터링)

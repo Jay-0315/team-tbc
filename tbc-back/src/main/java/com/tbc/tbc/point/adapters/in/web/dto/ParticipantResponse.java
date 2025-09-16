@@ -1,4 +1,4 @@
-package com.tbc.tbc.adapters.in.web.dto;
+package com.tbc.tbc.point.adapters.in.web.dto;
 
 import java.time.Instant;
 

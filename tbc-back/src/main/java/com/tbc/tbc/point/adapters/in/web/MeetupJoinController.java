@@ -1,10 +1,10 @@
-package com.tbc.tbc.adapters.in.web;
+package com.tbc.tbc.point.adapters.in.web;
 
-import com.tbc.tbc.application.exception.InsufficientPointsException;
-import com.tbc.tbc.application.exception.AlreadyJoinedException;
-import com.tbc.tbc.application.facade.MeetupJoinFacade;
-import com.tbc.tbc.adapters.in.web.dto.ParticipantResponse;
-import com.tbc.tbc.adapters.out.persistence.jpa.SpringDataMeetupJpaRepository;
+import com.tbc.tbc.point.application.exception.InsufficientPointsException;
+import com.tbc.tbc.point.application.exception.AlreadyJoinedException;
+import com.tbc.tbc.point.application.facade.MeetupJoinFacade;
+import com.tbc.tbc.point.adapters.in.web.dto.ParticipantResponse;
+import com.tbc.tbc.point.adapters.out.persistence.jpa.SpringDataMeetupJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;

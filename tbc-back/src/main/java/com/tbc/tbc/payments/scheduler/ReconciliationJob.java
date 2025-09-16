@@ -1,6 +1,6 @@
 package com.tbc.tbc.payments.scheduler;
 
-import com.tbc.tbc.payments.service.MonitoringService;
+import com.tbc.tbc.payments.application.service.MonitoringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,4 +1,4 @@
-package com.tbc.tbc.adapters.out.persistence.jpa;
+package com.tbc.tbc.point.adapters.out.persistence.jpa;
 
 import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupParticipantEntity;
 import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupParticipantId;

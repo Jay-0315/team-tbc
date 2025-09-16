@@ -1,7 +1,7 @@
-package com.tbc.tbc.adapters.out.persistence;
+package com.tbc.tbc.point.adapters.out.persistence;
 
 import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupEntity;
-import com.tbc.tbc.adapters.out.persistence.jpa.SpringDataMeetupJpaRepository;
+import com.tbc.tbc.point.adapters.out.persistence.jpa.SpringDataMeetupJpaRepository;
 import com.tbc.tbc.point.domain.model.Meetup;
 import com.tbc.tbc.point.domain.repository.MeetupRepository;
 import lombok.RequiredArgsConstructor;

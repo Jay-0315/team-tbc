@@ -1,11 +1,15 @@
 package com.tbc.tbc.mypage.application.facade;
 
-import com.tbc.tbc.point.adapters.out.persistence.entity.*;
+import com.tbc.tbc.mypage.adapters.out.persistence.entity.UserEntity;
 import com.tbc.tbc.mypage.adapters.in.web.dto.*;
 import com.tbc.tbc.mypage.adapters.out.persistence.jpa.*;
 import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupEntity;
-import com.tbc.tbc.adapters.out.persistence.jpa.SpringDataMeetupJpaRepository;
+import com.tbc.tbc.point.adapters.out.persistence.entity.MeetupParticipantEntity;
+import com.tbc.tbc.point.adapters.out.persistence.jpa.SpringDataMeetupJpaRepository;
+import com.tbc.tbc.payments.domain.wallet.Wallet;
+import com.tbc.tbc.payments.domain.wallet.WalletLedger;
 import lombok.RequiredArgsConstructor;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
@@ -73,8 +77,11 @@ public class MyPageFacade {
 
     // 2) 지갑 요약
     public WalletSummaryDto getWalletSummary(Long userId) {
-        WalletEntity w = walletRepo.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Wallet not found for user: " + userId));
+        Wallet w = walletRepo.findByUserId(userId)
+                .orElseGet(() -> walletRepo.save(Wallet.builder()
+                        .userId(userId)
+                        .balance(0L)
+                        .build()));
 
         return WalletSummaryDto.builder()
                 .walletId(w.getId())
@@ -84,25 +91,28 @@ public class MyPageFacade {
 
     // 3) 거래내역 (페이징)
     public PagedResponse<WalletTxnDto> getWalletTxns(Long userId, int page, int size) {
-        WalletEntity w = walletRepo.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Wallet not found for user: " + userId));
+        Wallet w = walletRepo.findByUserId(userId)
+                .orElseGet(() -> walletRepo.save(Wallet.builder()
+                        .userId(userId)
+                        .balance(0L)
+                        .build()));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<WalletTransactionEntity> p = txnRepo.findByWalletIdOrderByCreatedAtDesc(w.getId(), pageable);
+        Page<WalletLedger> p = txnRepo.findByWalletIdOrderByCreatedAtDesc(w.getId(), pageable);
 
         List<WalletTxnDto> content = p.getContent().stream()
                 .map(tx -> WalletTxnDto.builder()
                         .id(tx.getId())
-                        .type(tx.getType())
+                        .type(tx.getType().name())
                         .status(tx.getReason())
                         .amountPoints(tx.getAmount())
-                        .meetupId(tx.getRefId())          // 이제 String으로 맞춰줌
+                        .meetupId(tx.getRefId())
                         .externalRef(tx.getIdempotencyKey())
                         .description(tx.getReason())
-                        .createdAt(tx.getCreatedAt())
+                        .createdAt(tx.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
                         .build()
                 )
-                .collect(Collectors.toList());   // ✅ 타입 안정적
+                .collect(Collectors.toList());
 
         return PagedResponse.<WalletTxnDto>builder()
                 .content(content)

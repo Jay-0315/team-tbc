@@ -1,12 +1,12 @@
-package com.tbc.tbc.application.service;
+package com.tbc.tbc.point.application.service;
 
-import com.tbc.tbc.application.exception.InsufficientPointsException;
-import com.tbc.tbc.application.port.in.DeductPointUseCase;
+import com.tbc.tbc.point.application.exception.InsufficientPointsException;
+import com.tbc.tbc.point.application.port.in.DeductPointUseCase;
 import com.tbc.tbc.payments.domain.wallet.LedgerType;
 import com.tbc.tbc.payments.domain.wallet.Wallet;
 import com.tbc.tbc.payments.domain.wallet.WalletLedger;
-import com.tbc.tbc.payments.repository.WalletLedgerRepository;
-import com.tbc.tbc.payments.repository.WalletRepository;
+import com.tbc.tbc.payments.adapter.out.persistence.WalletLedgerRepository;
+import com.tbc.tbc.payments.adapter.out.persistence.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +25,12 @@ public class DeductPointService implements DeductPointUseCase {
             throw new IllegalArgumentException("amountPoints must be positive");
         }
 
-        // 1) 사용자 지갑 조회 (for update → 동시성 제어)
+        // 1) 사용자 지갑 조회 (for update → 동시성 제어). 없으면 0원 지갑 생성
         Wallet wallet = walletRepo.findByUserIdForUpdate(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Wallet not found for user: " + userId));
+                .orElseGet(() -> walletRepo.save(Wallet.builder()
+                        .userId(userId)
+                        .balance(0L)
+                        .build()));
 
         // 2) 잔액 확인
         if (wallet.getBalance() < amountPoints) {
