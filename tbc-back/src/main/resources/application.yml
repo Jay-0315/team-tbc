@@ -10,6 +10,11 @@ server:
         secure: false
         same-site: none
         http-only: true
+  tomcat:
+    threads:
+      max: 200
+  compression:
+    enabled: true
 
 spring:
   application:
@@ -33,18 +38,9 @@ spring:
   sql:
     init:
       mode: never
-        jdbc:
-          time_zone: UTC
   profiles:
     group:
       local: local
-
-server:
-  tomcat:
-    threads:
-      max: 200
-  compression:
-    enabled: true
 
 logging:
   level:
@@ -56,6 +52,7 @@ jwt:
   secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET_64+_CHARS
   access-expiration-minutes: 15
   refresh-expiration-days: 14
+
 springdoc:
   swagger-ui:
     path: /swagger-ui
@@ -73,16 +70,6 @@ app:
   seed.always: false
   seed.reviews: false
 
----
-spring:
-  config:
-    activate:
-      on-profile: local
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
 management:
   endpoints:
     web:
@@ -95,3 +82,13 @@ management:
 chat:
   max-content-length: 1000
   max-qps-per-session: 10
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
