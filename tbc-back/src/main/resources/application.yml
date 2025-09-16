@@ -12,6 +12,10 @@ server:
         http-only: true
 
 spring:
+  application:
+    name: tbc
+  jackson:
+    time-zone: UTC
   datasource:
     url: jdbc:mysql://192.168.219.70:3306/tbc_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -29,16 +33,35 @@ spring:
   sql:
     init:
       mode: never
+        jdbc:
+          time_zone: UTC
+  profiles:
+    group:
+      local: local
+
+server:
+  tomcat:
+    threads:
+      max: 200
+  compression:
+    enabled: true
 
 logging:
   level:
     org.springframework.web.socket: DEBUG
     org.springframework.web.socket.server: DEBUG
+    org.hibernate.SQL: warn
 
 jwt:
   secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET_64+_CHARS
   access-expiration-minutes: 15
   refresh-expiration-days: 14
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /v3/api-docs
+  override-with-generic-response: false
 
 app:
   cookie:
@@ -46,6 +69,19 @@ app:
     same-site: None
     access-name: access
     refresh-name: refresh
+  seed: false
+  seed.always: false
+  seed.reviews: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
 management:
   endpoints:

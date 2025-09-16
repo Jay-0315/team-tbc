@@ -7,10 +7,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 dist-ssr
 *.local
+
+# Next.js build outputs
+.next
+out
 
 # Editor directories and files
 .vscode/*
@@ -23,15 +30,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# ====== tbc-front ======
-tbc-front/index.html
-tbc-front/package-lock.json
-tbc-front/package.json
-tbc-front/src/App.tsx
-tbc-front/src/index.css
-tbc-front/src/main.tsx
-tbc-front/tsconfig.app.json
-tbc-front/tsconfig.json
-tbc-front/tsconfig.node.json
-tbc-front/vite.config.ts
+# Backup files
+*.backup
