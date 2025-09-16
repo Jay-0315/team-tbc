@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean build -x test
+RUN ./gradlew clean build -x test --refresh-dependencies
 
 # 2. 실행 단계
 FROM eclipse-temurin:21-jre
