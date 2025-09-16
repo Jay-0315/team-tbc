@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -37,4 +38,17 @@ public class UserEntity {
 
     @Column(name = "intro")
     private String intro;
+
+    // --- 추가 필드 ---
+    @Column(name = "phone", length = 20, unique = true)
+    private String phone;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
+
+    public enum Gender { F, M }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
 }

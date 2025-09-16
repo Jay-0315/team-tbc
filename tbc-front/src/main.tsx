@@ -12,25 +12,34 @@ import MyPage from "./pages/MyPage";
 import ProfileEditPage from "./pages/ProfileEditPage";
 import PaymentHistoryPage from "./pages/PaymentHistoryPage";
 import SettingsPage from "./pages/SettingsPage";
+import EventsPage from "./pages/EventsPage";
+import EventDetailPage from "./pages/EventDetailPage";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const qc = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route index element={<div style={{ padding: 20 }}>테스트 화면으로 이동하세요.</div>} />
-          <Route path="topup" element={<TopupPage />} />
-          <Route path="join" element={<JoinMeetupPage />} />
-          <Route path="wallet" element={<WalletPage />} />
-          <Route path="mypage" element={<MyPage />} />
-          <Route path="profile/edit" element={<ProfileEditPage />} />
-          <Route path="payments/history" element={<PaymentHistoryPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="payments/success" element={<Success />} />
-          <Route path="payments/fail" element={<Fail />} />
-          <Route path="monitoring" element={<MonitoringUi />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={qc}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />}>
+            <Route index element={<EventsPage />} />
+            <Route path="events" element={<EventsPage />} />
+            <Route path="event/:id" element={<EventDetailPage />} />
+            <Route path="topup" element={<TopupPage />} />
+            <Route path="join" element={<JoinMeetupPage />} />
+            <Route path="wallet" element={<WalletPage />} />
+            <Route path="mypage" element={<MyPage />} />
+            <Route path="profile/edit" element={<ProfileEditPage />} />
+            <Route path="payments/history" element={<PaymentHistoryPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="payments/success" element={<Success />} />
+            <Route path="payments/fail" element={<Fail />} />
+            <Route path="monitoring" element={<MonitoringUi />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   </React.StrictMode>
 );

@@ -16,7 +16,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class MeetupParticipantId implements Serializable {
 
-    @Column(name = "meetup_id")
+    @Column(name = "meeting_id")
     private Long meetupId;   // 🔥 String → Long
 
     @Column(name = "user_id")

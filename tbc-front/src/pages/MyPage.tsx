@@ -15,17 +15,6 @@ type WalletSummary = {
   balancePoints: number;
 };
 
-type WalletTxn = {
-  id: number;
-  type: string;
-  status?: string;
-  amountPoints: number;
-  meetupId?: string;
-  externalRef?: string;
-  description?: string;
-  createdAt: string;
-};
-
 export default function MyPage() {
   const [sp] = useSearchParams();
   const navigate = useNavigate();
@@ -34,7 +23,6 @@ export default function MyPage() {
   const [userId, setUserId] = useState<number>(initialUserId);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
-  const [txns, setTxns] = useState<WalletTxn[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -42,20 +30,16 @@ export default function MyPage() {
     setLoading(true);
     setError('');
     try {
-      const [pRes, wRes, tRes] = await Promise.all([
+      const [pRes, wRes] = await Promise.all([
         fetch(`/api/mypage/profile?userId=${userId}`),
         fetch(`/api/mypage/wallet?userId=${userId}`),
-        fetch(`/api/mypage/wallet/txns?userId=${userId}&page=0&size=10`),
       ]);
 
       if (!pRes.ok) throw new Error(await pRes.text());
       if (!wRes.ok) throw new Error(await wRes.text());
-      if (!tRes.ok) throw new Error(await tRes.text());
 
       setProfile(await pRes.json());
       setWallet(await wRes.json());
-      const t = await tRes.json();
-      setTxns(Array.isArray(t?.content) ? t.content : []);
     } catch (e: any) {
       setError(e.message || '로드 실패');
     } finally {
@@ -78,75 +62,138 @@ export default function MyPage() {
         background: '#fff',
         overflow: 'hidden',
       }}>
+        {/* 프로필 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', padding: 20, gap: 16, borderBottom: '1px solid #e9ecef' }}>
           {profile?.profileImage ? (
-            <img src={profile.profileImage} alt="profile" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover' }} />
+            <img src={profile.profileImage} alt="profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }} />
           ) : (
-            <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#e9ecef' }} />
+            <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#e9ecef' }} />
           )}
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>{profile?.username || '예시용'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{profile?.username || '사용자'}</div>
+              <span style={{ fontSize: 12, color: '#adb5bd' }}>웰컴 숏터뷰 미완료</span>
+            </div>
             <div style={{ color: '#868e96' }}>{profile?.email || ''}</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => navigate(`/profile/edit?userId=${userId}`)}>개인정보 수정</button>
             <button onClick={() => navigate(`/wallet?userId=${userId}`)}>내 카드 및 포인트</button>
             <button onClick={() => navigate(`/payments/history?userId=${userId}`)}>신청 및 결제 내역</button>
-            <button onClick={() => navigate(`/settings?userId=${userId}`)}>설정</button>
           </div>
         </div>
 
-        <div style={{ padding: 20 }}>
-          <div style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
-            <label>userId
-              <input
-                type="number"
-                value={userId}
-                onChange={(e) => setUserId(Number(e.target.value))}
-                style={{ marginLeft: 6 }}
-              />
-            </label>
-            <button onClick={loadAll} disabled={loading}>새로고침</button>
-            <div style={{ marginLeft: 'auto', fontWeight: 700 }}>
-              전체 보유 포인트: {wallet ? `${wallet.balancePoints.toLocaleString()}pt` : (loading ? '로딩중...' : '0pt')}
-            </div>
+        {/* 10분 웰컴 숏터뷰 CTA */}
+        <div style={{ padding: 40, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>
+          <div style={{ color: '#495057' }}>
+            지금 <b>10분 웰컴 숏터뷰</b>에 참여하고
+            <br />
+            하나뿐인 나의 커뮤니티 프로필을 받아 보세요!
           </div>
-
-          <div style={{ border: '1px solid #f1f3f5', borderRadius: 6, overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: '#f8f9fa' }}>
-                  <th style={{ textAlign: 'left', padding: 10, borderBottom: '1px solid #e9ecef' }}>거래ID</th>
-                  <th style={{ textAlign: 'left', padding: 10, borderBottom: '1px solid #e9ecef' }}>타입</th>
-                  <th style={{ textAlign: 'left', padding: 10, borderBottom: '1px solid #e9ecef' }}>금액</th>
-                  <th style={{ textAlign: 'left', padding: 10, borderBottom: '1px solid #e9ecef' }}>사유</th>
-                  <th style={{ textAlign: 'left', padding: 10, borderBottom: '1px solid #e9ecef' }}>일시</th>
-                </tr>
-              </thead>
-              <tbody>
-                {txns.length === 0 && (
-                  <tr>
-                    <td colSpan={5} style={{ padding: 12, color: '#868e96' }}>거래 내역이 없습니다.</td>
-                  </tr>
-                )}
-                {txns.map((t) => (
-                  <tr key={t.id}>
-                    <td style={{ padding: 10, borderBottom: '1px solid #f1f3f5' }}>{t.id}</td>
-                    <td style={{ padding: 10, borderBottom: '1px solid #f1f3f5' }}>{t.type}</td>
-                    <td style={{ padding: 10, borderBottom: '1px solid #f1f3f5' }}>{t.amountPoints.toLocaleString()}</td>
-                    <td style={{ padding: 10, borderBottom: '1px solid #f1f3f5' }}>{t.description || t.status || '-'}</td>
-                    <td style={{ padding: 10, borderBottom: '1px solid #f1f3f5' }}>{new Date(t.createdAt).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ marginTop: 16 }}>
+            <button
+              style={{ padding: '12px 20px', background: '#212529', color: '#fff', borderRadius: 8, border: 'none', fontWeight: 700 }}
+              onClick={() => alert('웰컴 숏터뷰 예약 화면으로 이동 (추후 연결)')}
+            >
+              10분 웰컴 숏터뷰 일정 잡기
+            </button>
           </div>
+          <div style={{ marginTop: 10 }}>
+            <button style={{ background: 'transparent', border: 'none', color: '#868e96', textDecoration: 'underline', cursor: 'pointer' }}
+              onClick={() => alert('웰컴 숏터뷰 안내 모달 (추후 구현)')}>
+              10분 웰컴 숏터뷰란?
+            </button>
+          </div>
+        </div>
 
-          {error && <div style={{ marginTop: 12, color: '#d6336c' }}>오류: {error}</div>}
+        {/* 빠른 이동 메뉴 */}
+        <div style={{ padding: 12 }}>
+          <div style={{ display: 'grid', gap: 0 }}>
+            <MenuItem label="개인 정보 수정" onClick={() => navigate(`/profile/edit?userId=${userId}`)} />
+            <MenuItem label="내 카드 및 포인트" onClick={() => navigate(`/wallet?userId=${userId}`)} />
+            <MenuItem label="신청 및 결제 내역" onClick={() => navigate(`/payments/history?userId=${userId}`)} />
+          </div>
         </div>
       </div>
+
+      {/* 나의 멤버십 */}
+      <section style={{ marginTop: 24 }}>
+        <h3 style={{ margin: '0 0 8px 0' }}>나의 멤버십</h3>
+        <div style={{ border: '1px solid #e9ecef', borderRadius: 8, background: '#fff', overflow: 'hidden' }}>
+          <div style={{ padding: 16, background: '#f8f9fa', color: '#868e96' }}>멤버십이 없습니다.</div>
+          <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontWeight: 700 }}>놀러가기</div>
+            <div style={{ color: '#868e96' }}>잔여 티켓 0개</div>
+          </div>
+          <div style={{ padding: 12, borderTop: '1px solid #e9ecef', textAlign: 'right' }}>
+            <button style={{ background: 'transparent', border: 'none', color: '#495057', textDecoration: 'underline', cursor: 'pointer' }}
+              onClick={() => navigate('/')}>
+              모임 구경하기
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 나의 모임 */}
+      <section style={{ marginTop: 24 }}>
+        <h3 style={{ margin: '0 0 8px 0' }}>나의 모임</h3>
+        <MyMeetupsEmpty />
+      </section>
+
+      {error && <div style={{ marginTop: 12, color: '#d6336c' }}>오류: {error}</div>}
     </div>
   );
 }
 
+
+function MenuItem({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        textAlign: 'left',
+        padding: '14px 12px',
+        border: 'none',
+        background: 'transparent',
+        borderTop: '1px solid #f1f3f5',
+        cursor: 'pointer',
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function MyMeetupsEmpty() {
+  const tabs = ['참여 중인 모임', '참여 종료된 모임', '내가 개설한 모임'];
+  const [active, setActive] = useState<number>(0);
+  return (
+    <div style={{ border: '1px solid #e9ecef', borderRadius: 8, background: '#fff', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #e9ecef' }}>
+        {tabs.map((t, idx) => (
+          <button
+            key={t}
+            onClick={() => setActive(idx)}
+            style={{
+              flex: 1,
+              padding: 12,
+              border: 'none',
+              background: active === idx ? '#fff' : '#f8f9fa',
+              fontWeight: active === idx ? 700 : 400,
+              cursor: 'pointer',
+              borderBottom: active === idx ? '2px solid #212529' : '2px solid transparent',
+            }}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <div style={{ color: '#495057', marginBottom: 16 }}>참여 중인 모임이 없어요.</div>
+        <button style={{ padding: '12px 20px', background: '#212529', color: '#fff', borderRadius: 8, border: 'none', fontWeight: 700 }}
+          onClick={() => (window.location.href = '/')}>정기모임 구경하기</button>
+      </div>
+    </div>
+  );
+}
 

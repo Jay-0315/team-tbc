@@ -38,6 +38,9 @@ public class MyPageFacade {
                 .name(u.getName())
                 .profileImage(u.getProfileImage())
                 .intro(u.getIntro())
+                .phone(u.getPhone())
+                .birthDate(u.getBirthDate())
+                .gender(u.getGender())
                 .build();
     }
 
@@ -62,6 +65,16 @@ public class MyPageFacade {
             u.setProfileImage(req.getProfileImage());
         }
 
+        if (req.getPhone() != null) {
+            u.setPhone(req.getPhone());
+        }
+        if (req.getBirthDate() != null) {
+            u.setBirthDate(req.getBirthDate());
+        }
+        if (req.getGender() != null) {
+            u.setGender(req.getGender());
+        }
+
         userRepo.save(u);
 
         return MyProfileDto.builder()
@@ -71,6 +84,9 @@ public class MyPageFacade {
                 .name(u.getName())
                 .profileImage(u.getProfileImage())
                 .intro(u.getIntro())
+                .phone(u.getPhone())
+                .birthDate(u.getBirthDate())
+                .gender(u.getGender())
                 .build();
     }
 

@@ -9,9 +9,9 @@ public interface SpringDataMeetupParticipantJpaRepository
         extends JpaRepository<MeetupParticipantEntity, MeetupParticipantId> {
 
     // 중복 참가 체크 (status != CANCELLED 인 Row가 있으면 이미 참가한 것으로 간주)
-    boolean existsByIdMeetupIdAndIdUserIdAndStatusNot(Long meetupId, Long userId, String status); // String → Long
+    boolean existsByIdMeetupIdAndIdUserIdAndStatusNot(Long meetupId, Long userId, String status);
 
     // 참가자 목록
-    List<MeetupParticipantEntity> findByIdMeetupId(Long meetupId); // String → Long
-    List<MeetupParticipantEntity> findByIdMeetupIdAndStatusNot(Long meetupId, String status); // String → Long
+    List<MeetupParticipantEntity> findByIdMeetupId(Long meetupId);
+    List<MeetupParticipantEntity> findByIdMeetupIdAndStatusNot(Long meetupId, String status);
 }
