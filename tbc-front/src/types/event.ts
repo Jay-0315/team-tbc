@@ -1,4 +1,4 @@
-import type { EventCardDTO, EventStatus } from '../features/events/types'
+import type { EventStatus } from '../features/events/types'
 
 // 페이지네이션 응답 타입
 export interface Page<T> {

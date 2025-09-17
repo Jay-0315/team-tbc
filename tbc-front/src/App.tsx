@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import Header from '@/components/Header'
-import HomePage from '@/app/page'
-import PostsPage from '@/app/posts/page'
-import NewPostPage from '@/app/posts/new/page'
-import PostDetailPage from '@/app/posts/[id]/page'
-import PostChatPage from '@/app/posts/[id]/chat/page'
+import HomePage from '@/pages/HomePage'
+import PostsPage from '@/pages/PostsPage'
+import NewPostPage from '@/pages/NewPostPage'
+import PostDetailPage from '@/pages/PostDetailPage'
+import PostChatPage from '@/pages/PostChatPage'
 
 export default function App() {
   const { user, isLoading } = useAuth()
@@ -34,8 +34,6 @@ export default function App() {
     <div className="min-h-screen bg-gray-50">
       <Header
         user={user || null}
-        onLoginSuccess={handleLoginSuccess}
-        onSignupSuccess={handleSignupSuccess}
         onLogout={handleLogout}
       />
       
