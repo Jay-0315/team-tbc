@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JpaParticipantRepository extends JpaRepository<Participant, Long>, ParticipantRepositoryPort {
+    boolean existsByUserIdAndMeetingIdAndStatusNot(Long userId, Long meetingId, Participant.Status status);
 }

@@ -70,7 +70,7 @@ export default function JoinMeetupPage() {
 
       // 에러 처리 분기
       if (res.status === 409) {
-        const reason = await res.text();
+        const reason = (await res.text()).trim();
         if (reason === 'INSUFFICIENT_POINTS') {
           let required: number | undefined;
           let balance: number | undefined;
@@ -95,6 +95,10 @@ export default function JoinMeetupPage() {
           setRequiredAmount(required ?? null);
           setCurrentBalance(balance ?? null);
           appendLog(`잔액 부족: 필요금액=${required ?? '?'} / 현재잔액=${balance ?? '?'}`);
+          return;
+        }
+        if (reason === 'ALREADY_JOINED') {
+          appendLog('이미 참가한 모임입니다.');
           return;
         }
         appendLog('join error: ' + reason);
