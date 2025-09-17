@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 export default function PostsPage() {
   const [page, setPage] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const { user, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
   const { data: postsData, isLoading, error } = usePosts(page, 12)
 
   const handleSearch = (e: React.FormEvent) => {

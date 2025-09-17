@@ -16,7 +16,6 @@ export function ChatRoom({ roomId, userId, roomName }: ChatRoomProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED')
-  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when new messages arrive

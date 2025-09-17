@@ -33,7 +33,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
-        user={user}
+        user={user || null}
         onLoginSuccess={handleLoginSuccess}
         onSignupSuccess={handleSignupSuccess}
         onLogout={handleLogout}
@@ -45,7 +45,7 @@ export default function App() {
             path="/" 
             element={
               <HomePage 
-                user={user}
+                user={user || null}
                 onOpenLogin={() => {}}
                 onOpenSignup={() => {}}
               />

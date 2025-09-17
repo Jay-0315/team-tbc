@@ -25,16 +25,6 @@ export default function Header({ user, onLogout, onLoginSuccess, onSignupSuccess
     }
   }
 
-  const handleLoginSuccess = () => {
-    setIsLoginModalOpen(false)
-    onLoginSuccess()
-  }
-
-  const handleSignupSuccess = () => {
-    setIsSignupModalOpen(false)
-    onSignupSuccess()
-  }
-
   return (
     <>
       <header className="site-header">
