@@ -1,6 +1,6 @@
-package com.tbcback.tbcback.login.port.out;
+package com.tbc.login.port.out;
 
-import com.tbcback.tbcback.login.domain.User;
+import com.tbc.login.domain.User;
 import java.util.Optional;
 
 public interface UserRepositoryPort {

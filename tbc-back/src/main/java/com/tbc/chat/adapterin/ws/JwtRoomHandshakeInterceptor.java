@@ -1,6 +1,6 @@
 package com.tbc.chat.adapterin.ws;
 
-import com.tbc.identity.jwt.JwtVerifier;             // 패키지 prefix com.back → com.tbc 로 맞추기
+import com.tbc.chat.jwt.JwtVerifier;             // 패키지 prefix com.back → com.tbc 로 맞추기
 import com.tbc.chat.domain.port.MembershipPort;      // 동일하게 com.tbc 로
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

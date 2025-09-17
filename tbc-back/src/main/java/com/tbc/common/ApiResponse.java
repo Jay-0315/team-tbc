@@ -1,4 +1,4 @@
-package com.tbcback.tbcback.common;
+package com.tbc.common;
 
 public class ApiResponse<T> {
     private final boolean success;

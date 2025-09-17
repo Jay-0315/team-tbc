@@ -1,6 +1,6 @@
-package com.tbcback.tbcback.login.adapter.out.persistence;
+package com.tbc.login.adapter.out.persistence;
 
-import com.tbcback.tbcback.login.domain.User;
+import com.tbc.login.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

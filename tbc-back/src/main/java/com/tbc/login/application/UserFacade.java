@@ -1,12 +1,12 @@
-package com.tbcback.tbcback.login.application;
+package com.tbc.login.application;
 
-import com.tbcback.tbcback.login.domain.User;
-import com.tbcback.tbcback.login.domain.UserService;
-import com.tbcback.tbcback.login.dto.LoginRequest;
-import com.tbcback.tbcback.login.dto.SignupRequest;
-import com.tbcback.tbcback.login.dto.SignupResponse;
-import com.tbcback.tbcback.login.dto.TokenPair;
-import com.tbcback.tbcback.login.adapter.out.security.JwtTokenProvider;
+import com.tbc.login.domain.User;
+import com.tbc.login.domain.UserService;
+import com.tbc.login.dto.LoginRequest;
+import com.tbc.login.dto.SignupRequest;
+import com.tbc.login.dto.SignupResponse;
+import com.tbc.login.dto.TokenPair;
+import com.tbc.login.adapter.out.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

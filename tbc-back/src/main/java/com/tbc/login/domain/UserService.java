@@ -1,8 +1,8 @@
-package com.tbcback.tbcback.login.domain;
+package com.tbc.login.domain;
 
-import com.tbcback.tbcback.login.dto.SignupRequest;
-import com.tbcback.tbcback.login.adapter.out.persistence.RefreshTokenRepository;
-import com.tbcback.tbcback.login.adapter.out.persistence.UserRepository;
+import com.tbc.login.dto.SignupRequest;
+import com.tbc.login.adapter.out.persistence.RefreshTokenRepository;
+import com.tbc.login.adapter.out.persistence.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
