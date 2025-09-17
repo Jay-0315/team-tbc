@@ -24,7 +24,6 @@ export const chatKeys = {
 export function useChat(roomId: number, userId: number) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED')
-  const [isTyping, setIsTyping] = useState(false)
 
   // Get chat history
   const { data: historyData, isLoading: isLoadingHistory } = useQuery({
@@ -98,7 +97,6 @@ export function useChat(roomId: number, userId: number) {
   return {
     messages,
     connectionState,
-    isTyping,
     isLoadingHistory,
     sendMessage,
     connect,

@@ -1,4 +1,4 @@
-import { Client, IMessage } from '@stomp/stompjs'
+import { Client, type IMessage } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 import type { ConnectionState, ChatMessage } from '@/types/chat'
 
@@ -63,11 +63,13 @@ class StompClientManager {
     // Add JWT token to connection headers
     // TODO: confirm if backend expects Authorization header or token query param
     // Based on JwtRoomHandshakeInterceptor, it supports both Authorization header and ?token= query param
-    this.client.connectHeaders = {
-      'Authorization': `Bearer ${token}`
-    }
+    if (this.client) {
+      this.client.connectHeaders = {
+        'Authorization': `Bearer ${token}`
+      }
 
-    this.client.activate()
+      this.client.activate()
+    }
   }
 
   disconnect() {

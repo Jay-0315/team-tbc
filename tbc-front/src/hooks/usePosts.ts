@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
-import type { Post, CreatePostRequest, PostListResponse, EventCardDTO } from '@/types/post'
+import type { Post, CreatePostRequest, PostListResponse } from '@/types/post'
 
 // Posts API functions
 const postsApi = {
