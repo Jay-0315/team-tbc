@@ -1,7 +1,13 @@
-import { useState } from "react"
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { PostCard } from '@/components/PostCard'
+import { usePosts } from '@/hooks/usePosts'
+import { useAuth } from '@/hooks/useAuth'
+import type { User } from '@/types/auth'
 
 type PageProps = {
-  user: { nickname?: string; realName?: string } | null
+  user: User | null
   onOpenLogin?: () => void
   onOpenSignup?: () => void
 }
@@ -14,15 +20,10 @@ type Banner = {
   imageUrl: string
 }
 
-// 게시글 타입
-type Post = {
-  id: number
-  title: string
-  author: string
-  imageUrl: string
-}
-
 export default function Page({ user, onOpenLogin, onOpenSignup }: PageProps) {
+  const { isAuthenticated } = useAuth()
+  const { data: postsData, isLoading: isLoadingPosts } = usePosts(0, 6) // Show first 6 posts on homepage
+  
   // 더미 배너 데이터 (무료 이미지 예시: unsplash)
   const [banners] = useState<Banner[]>([
     { id: 1, title: "이달의 추천 모임", desc: "새로운 친구들과 함께하세요!", imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
@@ -38,29 +39,6 @@ export default function Page({ user, onOpenLogin, onOpenSignup }: PageProps) {
 
   const handleNextBanner = () => {
     setBannerIndex(prev => (prev === banners.length - 1 ? 0 : prev + 1))
-  }
-
-  // 게시글 더미 데이터
-  const [posts] = useState<Post[]>([
-    { id: 1, title: "첫 번째 모임", author: "최재훈", imageUrl: "https://plus.unsplash.com/premium_photo-1722593856418-05d6d47eec59?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-    { id: 2, title: "맛있는 요리모임", author: "안두홍", imageUrl: "https://images.unsplash.com/photo-1533050487297-09b450131914?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-    { id: 3, title: "등산 같이 가요", author: "이성준", imageUrl: "https://images.unsplash.com/photo-1564284369929-026ba231f89b?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-    { id: 4, title: "스터디 그룹", author: "이상현", imageUrl: "https://plus.unsplash.com/premium_photo-1722944969837-25bf2385056a?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-    { id: 5, title: "캠핑 동호회", author: "반예진", imageUrl: "https://images.unsplash.com/photo-1501560379-05951a742668?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-    { id: 6, title: "독서모임", author: "스페이스씨엘", imageUrl: "https://plus.unsplash.com/premium_photo-1690957591806-95a2b81b1075?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-  ])
-
-  const [postIndex, setPostIndex] = useState(0)
-  const cardsPerPage = 4
-
-  const handlePrevPosts = () => {
-    setPostIndex(prev => Math.max(prev - cardsPerPage, 0))
-  }
-
-  const handleNextPosts = () => {
-    setPostIndex(prev =>
-      Math.min(prev + cardsPerPage, posts.length - cardsPerPage)
-    )
   }
 
   return (
@@ -84,7 +62,7 @@ export default function Page({ user, onOpenLogin, onOpenSignup }: PageProps) {
                   <div className="banner-overlay">
                     <h1 className="banner-title">{banner.title}</h1>
                     <p className="banner-desc">{banner.desc}</p>
-                    {!user ? (
+                    {!isAuthenticated ? (
                       <div className="banner-actions">
                         <button className="btn-primary btn-large" onClick={onOpenLogin}>
                           로그인 후 참여하기
@@ -96,8 +74,13 @@ export default function Page({ user, onOpenLogin, onOpenSignup }: PageProps) {
                     ) : (
                       <div className="banner-actions">
                         <span className="welcome-msg">
-                          환영합니다, {user.nickname || user.realName}님 🎉
+                          환영합니다, {user?.nickname || user?.realName}님 🎉
                         </span>
+                        <Link to="/posts/new">
+                          <button className="btn-primary btn-large">
+                            새 게시글 작성하기
+                          </button>
+                        </Link>
                       </div>
                     )}
                   </div>
@@ -114,34 +97,32 @@ export default function Page({ user, onOpenLogin, onOpenSignup }: PageProps) {
       <section className="post-section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title"></h2>
+            <h2 className="section-title">최신 게시글</h2>
+            <Link to="/posts">
+              <Button variant="outline">모든 게시글 보기</Button>
+            </Link>
           </div>
 
-          <div className="slider-wrapper">
-            <button className="slider-btn prev" onClick={handlePrevPosts}>&lt;</button>
-            <div className="slider">
-              <div
-                className="slider-track"
-                style={{
-                  transform: `translateX(-${(postIndex / cardsPerPage) * 100}%)`,
-                  width: `${(posts.length / cardsPerPage) * 100}%`,
-                }}
-              >
-                {posts.map(post => (
-                  <div key={post.id} className="post-card">
-                    <div className="post-image">
-                      <img src={post.imageUrl} alt={post.title} />
-                    </div>
-                    <div className="post-content">
-                      <h3 className="post-title">{post.title}</h3>
-                      <p className="post-author">작성자: {post.author}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {isLoadingPosts ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-lg">게시글을 불러오는 중...</div>
             </div>
-            <button className="slider-btn next" onClick={handleNextPosts}>&gt;</button>
-          </div>
+          ) : postsData?.content && postsData.content.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {postsData.content.slice(0, 6).map(post => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-gray-500 text-lg mb-4">아직 게시글이 없습니다</div>
+              {isAuthenticated && (
+                <Link to="/posts/new">
+                  <Button>첫 게시글 작성하기</Button>
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </>
