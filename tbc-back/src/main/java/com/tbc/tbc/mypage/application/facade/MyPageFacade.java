@@ -143,7 +143,7 @@ public class MyPageFacade {
     // 4) 내가 참가한 모임
     public PagedResponse<MyMeetupItemDto> getMyMeetups(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<MeetupParticipantEntity> p = participantRepo.findByIdUserIdOrderByJoinedAtDesc(userId, pageable);
+        Page<MeetupParticipantEntity> p = participantRepo.findByUserIdOrderByJoinedAtDesc(userId, pageable);
 
         List<MyMeetupItemDto> content = p.getContent().stream()
                 .map((MeetupParticipantEntity mp) -> MyMeetupItemDto.builder()
@@ -214,5 +214,59 @@ public class MyPageFacade {
                         .pricePoints(m.getPricePoints())
                         .build()
                 ).toList();
+    }
+
+    // 참여 중인 모임
+    public PagedResponse<MyMeetupItemDto> getActiveMeetups(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<MeetupParticipantEntity> p = participantRepo.findActiveByUser(userId, pageable);
+        List<MyMeetupItemDto> content = p.getContent().stream()
+                .map((MeetupParticipantEntity mp) -> MyMeetupItemDto.builder()
+                        .meetupId(mp.getMeetup().getId())
+                        .title(mp.getMeetup().getTitle())
+                        .startAt(mp.getMeetup().getStartAt())
+                        .endAt(mp.getMeetup().getEndAt())
+                        .role(mp.getRole())
+                        .participantStatus(mp.getStatus())
+                        .joinedAt(mp.getJoinedAt())
+                        .meetupStatus(mp.getMeetup().getStatus())
+                        .participantCount(mp.getMeetup().getParticipants().size())
+                        .pricePoints(mp.getMeetup().getPricePoints())
+                        .build()).toList();
+
+        return PagedResponse.<MyMeetupItemDto>builder()
+                .content(content)
+                .page(p.getNumber())
+                .size(p.getSize())
+                .totalElements(p.getTotalElements())
+                .totalPages(p.getTotalPages())
+                .build();
+    }
+
+    // 참여 종료된 모임
+    public PagedResponse<MyMeetupItemDto> getEndedMeetups(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<MeetupParticipantEntity> p = participantRepo.findEndedByUser(userId, pageable);
+        List<MyMeetupItemDto> content = p.getContent().stream()
+                .map((MeetupParticipantEntity mp) -> MyMeetupItemDto.builder()
+                        .meetupId(mp.getMeetup().getId())
+                        .title(mp.getMeetup().getTitle())
+                        .startAt(mp.getMeetup().getStartAt())
+                        .endAt(mp.getMeetup().getEndAt())
+                        .role(mp.getRole())
+                        .participantStatus(mp.getStatus())
+                        .joinedAt(mp.getJoinedAt())
+                        .meetupStatus(mp.getMeetup().getStatus())
+                        .participantCount(mp.getMeetup().getParticipants().size())
+                        .pricePoints(mp.getMeetup().getPricePoints())
+                        .build()).toList();
+
+        return PagedResponse.<MyMeetupItemDto>builder()
+                .content(content)
+                .page(p.getNumber())
+                .size(p.getSize())
+                .totalElements(p.getTotalElements())
+                .totalPages(p.getTotalPages())
+                .build();
     }
 }

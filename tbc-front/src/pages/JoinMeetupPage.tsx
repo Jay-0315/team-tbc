@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 
 export default function JoinMeetupPage() {
   const [userId, setUserId] = useState<number>(1);
-  const [meetupId, setMeetupId] = useState<number>(1);
+  const [meetupId, setMeetupId] = useState<number | null>(null);
   const [log, setLog] = useState<string>('');
   const navigate = useNavigate();
   const [requiredAmount, setRequiredAmount] = useState<number | null>(null);
   const [currentBalance, setCurrentBalance] = useState<number | null>(null);
+  const [openList, setOpenList] = useState<any[]>([]);
 
   // 항상 화면에 현재 잔액/필요 금액 표시: userId, meetupId 변경 시 조회
   useEffect(() => {
@@ -21,7 +22,13 @@ export default function JoinMeetupPage() {
 
         if (mounted && openRes.ok) {
           const list = await openRes.json();
-          const item = Array.isArray(list) ? list.find((m: any) => m.meetupId === meetupId) : undefined;
+          const deduped = Array.isArray(list)
+            ? Array.from(new Map(list.map((x: any) => [x.meetupId, x])).values())
+            : [];
+          setOpenList(deduped);
+          const selectedId = meetupId ?? (deduped.length > 0 ? deduped[0].meetupId : null);
+          if (meetupId == null && selectedId != null) setMeetupId(selectedId);
+          const item = deduped.find((m: any) => m.meetupId === selectedId);
           setRequiredAmount(item?.pricePoints ?? null);
         } else if (mounted) {
           setRequiredAmount(null);
@@ -48,6 +55,10 @@ export default function JoinMeetupPage() {
   const join = async () => {
     setLog('');
     try {
+      if (meetupId == null) {
+        appendLog('모임을 먼저 선택하세요.');
+        return;
+      }
       const res = await fetch(`/api/meetups/${meetupId}/join?userId=${userId}`, {
         method: 'POST'
       });
@@ -70,7 +81,9 @@ export default function JoinMeetupPage() {
             ]);
             if (openRes.ok) {
               const list = await openRes.json();
-              const item = Array.isArray(list) ? list.find((m: any) => m.meetupId === meetupId) : undefined;
+              const item = Array.isArray(list)
+                ? list.find((m: any) => m.meetupId === meetupId)
+                : undefined;
               required = item?.pricePoints;
             }
             if (walletRes.ok) {
@@ -132,8 +145,15 @@ export default function JoinMeetupPage() {
         <label>userId
           <input type="number" value={userId} onChange={e => setUserId(Number(e.target.value))} />
         </label>
-        <label>meetupId
-          <input type="number" value={meetupId} onChange={e => setMeetupId(Number(e.target.value))} />
+        <label>모임 선택
+          <select value={meetupId ?? ''} onChange={e => setMeetupId(e.target.value ? Number(e.target.value) : null)}>
+            {openList.length === 0 && <option value="">열린 모임 없음</option>}
+            {openList.map((m: any) => (
+              <option key={m.meetupId} value={m.meetupId}>
+                {m.title}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 

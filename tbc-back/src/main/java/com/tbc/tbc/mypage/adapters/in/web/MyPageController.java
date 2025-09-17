@@ -87,5 +87,23 @@ public class MyPageController {
     public ResponseEntity<List<MyMeetupItemDto>> openMeetups() {
         return ResponseEntity.ok(facade.getOpenMeetups());
     }
+
+    // 참여 중인 모임
+    @GetMapping("/my-meetups/active")
+    public ResponseEntity<PagedResponse<MyMeetupItemDto>> myActiveMeetups(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(facade.getActiveMeetups(userId, page, size));
+    }
+
+    // 참여 종료된 모임
+    @GetMapping("/my-meetups/ended")
+    public ResponseEntity<PagedResponse<MyMeetupItemDto>> myEndedMeetups(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(facade.getEndedMeetups(userId, page, size));
+    }
 }
 

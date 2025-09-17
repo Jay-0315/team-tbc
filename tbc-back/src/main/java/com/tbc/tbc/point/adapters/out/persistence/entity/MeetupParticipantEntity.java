@@ -8,17 +8,25 @@ import com.tbc.tbc.mypage.adapters.out.persistence.entity.UserEntity;
 import java.time.Instant;
 
 @Entity
-@Table(name = "meetup_participants")
+@Table(name = "meeting_participants")
 @Getter
 @Setter
 public class MeetupParticipantEntity {
 
-    @EmbeddedId
-    private MeetupParticipantId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "meeting_id", nullable = false)
+    private Long meetingId;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     // 🔥 모임 연관관계 (MeetupEntity)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meetup_id", insertable = false, updatable = false)
+    @JoinColumn(name = "meeting_id", insertable = false, updatable = false)
     private MeetupEntity meetup;
 
     // 🔥 유저 연관관계 (UserEntity)
@@ -27,11 +35,14 @@ public class MeetupParticipantEntity {
     private UserEntity user;
 
     @Column(name = "role", length = 20, nullable = false)
-    private String role = "ATTENDEE";
+    private String role;
 
     @Column(name = "status", length = 20, nullable = false)
-    private String status = "PENDING";
+    private String status;
 
-    @Column(name = "joined_at", nullable = false)
-    private Instant joinedAt = Instant.now();
+    @Column(name = "created_at", nullable = false)
+    private Instant joinedAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

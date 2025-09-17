@@ -25,14 +25,20 @@ export default function MyPage() {
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [activeMeetups, setActiveMeetups] = useState<any[]>([]);
+  const [endedMeetups, setEndedMeetups] = useState<any[]>([]);
+  const [hostedMeetups, setHostedMeetups] = useState<any[]>([]);
 
   const loadAll = async () => {
     setLoading(true);
     setError('');
     try {
-      const [pRes, wRes] = await Promise.all([
+      const [pRes, wRes, aRes, eRes, hRes] = await Promise.all([
         fetch(`/api/mypage/profile?userId=${userId}`),
         fetch(`/api/mypage/wallet?userId=${userId}`),
+        fetch(`/api/mypage/my-meetups/active?userId=${userId}&page=0&size=6`),
+        fetch(`/api/mypage/my-meetups/ended?userId=${userId}&page=0&size=6`),
+        fetch(`/api/mypage/hosted-meetups?userId=${userId}&page=0&size=6`),
       ]);
 
       if (!pRes.ok) throw new Error(await pRes.text());
@@ -40,6 +46,22 @@ export default function MyPage() {
 
       setProfile(await pRes.json());
       setWallet(await wRes.json());
+      const a = await aRes.json();
+      const e = await eRes.json();
+      const h = await hRes.json();
+
+      const dedupeByMeetupId = (arr: any[]) => {
+        if (!Array.isArray(arr)) return [];
+        const m = new Map<number, any>();
+        for (const x of arr) {
+          if (x && x.meetupId != null && !m.has(x.meetupId)) m.set(x.meetupId, x);
+        }
+        return Array.from(m.values());
+      };
+
+      setActiveMeetups(dedupeByMeetupId(a?.content));
+      setEndedMeetups(dedupeByMeetupId(e?.content));
+      setHostedMeetups(dedupeByMeetupId(h?.content));
     } catch (e: any) {
       setError(e.message || '로드 실패');
     } finally {
@@ -76,11 +98,7 @@ export default function MyPage() {
             </div>
             <div style={{ color: '#868e96' }}>{profile?.email || ''}</div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => navigate(`/profile/edit?userId=${userId}`)}>개인정보 수정</button>
-            <button onClick={() => navigate(`/wallet?userId=${userId}`)}>내 카드 및 포인트</button>
-            <button onClick={() => navigate(`/payments/history?userId=${userId}`)}>신청 및 결제 내역</button>
-          </div>
+          {/* 헤더 우측 버튼 제거 (아래 빠른 이동 메뉴 사용) */}
         </div>
 
         {/* 10분 웰컴 숏터뷰 CTA */}
@@ -116,28 +134,15 @@ export default function MyPage() {
         </div>
       </div>
 
-      {/* 나의 멤버십 */}
-      <section style={{ marginTop: 24 }}>
-        <h3 style={{ margin: '0 0 8px 0' }}>나의 멤버십</h3>
-        <div style={{ border: '1px solid #e9ecef', borderRadius: 8, background: '#fff', overflow: 'hidden' }}>
-          <div style={{ padding: 16, background: '#f8f9fa', color: '#868e96' }}>멤버십이 없습니다.</div>
-          <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontWeight: 700 }}>놀러가기</div>
-            <div style={{ color: '#868e96' }}>잔여 티켓 0개</div>
-          </div>
-          <div style={{ padding: 12, borderTop: '1px solid #e9ecef', textAlign: 'right' }}>
-            <button style={{ background: 'transparent', border: 'none', color: '#495057', textDecoration: 'underline', cursor: 'pointer' }}
-              onClick={() => navigate('/')}>
-              모임 구경하기
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* 나의 모임 */}
       <section style={{ marginTop: 24 }}>
         <h3 style={{ margin: '0 0 8px 0' }}>나의 모임</h3>
-        <MyMeetupsEmpty />
+        <MyMeetupsTabs
+          activeItems={activeMeetups}
+          endedItems={endedMeetups}
+          hostedItems={hostedMeetups}
+        />
       </section>
 
       {error && <div style={{ marginTop: 12, color: '#d6336c' }}>오류: {error}</div>}
@@ -164,7 +169,7 @@ function MenuItem({ label, onClick }: { label: string; onClick: () => void }) {
   );
 }
 
-function MyMeetupsEmpty() {
+function MyMeetupsTabs({ activeItems, endedItems, hostedItems }: { activeItems: any[]; endedItems: any[]; hostedItems: any[] }) {
   const tabs = ['참여 중인 모임', '참여 종료된 모임', '내가 개설한 모임'];
   const [active, setActive] = useState<number>(0);
   return (
@@ -188,11 +193,36 @@ function MyMeetupsEmpty() {
           </button>
         ))}
       </div>
+      <MeetupList
+        title={tabs[active]}
+        items={active === 0 ? activeItems : active === 1 ? endedItems : hostedItems}
+      />
+    </div>
+  );
+}
+
+function MeetupList({ title, items }: { title: string; items: any[] }) {
+  const navigate = useNavigate();
+  if (!items || items.length === 0) {
+    return (
       <div style={{ padding: 40, textAlign: 'center' }}>
-        <div style={{ color: '#495057', marginBottom: 16 }}>참여 중인 모임이 없어요.</div>
+        <div style={{ color: '#495057', marginBottom: 16 }}>{title}이(가) 없어요.</div>
         <button style={{ padding: '12px 20px', background: '#212529', color: '#fff', borderRadius: 8, border: 'none', fontWeight: 700 }}
-          onClick={() => (window.location.href = '/')}>정기모임 구경하기</button>
+          onClick={() => (window.location.href = '/')}>모임 구경하기</button>
       </div>
+    );
+  }
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12, padding: 12 }}>
+      {items.map((m: any) => (
+        <div key={m.meetupId} style={{ border: '1px solid #e9ecef', borderRadius: 6, padding: 12, cursor: 'pointer' }} onClick={() => navigate(`/meetup/${m.meetupId}`)}>
+          <div style={{ fontWeight: 700 }}>{m.title}</div>
+          <div style={{ color: '#868e96', fontSize: 12 }}>{m.meetupStatus}</div>
+          <div style={{ marginTop: 6 }}>가격: {m.pricePoints?.toLocaleString?.() || m.pricePoints}pt</div>
+          <div style={{ marginTop: 6 }}>참여자: {m.participantCount}</div>
+          {m.joinedAt && <div style={{ marginTop: 6, color: '#868e96' }}>참여: {new Date(m.joinedAt).toLocaleString()}</div>}
+        </div>
+      ))}
     </div>
   );
 }
