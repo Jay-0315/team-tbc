@@ -1,117 +1,212 @@
-import { useEffect, useRef, useState } from "react";
-import { Client } from "@stomp/stompjs";
-import type { IMessage } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
+import { useEffect, useRef, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { stompClient } from '@/lib/stompClient'
+import { useAuth } from '@/hooks/useAuth'
+import { toast } from 'sonner'
+import type { ChatMessage, ConnectionState } from '@/types/chat'
 
-type Props = { roomId: number; userId?: number };
-
-type ChatMsg = {
-    id?: string | number;
-    userId?: number;
-    content: string;
-    type?: "CHAT" | "SYSTEM";
-    createdAt?: string;
-};
-
-export default function ChatRoom({ roomId, userId }: Props) {
-    const clientRef = useRef<Client | null>(null);
-    const [connected, setConnected] = useState(false);
-    const [msgs, setMsgs] = useState<ChatMsg[]>([]);
-    const [text, setText] = useState("");
-
-    useEffect(() => {
-        const client = new Client({
-            // Spring STOMP + SockJS 엔드포인트
-            webSocketFactory: () => new SockJS("/ws"),
-            reconnectDelay: 1000,
-            debug: () => {}
-        });
-
-        client.onConnect = () => {
-            setConnected(true);
-            // 구독 경로는 프로젝트 설정에 맞춰 조정
-            client.subscribe(`/topic/rooms/${roomId}`, (msg: IMessage) => {
-                try {
-                    const body: ChatMsg = JSON.parse(msg.body);
-                    setMsgs(prev => [...prev, body]);
-                } catch {
-                    setMsgs(prev => [...prev, { content: msg.body, type: "SYSTEM" }]);
-                }
-            });
-        };
-
-        client.onStompError = () => setConnected(false);
-        client.onWebSocketClose = () => setConnected(false);
-
-        client.activate();
-        clientRef.current = client;
-
-        return () => {
-            client.deactivate();
-            clientRef.current = null;
-        };
-    }, [roomId]);
-
-    const send = () => {
-        if (!clientRef.current || !connected || !text.trim()) return;
-        const payload: ChatMsg = {
-            content: text.trim(),
-            type: "CHAT",
-            userId
-        };
-        // 전송 경로는 프로젝트 설정에 맞춰 조정
-        clientRef.current.publish({
-            destination: `/app/rooms/${roomId}/send`,
-            body: JSON.stringify(payload)
-        });
-        setText("");
-    };
-
-    return (
-        <div className="bg-white rounded-2xl shadow-sm p-4 flex flex-col h-[80vh]">
-            <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">그룹 채팅방 #{roomId}</h2>
-                <span className={`text-sm ${connected ? "text-green-600" : "text-red-500"}`}>
-          {connected ? "연결됨" : "연결 끊김"}
-        </span>
-            </div>
-
-            <div className="flex-1 overflow-auto border rounded-xl p-3 space-y-2 bg-gray-50">
-                {msgs.length === 0 && (
-                    <div className="text-gray-400 text-center py-10">메시지가 없습니다.</div>
-                )}
-                {msgs.map((m, i) => (
-                    <div key={i} className="text-sm">
-                        {m.type === "SYSTEM" ? (
-                            <div className="text-gray-500 italic">※ {m.content}</div>
-                        ) : (
-                            <div>
-                <span className="font-medium text-gray-700">
-                  {m.userId ?? "익명"}
-                </span>
-                                <span className="mx-2 text-gray-400">|</span>
-                                <span className="text-gray-800">{m.content}</span>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
-
-            <div className="mt-3 flex gap-2">
-                <input
-                    className="flex-1 border rounded-xl px-3 py-2"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyUp={(e) => { if (e.key === "Enter") send(); }}
-                    placeholder="메시지를 입력하세요"
-                />
-                <button
-                    onClick={send}
-                    className="px-4 py-2 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
-                >
-                    전송
-                </button>
-            </div>
-        </div>
-    );
+interface ChatRoomProps {
+  roomId: number
+  userId: number
+  roomName?: string
 }
+
+export function ChatRoom({ roomId, userId, roomName }: ChatRoomProps) {
+  const { user } = useAuth()
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [newMessage, setNewMessage] = useState('')
+  const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED')
+  const [isTyping, setIsTyping] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  // Connect to STOMP and subscribe to room
+  useEffect(() => {
+    if (!user) return
+
+    // Get auth token from localStorage
+    const token = localStorage.getItem('authToken')
+    if (!token) {
+      toast.error('인증 토큰이 없습니다. 다시 로그인해주세요.')
+      return
+    }
+
+    // Connect to STOMP
+    stompClient.connect(token)
+
+    // Subscribe to connection state changes
+    const unsubscribeState = stompClient.onConnectionStateChange((state) => {
+      setConnectionState(state)
+      if (state === 'ERROR') {
+        toast.error('채팅 연결에 실패했습니다.')
+      } else if (state === 'CONNECTED') {
+        toast.success('채팅방에 연결되었습니다.')
+      }
+    })
+
+    // Subscribe to room messages
+    const subscription = stompClient.subscribeToRoom(roomId, (message: ChatMessage) => {
+      setMessages(prev => [...prev, message])
+    })
+
+    return () => {
+      subscription?.unsubscribe()
+      unsubscribeState()
+      stompClient.disconnect()
+    }
+  }, [roomId, user])
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || connectionState !== 'CONNECTED') return
+
+    try {
+      stompClient.sendMessage(roomId, newMessage.trim(), userId)
+      setNewMessage('')
+    } catch (error) {
+      toast.error('메시지 전송에 실패했습니다.')
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
+
+  const getConnectionStatusText = () => {
+    switch (connectionState) {
+      case 'CONNECTING':
+        return '연결 중...'
+      case 'CONNECTED':
+        return '연결됨'
+      case 'DISCONNECTED':
+        return '연결 끊김'
+      case 'ERROR':
+        return '연결 오류'
+      default:
+        return '알 수 없음'
+    }
+  }
+
+  const getConnectionStatusColor = () => {
+    switch (connectionState) {
+      case 'CONNECTING':
+        return 'text-yellow-600'
+      case 'CONNECTED':
+        return 'text-green-600'
+      case 'DISCONNECTED':
+        return 'text-gray-500'
+      case 'ERROR':
+        return 'text-red-600'
+      default:
+        return 'text-gray-500'
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-md flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {roomName || `채팅방 #${roomId}`}
+          </h2>
+          <p className="text-sm text-gray-600">
+            참여자: {user?.nickname} (ID: {userId})
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className={`text-sm font-medium ${getConnectionStatusColor()}`}>
+            {getConnectionStatusText()}
+          </div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.length === 0 ? (
+          <div className="text-center text-gray-500 py-8">
+            아직 메시지가 없습니다. 첫 메시지를 보내보세요!
+          </div>
+        ) : (
+          messages.map((message, index) => (
+            <div
+              key={message.id || index}
+              className={`flex ${message.userId === userId ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  message.userId === userId
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-900'
+                }`}
+              >
+                {message.type === 'SYSTEM' ? (
+                  <div className="text-sm italic text-center">
+                    {message.content}
+                  </div>
+                ) : (
+                  <div>
+                    {message.userId !== userId && (
+                      <div className="text-xs font-medium mb-1 opacity-75">
+                        {message.userNickname || `사용자 ${message.userId}`}
+                      </div>
+                    )}
+                    <div className="text-sm">{message.content}</div>
+                    <div className="text-xs opacity-75 mt-1">
+                      {new Date(message.timestamp).toLocaleTimeString('ko-KR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Message Input */}
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={
+              connectionState === 'CONNECTED'
+                ? '메시지를 입력하세요...'
+                : '연결을 기다리는 중...'
+            }
+            disabled={connectionState !== 'CONNECTED'}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={!newMessage.trim() || connectionState !== 'CONNECTED'}
+            className="px-6"
+          >
+            전송
+          </Button>
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Enter로 전송, Shift+Enter로 줄바꿈
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ChatRoom
