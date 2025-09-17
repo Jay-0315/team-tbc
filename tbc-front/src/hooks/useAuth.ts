@@ -14,9 +14,24 @@ const authApi = {
     return response.data.data
   },
 
-  getCurrentUser: async (): Promise<User> => {
-    const response = await apiClient.get('/auth/me')
-    return response.data.data
+  // getCurrentUser: async (): Promise<User> => {
+  //   const response = await apiClient.get('/auth/me')
+  //   return response.data.data
+  // },
+
+
+  getCurrentUser: async (): Promise<User | null> => {
+    try {
+      const response = await apiClient.get('/auth/me')
+      return response.data.data ?? null
+    } catch (err: any) {
+      // 인증 실패는 '비로그인'으로 간주하고 null 반환
+      if (err?.response?.status === 401) {
+        return null
+      }
+      // 그 외 에러는 상위로 던져서 react-query가 처리하게 함
+      throw err
+    }
   },
 
   logout: async (): Promise<void> => {
@@ -40,6 +55,7 @@ export function useAuth() {
     queryFn: authApi.getCurrentUser,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: null,
   })
 
   // Login mutation

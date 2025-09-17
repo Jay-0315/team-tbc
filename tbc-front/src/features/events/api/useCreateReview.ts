@@ -49,12 +49,12 @@ export function useCreateReview(eventId: number) {
       
       return { previousReviews }
     },
-    onError: (err, newReview, context) => {
-      // 실패 시 이전 데이터로 롤백
-      if (context?.previousReviews) {
-        queryClient.setQueryData(eventKeys.reviews(eventId), context.previousReviews)
-      }
-    },
+    // onError: (err, newReview, context) => {
+    //   // 실패 시 이전 데이터로 롤백
+    //   if (context?.previousReviews) {
+    //     queryClient.setQueryData(eventKeys.reviews(eventId), context.previousReviews)
+    //   }
+    // },
     onSettled: () => {
       // 성공/실패 관계없이 쿼리 무효화하여 서버 데이터와 동기화
       queryClient.invalidateQueries({ queryKey: eventKeys.reviews(eventId) })

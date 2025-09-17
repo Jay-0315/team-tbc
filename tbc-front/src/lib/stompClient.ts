@@ -13,10 +13,9 @@ class StompClientManager {
   }
 
   private setupClient() {
-    // Create SockJS connection to backend WebSocket endpoint
-    // TODO: confirm exact endpoint from backend - using /ws as detected from StompWebSocketConfig
+    // SockJS 연결은 항상 상대경로 '/ws' 사용 (vite proxy가 백엔드로 포워딩)
     const socket = new SockJS('/ws')
-    
+
     this.client = new Client({
       webSocketFactory: () => socket,
       debug: (str) => {
@@ -48,6 +47,12 @@ class StompClientManager {
     }
   }
 
+  /**
+   * Connect to STOMP server with a JWT token.
+   * Note: SockJS's initial /ws/info XHR cannot include Authorization headers,
+   * so backend must permit /ws/info (handled in SecurityConfig). Actual auth
+   * should be performed on CONNECT frame using the header below.
+   */
   connect(token: string) {
     if (!this.client) {
       this.setupClient()
@@ -60,14 +65,14 @@ class StompClientManager {
     this.connectionState = 'CONNECTING'
     this.notifyStateListeners()
 
-    // Add JWT token to connection headers
-    // TODO: confirm if backend expects Authorization header or token query param
-    // Based on JwtRoomHandshakeInterceptor, it supports both Authorization header and ?token= query param
     if (this.client) {
+      // Put token into STOMP CONNECT headers
+      // Backend should validate token from CONNECT headers (or query param if implemented)
       this.client.connectHeaders = {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       }
 
+      // Activate (will trigger SockJS /ws/info XHR first; that endpoint must be permitted by server)
       this.client.activate()
     }
   }
@@ -113,12 +118,12 @@ class StompClientManager {
       content,
       userId,
       timestamp: new Date().toISOString(),
-      type: 'MESSAGE'
+      type: 'MESSAGE',
     }
 
     this.client.publish({
       destination,
-      body: JSON.stringify(message)
+      body: JSON.stringify(message),
     })
   }
 
@@ -134,7 +139,7 @@ class StompClientManager {
   }
 
   private notifyStateListeners() {
-    this.stateListeners.forEach(callback => callback(this.connectionState))
+    this.stateListeners.forEach((callback) => callback(this.connectionState))
   }
 
   getConnectionState(): ConnectionState {

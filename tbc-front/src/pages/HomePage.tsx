@@ -20,7 +20,7 @@ type Banner = {
   imageUrl: string
 }
 
-export default function Page({ user, onOpenLogin, onOpenSignup }: PageProps) {
+export default function HomePage({ user, onOpenLogin, onOpenSignup }: PageProps) {
   const { isAuthenticated } = useAuth()
   const { data: postsData, isLoading: isLoadingPosts } = usePosts(0, 6) // Show first 6 posts on homepage
   
