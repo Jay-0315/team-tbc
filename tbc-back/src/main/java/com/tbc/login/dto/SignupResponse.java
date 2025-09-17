@@ -1,6 +1,6 @@
-package com.tbcback.tbcback.login.dto;
+package com.tbc.login.dto;
 
-import com.tbcback.tbcback.login.domain.User;
+import com.tbc.login.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

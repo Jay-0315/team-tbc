@@ -1,7 +1,7 @@
-package com.tbcback.tbcback.login.adapter.out.persistence;
+package com.tbc.login.adapter.out.persistence;
 
-import com.tbcback.tbcback.login.domain.User;
-import com.tbcback.tbcback.login.port.out.UserRepositoryPort;
+import com.tbc.login.domain.User;
+import com.tbc.login.port.out.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

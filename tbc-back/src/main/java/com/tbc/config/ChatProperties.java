@@ -1,4 +1,4 @@
-package com.tbc.chat.config;
+package com.tbc.config;
 
 import lombok.Getter;
 import lombok.Setter;

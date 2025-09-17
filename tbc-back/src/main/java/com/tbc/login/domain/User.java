@@ -1,4 +1,4 @@
-package com.tbcback.tbcback.login.domain;
+package com.tbc.login.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

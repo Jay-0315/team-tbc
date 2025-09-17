@@ -1,4 +1,4 @@
-package com.tbcback.tbcback.login.port.out;
+package com.tbc.login.port.out;
 
 public class RefreshTokenRepositoryPort {
 }

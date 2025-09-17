@@ -1,6 +1,6 @@
-package com.tbcback.tbcback.login.adapter.in.controller;
+package com.tbc.login.adapter.in.controller;
 
-import com.tbcback.tbcback.login.domain.UserService;
+import com.tbc.login.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

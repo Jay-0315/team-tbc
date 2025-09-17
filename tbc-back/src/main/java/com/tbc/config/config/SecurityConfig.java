@@ -1,6 +1,6 @@
-package com.tbcback.tbcback.config;
+package com.tbc.config.config;
 
-import com.tbcback.tbcback.login.adapter.out.security.JwtAuthenticationFilter;
+import com.tbc.login.adapter.out.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

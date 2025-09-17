@@ -1,10 +1,10 @@
-package com.tbcback.tbcback.login.adapter.in.controller;
+package com.tbc.login.adapter.in.controller;
 
-import com.tbcback.tbcback.common.ApiResponse; // ✅ 우리의 ApiResponse 임포트
-import com.tbcback.tbcback.login.adapter.out.security.JwtTokenProvider;
-import com.tbcback.tbcback.login.dto.*;
-import com.tbcback.tbcback.login.domain.User;
-import com.tbcback.tbcback.login.domain.UserService;
+import com.tbc.common.ApiResponse; // ✅ 우리의 ApiResponse 임포트
+import com.tbc.login.adapter.out.security.JwtTokenProvider;
+import com.tbc.login.dto.*;
+import com.tbc.login.domain.User;
+import com.tbc.login.domain.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletResponse;

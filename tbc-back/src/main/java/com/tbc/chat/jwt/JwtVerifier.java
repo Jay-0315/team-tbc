@@ -1,4 +1,4 @@
-package com.tbc.identity.jwt;
+package com.tbc.chat.jwt;
 
 import org.springframework.stereotype.Component;
 

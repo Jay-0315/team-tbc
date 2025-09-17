@@ -1,4 +1,4 @@
-package com.tbcback.tbcback.login.dto;
+package com.tbc.login.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

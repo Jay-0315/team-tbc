@@ -1,8 +1,8 @@
-package com.tbcback.tbcback.login.port.in;
+package com.tbc.login.port.in;
 
-import com.tbcback.tbcback.login.dto.SignupRequest;
-import com.tbcback.tbcback.login.dto.SignupResponse;
-import com.tbcback.tbcback.login.dto.LoginRequest;
+import com.tbc.login.dto.SignupRequest;
+import com.tbc.login.dto.SignupResponse;
+import com.tbc.login.dto.LoginRequest;
 
 public interface UserUseCase {
     SignupResponse signup(SignupRequest request);
