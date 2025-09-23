@@ -23,11 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
-index.html
-package-lock.json
-package.json
-src
-tsconfig.app.json
-tsconfig.json
-tsconfig.node.json
-vite.config.ts
+/tbc-front/.env.local
+/tbc-front/index.html
+/tbc-front/package.json
+/tbc-front/package-lock.json
+/tbc-front/src/
+/tbc-front/tsconfig.json
+/tbc-front/tsconfig.app.json
+/tbc-front/tsconfig.node.json
