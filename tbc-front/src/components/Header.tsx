@@ -1,11 +1,15 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { LoginModal } from '@/components/LoginModal'
-import { SignupModal } from '@/components/SignupModal'
-import { useAuth } from '@/hooks/useAuth'
+"use client"
 
-interface HeaderProps {
-  user?: { nickname?: string; realName?: string } | null
+import { useState } from "react"
+import LoginModal from "@/components/LoginModal"
+import SignupModal from "@/components/SignupModal"
+
+type User = {
+  nickname?: string
+}
+
+type HeaderProps = {
+  user: User | null
   onLogout: () => void
   onLoginSuccess: () => void
   onSignupSuccess: () => void
@@ -14,77 +18,42 @@ interface HeaderProps {
 export default function Header({ user, onLogout, onLoginSuccess, onSignupSuccess }: HeaderProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
-  const { logout, isLoggingOut } = useAuth()
-
-  const handleLogout = async () => {
-    try {
-      await logout()
-      onLogout()
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
-  }
 
   return (
     <>
-      <header className="site-header">
-        <div className="header-inner">
-          <div className="brand">
-            <div className="brand-dot" />
-            <span>TBC</span>
-          </div>
-          <nav className="nav">
+      <header className="header">
+        <div className="container header-content">
+          <div className="logo">TBC</div>
+
+          <div className="header-actions">
             {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  안녕하세요, {user.nickname || user.realName}님!
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                >
-                  {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
-                </Button>
+              <div className="user-menu">
+                <span className="user-greeting">환영합니다 {user.nickname}님!</span>
+                <button className="btn-white" onClick={onLogout}>로그아웃</button>
+                <button className="btn-black">마이페이지</button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsLoginModalOpen(true)}
-                >
-                  로그인
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setIsSignupModalOpen(true)}
-                >
-                  회원가입
-                </Button>
+              <div className="auth-buttons">
+                <button className="btn-white" onClick={() => setIsLoginModalOpen(true)}>로그인</button>
+                <button className="btn-black" onClick={() => setIsSignupModalOpen(true)}>회원가입</button>
               </div>
             )}
-          </nav>
+          </div>
         </div>
       </header>
 
-      <LoginModal
+      <LoginModal 
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onSwitchToSignup={() => {
-          setIsLoginModalOpen(false)
-          setIsSignupModalOpen(true)
-        }}
+        onLoginSuccess={() => { setIsLoginModalOpen(false); onLoginSuccess() }}
+        onOpenSignup={() => { setIsLoginModalOpen(false); setIsSignupModalOpen(true) }}
       />
 
-      <SignupModal
+      <SignupModal 
         isOpen={isSignupModalOpen}
         onClose={() => setIsSignupModalOpen(false)}
-        onSwitchToLogin={() => {
-          setIsSignupModalOpen(false)
-          setIsLoginModalOpen(true)
-        }}
+        onSignupSuccess={() => { setIsSignupModalOpen(false); onSignupSuccess() }}
+        onOpenLogin={() => { setIsSignupModalOpen(false); setIsLoginModalOpen(true) }}
       />
     </>
   )

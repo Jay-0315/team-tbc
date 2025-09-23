@@ -21,11 +21,13 @@ export default function EventDetailPage() {
       await navigator.clipboard.writeText(window.location.href)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
-    } catch {}
+    } catch (e) {
+      console.error('링크 복사 실패', e)
+    }
   }
 
   return (
-    <main role="main" aria-labelledby="page-title" className="mx-auto max-w-5xl px-4 py-6">
+    <main role="main" aria-labelledby="page-title" className="px-4 py-6 mx-auto max-w-5xl">
       <h1 id="page-title" className="sr-only">
         이벤트 상세 페이지
       </h1>
@@ -33,13 +35,13 @@ export default function EventDetailPage() {
       {isLoading && (
         <div role="status" className="space-y-4" aria-live="polite" aria-busy>
           <div className="aspect-[16/9] rounded-xl bg-zinc-200 animate-pulse" />
-          <div className="h-6 w-2/3 bg-zinc-200 rounded animate-pulse" />
-          <div className="h-4 w-1/2 bg-zinc-200 rounded animate-pulse" />
+          <div className="w-2/3 h-6 rounded animate-pulse bg-zinc-200" />
+          <div className="w-1/2 h-4 rounded animate-pulse bg-zinc-200" />
         </div>
       )}
 
       {isError && (
-        <div role="alert" className="text-sm text-red-600 flex items-center justify-between">
+        <div role="alert" className="flex justify-between items-center text-sm text-red-600">
           상세 정보를 불러오지 못했습니다.
           <button
             type="button"
@@ -58,9 +60,9 @@ export default function EventDetailPage() {
 
       {!isLoading && !isError && data && (
         <>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <section className="lg:col-span-2 space-y-4">
-            <div className="rounded-xl overflow-hidden border border-zinc-200 bg-white">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <section className="space-y-4 lg:col-span-2">
+            <div className="overflow-hidden bg-white rounded-xl border border-zinc-200">
               <img
                 src={data.coverUrl}
                 alt={`${data.title} 커버 이미지`}
@@ -74,7 +76,7 @@ export default function EventDetailPage() {
                   </span>
                 </div>
                 <h2 className="text-2xl font-bold">{data.title}</h2>
-                <div className="mt-3 flex flex-col gap-2 text-sm text-zinc-700">
+                <div className="flex flex-col gap-2 mt-3 text-sm text-zinc-700">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4" aria-hidden="true" />
                     <span>{new Date(data.startAt).toLocaleString()}</span>
@@ -90,19 +92,19 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            <article className="rounded-xl border border-zinc-200 bg-white p-4" aria-label="이벤트 소개">
-              <h3 className="text-lg font-semibold mb-2">소개</h3>
+            <article className="p-4 bg-white rounded-xl border border-zinc-200" aria-label="이벤트 소개">
+              <h3 className="mb-2 text-lg font-semibold">소개</h3>
               <ExpandableText text={data.description} />
             </article>
 
             {/* 리뷰 섹션 */}
-            <section className="rounded-xl border border-zinc-200 bg-white p-4" aria-label="이벤트 후기">
-              <div className="flex items-center justify-between mb-4">
+            <section className="p-4 bg-white rounded-xl border border-zinc-200" aria-label="이벤트 후기">
+              <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">후기</h3>
                 {numericId && (
                   <ReviewFormDialog eventId={numericId}>
                     <Button size="sm" className="gap-2">
-                      <Star className="h-4 w-4" />
+                      <Star className="w-4 h-4" />
                       후기 작성
                     </Button>
                   </ReviewFormDialog>
@@ -111,25 +113,25 @@ export default function EventDetailPage() {
               {numericId ? (
                 <EventReviews eventId={numericId} />
               ) : (
-                <div className="text-sm text-zinc-500 py-8 text-center">
+                <div className="py-8 text-sm text-center text-zinc-500">
                   이벤트 정보를 불러올 수 없습니다.
                 </div>
               )}
             </section>
           </section>
 
-          <aside className="lg:col-span-1 space-y-3" aria-label="행동 영역">
+          <aside className="space-y-3 lg:col-span-1" aria-label="행동 영역">
             <button
               type="button"
-              className="w-full h-11 rounded-lg bg-black text-white font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black"
+              className="w-full h-11 font-semibold text-white bg-black rounded-lg hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black"
               aria-label="참가하기"
               onClick={() => setOpenJoin(true)}
             >
               참가하기
             </button>
 
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-11 rounded-lg border border-zinc-300 hover:bg-zinc-50 inline-flex items-center justify-center">
+            <div className="flex gap-2 items-center">
+              <div className="inline-flex flex-1 justify-center items-center h-11 rounded-lg border border-zinc-300 hover:bg-zinc-50">
                 {numericId ? <FavoriteButton eventId={numericId} initialFavorited={false} size={20} /> : null}
               </div>
               <button
@@ -138,11 +140,11 @@ export default function EventDetailPage() {
                 onClick={handleCopy}
                 aria-label="링크 복사"
               >
-                <Copy className="w-4 h-4 mx-auto" aria-hidden="true" />
+                <Copy className="mx-auto w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
-            <div role="status" aria-live="polite" className="text-xs text-emerald-600 h-4">
+            <div role="status" aria-live="polite" className="h-4 text-xs text-emerald-600">
               {copied ? '링크를 복사했어요.' : ''}
             </div>
           </aside>

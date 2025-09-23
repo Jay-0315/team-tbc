@@ -57,14 +57,14 @@ export default function NewPostPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">새 게시글 작성</h1>
+      <div className="container px-4 py-8 mx-auto">
+        <div className="mx-auto max-w-2xl">
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <h1 className="mb-6 text-2xl font-bold text-gray-900">새 게시글 작성</h1>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700">
                   제목 *
                 </label>
                 <input
@@ -73,14 +73,14 @@ export default function NewPostPage() {
                   type="text"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="게시글 제목을 입력하세요"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-700">
                   내용 *
                 </label>
                 <Textarea
@@ -95,7 +95,7 @@ export default function NewPostPage() {
               </div>
 
               <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-700">
                   이미지 (선택사항)
                 </label>
                 <input
@@ -104,14 +104,14 @@ export default function NewPostPage() {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {formData.image && (
                   <div className="mt-2">
                     <img
                       src={URL.createObjectURL(formData.image)}
                       alt="Preview"
-                      className="w-32 h-32 object-cover rounded-md"
+                      className="object-cover w-32 h-32 rounded-md"
                     />
                   </div>
                 )}

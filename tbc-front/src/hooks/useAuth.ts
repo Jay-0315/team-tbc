@@ -5,24 +5,18 @@ import type { User, LoginRequest, LoginResponse, SignupRequest, SignupResponse }
 // Auth API functions
 const authApi = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post('/auth/login', credentials)
-    return response.data.data // Backend returns { data: { token, refreshToken } }
+    const response = await apiClient.post('/auth/login', credentials) // /api 경로 추가
+    return response.data.data // Backend returns { data: { accessToken, refreshToken } }
   },
 
   signup: async (userData: SignupRequest): Promise<SignupResponse> => {
-    const response = await apiClient.post('/auth/signup', userData)
+    const response = await apiClient.post('/auth/signup', userData) // /api 경로 추가
     return response.data.data
   },
 
-  // getCurrentUser: async (): Promise<User> => {
-  //   const response = await apiClient.get('/auth/me')
-  //   return response.data.data
-  // },
-
-
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      const response = await apiClient.get('/auth/me')
+      const response = await apiClient.get('/auth/me') // /api 경로 추가
       return response.data.data ?? null
     } catch (err: any) {
       // 인증 실패는 '비로그인'으로 간주하고 null 반환
@@ -35,7 +29,7 @@ const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout')
+    await apiClient.post('/auth/logout') // /api 경로 추가
   }
 }
 
@@ -62,7 +56,8 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
-      setAuthToken(data.token)
+      console.log('Login success data:', data) // 디버깅용
+      setAuthToken(data.accessToken) // accessToken 사용
       queryClient.invalidateQueries({ queryKey: authKeys.user() })
     },
     onError: (error) => {
