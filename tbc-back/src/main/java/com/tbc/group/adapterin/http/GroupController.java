@@ -1,11 +1,14 @@
-// tbc-back/src/main/java/com/tbc/group/adapterin/http/GroupController.java
 package com.tbc.group.adapterin.http;
 
 import com.tbc.group.adapterin.http.dto.GroupCreateRequest;
 import com.tbc.group.adapterin.http.dto.GroupCreateResponse;
+import com.tbc.group.adapterin.http.dto.GroupCardDTO;
 import com.tbc.group.application.facade.GroupFacade;
 import com.tbc.group.application.facade.GroupReadFacade;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,47 +20,33 @@ public class GroupController {
     private final GroupReadFacade groupReadFacade;  // 읽기 파사드(채팅방 ID 조회)
 
     @PostMapping
-    public GroupCreateResponse create(@RequestBody GroupCreateRequest req) {
-        // 🔹 임시: 로그인 구현 전까지는 hostId = 1L 로 고정
-        Long id = groupFacade.createGroup(req, 1L);
+    public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
+                                      @RequestHeader("X-User-Id") Long hostId) {
+        Long id = groupFacade.createGroup(req, hostId);
         return new GroupCreateResponse(id);
+    }
+
+    @GetMapping
+    public Page<GroupCardDTO> list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return groupReadFacade.findAll(pageable);
+    }
+
+    @GetMapping("/{groupId}")
+    public GroupCardDTO getOne(@PathVariable Long groupId) {
+        return groupReadFacade.findOne(groupId);
     }
 
     public record ChatRoomRes(Long roomId) {}
 
     @GetMapping("/{groupId}/chat-room")
-    public ChatRoomRes getChatRoom(@PathVariable Long groupId) {
-        // 🔹 임시: 유저 검증 생략
+    public ChatRoomRes getChatRoom(@PathVariable Long groupId,
+                                   @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        // TODO: 필요 시 groupId-userId 멤버십 검증 (userId가 null일 수 있음)
         Long roomId = groupReadFacade.getChatRoomId(groupId);
         return new ChatRoomRes(roomId);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-//    @PostMapping
-//    public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
-//                                      @RequestAttribute("userId") Long hostId) {
-//        Long id = groupFacade.createGroup(req, hostId);
-//        return new GroupCreateResponse(id);
-//    }
-//
-//    // DTO용 내부 레코드 (매핑 애노테이션 붙이지 마세요)
-//    public record ChatRoomRes(Long roomId) {}
-//
-//    @GetMapping("/{groupId}/chat-room")
-//    public ChatRoomRes getChatRoom(@PathVariable Long groupId,
-//                                   @RequestAttribute("userId") Long userId) {
-//        // TODO: 필요 시 groupId-userId 멤버십 검증
-//        Long roomId = groupReadFacade.getChatRoomId(groupId);
-//        return new ChatRoomRes(roomId);
-//    }
-//}

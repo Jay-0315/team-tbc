@@ -1,7 +1,7 @@
 package com.tbc.chat.application.facade;
 
 import com.tbc.chat.application.dto.ChatMessageDto;
-import com.tbc.chat.domain.entity.ChatMessageEntity;
+import com.tbc.chat.domain.model.entity.ChatMessageEntity;
 import com.tbc.chat.domain.model.ChatMessageType;
 import com.tbc.chat.domain.repo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;

@@ -4,6 +4,8 @@ import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
 import com.tbc.group.adapterout.persistence.jpa.repository.GroupJpaRepository;
 import com.tbc.group.application.port.out.GroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
@@ -38,6 +40,19 @@ public class GroupRepositoryAdapter implements GroupRepository {
     @Override
     public Optional<com.tbc.group.domain.model.Group> findById(Long id) {
         return repo.findById(id).map(e -> new com.tbc.group.domain.model.Group(
+                e.getId(), e.getTitle(), e.getCategory(), e.getTopic(),
+                e.getMinParticipants(), e.getMaxParticipants(),
+                com.tbc.group.domain.model.Group.Mode.valueOf(e.getMode()),
+                com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
+                e.getFeeAmount(), e.getFeeInfo(),
+                e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
+                e.getContentHtml(), e.getHostId()
+        ));
+    }
+
+    @Override
+    public Page<com.tbc.group.domain.model.Group> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(e -> new com.tbc.group.domain.model.Group(
                 e.getId(), e.getTitle(), e.getCategory(), e.getTopic(),
                 e.getMinParticipants(), e.getMaxParticipants(),
                 com.tbc.group.domain.model.Group.Mode.valueOf(e.getMode()),

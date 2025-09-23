@@ -1,4 +1,4 @@
-package com.tbc.chat.domain.entity;
+package com.tbc.chat.domain.model.entity;
 
 import com.tbc.chat.domain.model.ChatMessageType;
 import jakarta.persistence.*;

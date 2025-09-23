@@ -94,7 +94,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/check-email").permitAll()
                         .requestMatchers("/api/users/check-nickname").permitAll()
-
+                        .requestMatchers("/api/groups/**").permitAll()
+                        .requestMatchers("/api/events/**").permitAll()
                         // 모니터링 허용
                         .requestMatchers("/actuator/**").permitAll()
 
