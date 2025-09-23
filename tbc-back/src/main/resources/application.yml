@@ -21,11 +21,13 @@ spring:
     name: tbc
   jackson:
     time-zone: UTC
+
   datasource:
     url: jdbc:mysql://192.168.219.70:3306/tbc_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: tbc
     password: EjrqhR21!
+
   jpa:
     hibernate:
       ddl-auto: update   # 개발 시 자동 갱신

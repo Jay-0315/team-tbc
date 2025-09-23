@@ -1,6 +1,6 @@
 package com.tbc.chat.domain.repo;
 
-import com.tbc.chat.domain.entity.ChatMessageEntity;
+import com.tbc.chat.domain.model.entity.ChatMessageEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
