@@ -14,14 +14,15 @@ export default function PaymentButton({
   orderName,
   userId,
 }: PaymentButtonProps) {
-  const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY as string;
-  const successUrl = import.meta.env.VITE_TOSS_SUCCESS_URL as string;
-  const failUrl = import.meta.env.VITE_TOSS_FAIL_URL as string;
+  // 환경 변수 타입 오류 해결: import.meta.env를 any로 캐스팅
+  const clientKey = (import.meta as any).env.VITE_TOSS_CLIENT_KEY as string;
+  const successUrl = (import.meta as any).env.VITE_TOSS_SUCCESS_URL as string;
+  const failUrl = (import.meta as any).env.VITE_TOSS_FAIL_URL as string;
 
   const requestPayment = async () => {
     try {
       // 1️⃣ 먼저 백엔드 INIT API 호출 → DB에 orderId 등록
-      const initRes = await fetch("http://localhost:8080/payments", {
+      const initRes = await fetch("/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

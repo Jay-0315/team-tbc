@@ -29,16 +29,16 @@ public class MonitoringService {
             Long ledgerSum = ledgerRepo.sumByWalletId(w.getId());
             if (!w.getBalance().equals(ledgerSum)) {
                 sb.append("❌ Wallet ID=")
-                    .append(w.getId())
-                    .append(" 불일치: balance=")
-                    .append(w.getBalance())
-                    .append(", ledgerSum=")
-                    .append(ledgerSum)
-                    .append("\n");
+                        .append(w.getId())
+                        .append(" 불일치: balance=")
+                        .append(w.getBalance())
+                        .append(", ledgerSum=")
+                        .append(ledgerSum)
+                        .append("\n");
             } else {
                 sb.append("✅ Wallet ID=")
-                    .append(w.getId())
-                    .append(" OK\n");
+                        .append(w.getId())
+                        .append(" OK\n");
             }
         }
         return sb.toString();

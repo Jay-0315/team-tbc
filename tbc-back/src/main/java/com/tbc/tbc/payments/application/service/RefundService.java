@@ -71,10 +71,10 @@ public class RefundService implements RefundUseCase {
         }
 
         return new RefundResponse(
-            payment.getOrderId(),
-            payment.getState().name(),
-            req.refundAmount(),
-            wallet.getBalance()
+                payment.getOrderId(),
+                payment.getState().name(),
+                req.refundAmount(),
+                wallet.getBalance()
         );
     }
 }

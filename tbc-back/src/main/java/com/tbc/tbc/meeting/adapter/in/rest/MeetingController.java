@@ -4,16 +4,22 @@ import com.tbc.tbc.meeting.application.port.in.JoinMeetingUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.tbc.tbc.point.application.exception.InsufficientPointsException;
+import com.tbc.tbc.point.application.exception.AlreadyJoinedException;
 
 @RestController
-@RequestMapping("/meetings")
+@RequestMapping("/api/meetups")
 @RequiredArgsConstructor
 public class MeetingController {
 
@@ -26,9 +32,28 @@ public class MeetingController {
     })
     @PostMapping("/{meetingId}/join")
     public ResponseEntity<String> joinMeeting(@PathVariable Long meetingId,
-                                              @AuthenticationPrincipal String username) {
-        // username = JWT에서 파싱된 사용자 식별값 (보통 email/username)
-        // 필요하면 DB 조회해서 userId로 변환
-        return ResponseEntity.ok("참가 완료");
+                                              @RequestParam(value = "userId") Long userId) {
+        joinMeetingUseCase.join(userId, meetingId);
+        return ResponseEntity.ok("OK");
+    }
+
+    // 간결한 에러 바디로 매핑
+    @ExceptionHandler(InsufficientPointsException.class)
+    public ResponseEntity<String> handleInsufficient(InsufficientPointsException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("INSUFFICIENT_POINTS");
+    }
+
+    @ExceptionHandler(AlreadyJoinedException.class)
+    public ResponseEntity<String> handleAlreadyJoined(AlreadyJoinedException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("ALREADY_JOINED");
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleAlreadyJoinedOrBad(IllegalArgumentException e) {
+        String msg = e.getMessage() == null ? "" : e.getMessage();
+        if (msg.contains("이미 참가")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("ALREADY_JOINED");
+        }
+        return ResponseEntity.badRequest().body(msg);
     }
 }

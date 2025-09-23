@@ -1,17 +1,17 @@
-import PaymentButton from "./components/PaymentButton";
+import { Link, Outlet } from 'react-router-dom';
+import PaymentButton from './components/PaymentButton';
 
-function App() {
+export default function App() {
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>TBC Front - Toss Payments Test</h1>
-      <PaymentButton
-        orderId={`ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`}
-        amount={50000}
-        orderName="테스트 결제"
-        userId={1}
-      />
-    </div>
+    <>
+      <nav style={{ display: 'flex', gap: 12, padding: 12 }}>
+        <Link to="/">홈(이벤트)</Link>
+        <Link to="/topup">포인트 충전</Link>
+        <Link to="/join">모임 참가</Link>
+        <Link to="/wallet">포인트 확인</Link>
+        <Link to="/mypage">마이페이지</Link>
+      </nav>
+      <Outlet />
+    </>
   );
 }
-
-export default App;

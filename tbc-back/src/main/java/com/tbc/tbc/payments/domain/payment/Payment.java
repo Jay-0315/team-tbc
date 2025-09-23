@@ -15,7 +15,7 @@ public class Payment extends BaseTimeEntity {
     @Column(name="order_id", nullable=false, unique=true)
     private String orderId;
 
-    @Column(nullable=false)
+    @Column(name="user_id", nullable=false)
     private Long userId;
 
     @Column(nullable=false)

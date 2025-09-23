@@ -33,7 +33,6 @@ public class WebhookProcessor {
             } catch (Exception ex) {
                 log.error("[WH] process failed eventId={}", e.getEventId(), ex);
                 e.setStatus(WebhookStatus.FAILED);
-                e.setAttemptCount(e.getAttemptCount() + 1);
                 e.setLastError(safeMessage(ex));
             }
             eventRepo.save(e);

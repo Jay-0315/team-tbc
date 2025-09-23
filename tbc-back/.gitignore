@@ -37,4 +37,4 @@ out/
 .vscode/
 
 build.gradle
-src/main/resources/application.properties
+tbc-back/src/main/resources/application.properties

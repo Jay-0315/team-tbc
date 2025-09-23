@@ -31,7 +31,6 @@ public class WebhookRetryService {
                 report.append("✅ 재처리 성공: ").append(e.getEventId()).append("\n");
             } catch (Exception ex) {
                 log.error("❌ 재처리 실패 eventId={}", e.getEventId(), ex);
-                e.setAttemptCount(e.getAttemptCount() + 1);
                 e.setLastError(ex.getMessage());
                 // 여전히 FAILED 유지
                 report.append("❌ 재처리 실패: ").append(e.getEventId())
