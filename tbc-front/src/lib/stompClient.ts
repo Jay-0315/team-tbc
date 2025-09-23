@@ -7,6 +7,7 @@ class StompClientManager {
   private connectionState: ConnectionState = 'DISCONNECTED'
   private listeners: Map<string, (message: ChatMessage) => void> = new Map()
   private stateListeners: ((state: ConnectionState) => void)[] = []
+  private pending: Array<() => void> = []
 
   constructor() {
     this.setupClient()
@@ -14,10 +15,8 @@ class StompClientManager {
 
   private setupClient() {
     // SockJS 연결은 항상 상대경로 '/ws' 사용 (vite proxy가 백엔드로 포워딩)
-    const socket = new SockJS('/ws')
-
     this.client = new Client({
-      webSocketFactory: () => socket,
+      webSocketFactory: () => new SockJS('/ws'),
       debug: (str) => {
         if (import.meta.env.DEV) {
           console.log('STOMP Debug:', str)
@@ -32,6 +31,9 @@ class StompClientManager {
       console.log('STOMP Connected:', frame)
       this.connectionState = 'CONNECTED'
       this.notifyStateListeners()
+      const toRun = [...this.pending]
+      this.pending = []
+      toRun.forEach(fn => { try { fn() } catch (e) { console.error(e) } })
     }
 
     this.client.onStompError = (frame) => {
@@ -108,23 +110,19 @@ class StompClientManager {
   }
 
   sendMessage(roomId: number, content: string, userId: number) {
+    const publish = () => {
+      if (!this.client) return
+      const destination = `/app/rooms/${roomId}/send`
+      const message = { content, userId, timestamp: new Date().toISOString(), type: 'CHAT' }
+      this.client.publish({ destination, body: JSON.stringify(message) })
+    }
+
     if (!this.client || this.connectionState !== 'CONNECTED') {
-      console.error('STOMP client not connected')
+      console.warn('STOMP client not connected yet; queuing message')
+      this.pending.push(publish)
       return
     }
-
-    const destination = `/app/rooms/${roomId}/send`
-    const message = {
-      content,
-      userId,
-      timestamp: new Date().toISOString(),
-      type: 'MESSAGE',
-    }
-
-    this.client.publish({
-      destination,
-      body: JSON.stringify(message),
-    })
+    publish()
   }
 
   // Subscribe to connection state changes

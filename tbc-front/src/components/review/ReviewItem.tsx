@@ -27,12 +27,12 @@ export function ReviewItem({ review }: ReviewItemProps) {
   }
 
   return (
-    <div className="border rounded-lg p-4 space-y-3">
+    <div className="p-4 space-y-3 rounded-lg border">
       {/* 헤더: 평점, 작성자, 날짜 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-2 items-center">
           {/* 별점 시각화 */}
-          <div className="flex items-center gap-1" role="img" aria-label={`별점 ${review.rating}점`}>
+          <div className="flex gap-1 items-center" role="img" aria-label={`별점 ${review.rating}점`}>
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
@@ -50,7 +50,7 @@ export function ReviewItem({ review }: ReviewItemProps) {
           </div>
         </div>
         
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex gap-2 items-center text-sm text-gray-500">
           <span>익명#{review.userId}</span>
           <span>•</span>
           <time dateTime={review.createdAt}>
@@ -60,7 +60,7 @@ export function ReviewItem({ review }: ReviewItemProps) {
       </div>
 
       {/* 댓글 내용 */}
-      <div className="text-gray-800 leading-relaxed">
+      <div className="leading-relaxed text-gray-800">
         {review.comment}
       </div>
     </div>

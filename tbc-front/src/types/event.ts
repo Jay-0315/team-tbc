@@ -16,14 +16,14 @@ export interface EventListParams {
   q?: string
   category?: string
   status?: EventStatus
-  sort?: 'CREATED_DESC' | 'START_ASC' | 'DEADLINE_ASC' | 'REVIEWS_DESC'
+  sort?: 'START_ASC' | 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'NEW_DESC'
   page?: number
   size?: number
 }
 
 // 정렬 옵션 상수
 export const SORT_OPTIONS = {
-  CREATED_DESC: 'CREATED_DESC',
+  NEW_DESC: 'NEW_DESC',
   START_ASC: 'START_ASC', 
   DEADLINE_ASC: 'DEADLINE_ASC',
   REVIEWS_DESC: 'REVIEWS_DESC'

@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChatRoom } from '@/components/ChatRoom'
 import { usePost } from '@/hooks/usePosts'
@@ -12,8 +13,13 @@ export default function PostChatPage() {
   
   const { data: post, isLoading, error } = usePost(postId)
 
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      navigate('/')
+    }
+  }, [isAuthenticated, user, navigate])
+
   if (!isAuthenticated || !user) {
-    navigate('/')
     return null
   }
 
