@@ -19,7 +19,7 @@ export default function JoinMeetupPage() {
           fetch('/api/mypage/open-meetups'),
           fetch(`/api/mypage/wallet?userId=${userId}`)
         ]);
-
+    
         if (mounted && openRes.ok) {
           const list = await openRes.json();
           const deduped = Array.isArray(list)

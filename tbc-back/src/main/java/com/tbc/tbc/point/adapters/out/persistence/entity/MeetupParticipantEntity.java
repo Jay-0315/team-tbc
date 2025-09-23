@@ -41,7 +41,7 @@ public class MeetupParticipantEntity {
     private String status;
 
     @Column(name = "created_at", nullable = false)
-    private Instant joinedAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;

@@ -25,22 +25,29 @@ public class MyPageFacade {
     private final MyPageWalletTxnRepository txnRepo;
     private final MyPageMeetupParticipantRepository participantRepo;
     private final SpringDataMeetupJpaRepository meetupRepo;
+    private final com.tbc.tbc.mypage.adapters.out.persistence.jpa.MyPageUserProfileRepository userProfileRepo;
 
     // 1) 프로필
     public MyProfileDto getProfile(Long userId) {
         UserEntity u = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
+        var p = userProfileRepo.findByUserId(userId).orElseGet(() -> {
+            var np = new com.tbc.tbc.mypage.adapters.out.persistence.entity.UserProfileEntity();
+            np.setUserId(userId);
+            return userProfileRepo.save(np);
+        });
+
         return MyProfileDto.builder()
                 .userId(u.getId())
                 .email(u.getEmail())
-                .username(u.getUsername())
-                .name(u.getName())
-                .profileImage(u.getProfileImage())
-                .intro(u.getIntro())
-                .phone(u.getPhone())
-                .birthDate(u.getBirthDate())
-                .gender(u.getGender())
+                .username(u.getNickname())
+                .name(u.getRealName())
+                .profileImage(p != null ? p.getProfileImage() : null)
+                .intro(p != null ? p.getIntro() : null)
+                .phone(p != null ? p.getPhone() : null)
+                .birthDate(p != null ? p.getBirthDate() : null)
+                .gender(p != null ? (p.getGender() == null ? null : com.tbc.tbc.mypage.adapters.out.persistence.entity.UserProfileEntity.Gender.valueOf(p.getGender().name())) : null)
                 .build();
     }
 
@@ -48,45 +55,44 @@ public class MyPageFacade {
         UserEntity u = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-        // 닉네임(username) 수정 추가 ✅
+        // users: nickname, real_name만 업데이트(팀 스키마 기준)
         if (req.getUsername() != null && !req.getUsername().isBlank()) {
-            u.setUsername(req.getUsername());
+            u.setNickname(req.getUsername());
         }
-
         if (req.getName() != null && !req.getName().isBlank()) {
-            u.setName(req.getName());
+            u.setRealName(req.getName());
         }
-
-        if (req.getIntro() != null) {
-            u.setIntro(req.getIntro());
-        }
-
-        if (req.getProfileImage() != null) {
-            u.setProfileImage(req.getProfileImage());
-        }
-
-        if (req.getPhone() != null) {
-            u.setPhone(req.getPhone());
-        }
-        if (req.getBirthDate() != null) {
-            u.setBirthDate(req.getBirthDate());
-        }
-        if (req.getGender() != null) {
-            u.setGender(req.getGender());
-        }
-
         userRepo.save(u);
 
+        // user_profiles: 나머지 세부 정보 분리 저장
+        var profile = userProfileRepo.findByUserId(userId)
+                .orElseGet(() -> {
+                    var np = new com.tbc.tbc.mypage.adapters.out.persistence.entity.UserProfileEntity();
+                    np.setUserId(userId);
+                    return np;
+                });
+
+        if (req.getProfileImage() != null) profile.setProfileImage(req.getProfileImage());
+        if (req.getIntro() != null) profile.setIntro(req.getIntro());
+        if (req.getPhone() != null) profile.setPhone(req.getPhone());
+        if (req.getBirthDate() != null) profile.setBirthDate(req.getBirthDate());
+        if (req.getGender() != null) profile.setGender(
+                com.tbc.tbc.mypage.adapters.out.persistence.entity.UserProfileEntity.Gender.valueOf(req.getGender().name())
+        );
+
+        userProfileRepo.save(profile);
+
+        var p = profile;
         return MyProfileDto.builder()
                 .userId(u.getId())
                 .email(u.getEmail())
-                .username(u.getUsername())   // ✅ 변경된 닉네임 반환
-                .name(u.getName())
-                .profileImage(u.getProfileImage())
-                .intro(u.getIntro())
-                .phone(u.getPhone())
-                .birthDate(u.getBirthDate())
-                .gender(u.getGender())
+                .username(u.getNickname())
+                .name(u.getRealName())
+                .profileImage(p.getProfileImage())
+                .intro(p.getIntro())
+                .phone(p.getPhone())
+                .birthDate(p.getBirthDate())
+                .gender(p.getGender() == null ? null : com.tbc.tbc.mypage.adapters.out.persistence.entity.UserProfileEntity.Gender.valueOf(p.getGender().name()))
                 .build();
     }
 
@@ -143,7 +149,7 @@ public class MyPageFacade {
     // 4) 내가 참가한 모임
     public PagedResponse<MyMeetupItemDto> getMyMeetups(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<MeetupParticipantEntity> p = participantRepo.findByUserIdOrderByJoinedAtDesc(userId, pageable);
+        Page<MeetupParticipantEntity> p = participantRepo.findByUserIdOrderByCreatedAtDesc(userId, pageable);
 
         List<MyMeetupItemDto> content = p.getContent().stream()
                 .map((MeetupParticipantEntity mp) -> MyMeetupItemDto.builder()
@@ -153,7 +159,7 @@ public class MyPageFacade {
                         .endAt(mp.getMeetup().getEndAt())
                         .role(mp.getRole())
                         .participantStatus(mp.getStatus())
-                        .joinedAt(mp.getJoinedAt())
+                        .joinedAt(mp.getCreatedAt())
                         .meetupStatus(mp.getMeetup().getStatus())
                         .participantCount(mp.getMeetup().getParticipants().size())
                         .pricePoints(mp.getMeetup().getPricePoints())
@@ -228,7 +234,7 @@ public class MyPageFacade {
                         .endAt(mp.getMeetup().getEndAt())
                         .role(mp.getRole())
                         .participantStatus(mp.getStatus())
-                        .joinedAt(mp.getJoinedAt())
+                        .joinedAt(mp.getCreatedAt())
                         .meetupStatus(mp.getMeetup().getStatus())
                         .participantCount(mp.getMeetup().getParticipants().size())
                         .pricePoints(mp.getMeetup().getPricePoints())
@@ -255,7 +261,7 @@ public class MyPageFacade {
                         .endAt(mp.getMeetup().getEndAt())
                         .role(mp.getRole())
                         .participantStatus(mp.getStatus())
-                        .joinedAt(mp.getJoinedAt())
+                        .joinedAt(mp.getCreatedAt())
                         .meetupStatus(mp.getMeetup().getStatus())
                         .participantCount(mp.getMeetup().getParticipants().size())
                         .pricePoints(mp.getMeetup().getPricePoints())

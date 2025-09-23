@@ -23,7 +23,7 @@ public class MeetupParticipantPersistenceAdapter {
         entity.setRole(role == null || role.isBlank() ? "ATTENDEE" : role);
         entity.setStatus(status);
         Instant now = Instant.now();
-        entity.setJoinedAt(now);
+        entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
         jpa.save(entity);
     }
@@ -44,7 +44,7 @@ public class MeetupParticipantPersistenceAdapter {
                         String.valueOf(e.getUserId()),
                         e.getRole(),
                         e.getStatus(),
-                        e.getJoinedAt()
+                        e.getCreatedAt()
                 ))
                 .toList();
     }

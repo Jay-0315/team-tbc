@@ -33,10 +33,7 @@ export default function ProfileEditPage() {
   const [phone, setPhone] = useState<string>('');
   const [birth, setBirth] = useState<string>('');
   const [gender, setGender] = useState<'F' | 'M' | ''>('');
-  const [agreeAll, setAgreeAll] = useState<boolean>(false);
-  const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
-  const [agreePrivacy, setAgreePrivacy] = useState<boolean>(false);
-  const [agreeMarketing, setAgreeMarketing] = useState<boolean>(false);
+  // 동의/고급설정 제거
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
@@ -112,19 +109,44 @@ export default function ProfileEditPage() {
       <h2 style={{ marginBottom: 16 }}>개인 정보</h2>
 
       {/* 안내 배너 */}
-      <div style={{
-        padding: 12,
-        marginBottom: 16,
-        border: '1px solid #e9ecef',
-        background: '#f8f9fa',
-        color: '#868e96',
-        borderRadius: 8,
-        maxWidth: 720,
-      }}>
-        하단 정보는 본인 확인 및 마케팅 수신 서비스에 사용되며, 절대로 프로필에 공개되지 않습니다.
-      </div>
+      {/* 안내 배너 제거 */}
 
       <div style={{ display: 'grid', gap: 18, maxWidth: 720 }}>
+        {/* 프로필 사진 */}
+        <div>
+          <div style={{ marginBottom: 8 }}>프로필 사진</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {form.profileImage ? (
+              <img
+                src={form.profileImage}
+                alt="profile"
+                style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '1px solid #dee2e6' }}
+              />
+            ) : (
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#e9ecef' }} />
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => {
+                  const f = e.target.files?.[0];
+                  if (f) upload(f);
+                }}
+              />
+              {form.profileImage && (
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, profileImage: '' })}
+                  style={{ padding: '8px 10px', background: '#f1f3f5', border: '1px solid #dee2e6', borderRadius: 6, cursor: 'pointer' }}
+                >
+                  이미지 제거
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* 이름 */}
         <div>
           <div style={{ marginBottom: 8 }}>이름</div>
@@ -146,7 +168,6 @@ export default function ProfileEditPage() {
               onChange={e => setPhone(e.target.value)}
               placeholder="01012345678"
             />
-            <span style={{ color: '#20c997', fontSize: 12 }}>✓ 인증 완료</span>
           </div>
         </div>
 
@@ -184,46 +205,9 @@ export default function ProfileEditPage() {
           </div>
         </div>
 
-        {/* 동의 영역 */}
-        <div>
-          <div style={{ marginBottom: 8 }}>개인 정보 처리 및 마케팅 수신 동의</div>
-          <div style={{ border: '1px solid #e9ecef', borderRadius: 8, overflow: 'hidden' }}>
-            <div style={{ padding: 12, display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #e9ecef' }}>
-              <input type="checkbox" checked={agreeAll} onChange={(e) => {
-                const v = e.target.checked;
-                setAgreeAll(v);
-                setAgreeTerms(v);
-                setAgreePrivacy(v);
-                setAgreeMarketing(v);
-              }} /> 전체 동의(선택항목 포함)
-            </div>
-            <div style={{ padding: 12, display: 'grid', gap: 8 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input type="checkbox" checked={agreeTerms} onChange={e => setAgreeTerms(e.target.checked)} /> 이용약관
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input type="checkbox" checked={agreePrivacy} onChange={e => setAgreePrivacy(e.target.checked)} /> 개인정보 수집 및 이용에 대한 안내
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input type="checkbox" checked={agreeMarketing} onChange={e => setAgreeMarketing(e.target.checked)} /> 마케팅 수신(선택)
-              </label>
-              <div style={{ color: '#868e96', fontSize: 12 }}>동의 시 할인 및 공지 관련 문자 및 이메일로 전송드립니다.</div>
-            </div>
-          </div>
-        </div>
+        {/* 동의 영역 제거 */}
 
-        {/* 숨김: 개발 편의용 userId/닉네임 */}
-        <details>
-          <summary style={{ cursor: 'pointer', color: '#868e96' }}>고급 설정(개발용)</summary>
-          <div style={{ marginTop: 8, display: 'grid', gap: 8 }}>
-            <label>userId
-              <input type="number" value={userId} onChange={e => setUserId(Number(e.target.value))} />
-            </label>
-            <label>닉네임
-              <input value={form.username || ''} onChange={e => setForm({ ...form, username: e.target.value })} />
-            </label>
-          </div>
-        </details>
+        {/* 고급 설정(개발용) 제거 */}
 
         {/* 저장 버튼 */}
         <div>

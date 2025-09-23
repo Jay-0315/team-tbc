@@ -15,19 +15,19 @@ public interface MyPageMeetupParticipantRepository
 
     // 참가자 + 모임(MeetupEntity) 같이 불러오기 (N+1 방지)
     @EntityGraph(attributePaths = {"meetup"})
-    Page<MeetupParticipantEntity> findByUserIdOrderByJoinedAtDesc(Long userId, Pageable pageable);
+    Page<MeetupParticipantEntity> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-    // 참여 중(진행 중/오픈): 참가자 status != CANCELLED AND (meetup.status='OPEN' OR meetup.endAt > now)
+    // 참여 중: 참가자 status != CANCELLED AND meetup.status='OPEN'
     @EntityGraph(attributePaths = {"meetup"})
     @Query("select mp from MeetupParticipantEntity mp join mp.meetup m " +
-            "where mp.userId=:uid and mp.status <> 'CANCELLED' and (m.status='OPEN' or m.endAt > CURRENT_TIMESTAMP) " +
-            "order by mp.joinedAt desc")
+            "where mp.userId=:uid and mp.status <> 'CANCELLED' and m.status='OPEN' " +
+            "order by mp.createdAt desc")
     Page<MeetupParticipantEntity> findActiveByUser(@Param("uid") Long userId, Pageable pageable);
 
-    // 참여 종료: endAt <= now or meetup status in CLOSED/FINISHED/CANCELLED
+    // 참여 종료: meetup.status='FINISHED' (요청 사양)
     @EntityGraph(attributePaths = {"meetup"})
     @Query("select mp from MeetupParticipantEntity mp join mp.meetup m " +
-            "where mp.userId=:uid and (m.endAt <= CURRENT_TIMESTAMP or m.status in ('CLOSED','FINISHED','CANCELLED')) " +
-            "order by mp.joinedAt desc")
+            "where mp.userId=:uid and m.status = 'FINISHED' " +
+            "order by mp.createdAt desc")
     Page<MeetupParticipantEntity> findEndedByUser(@Param("uid") Long userId, Pageable pageable);
 }
