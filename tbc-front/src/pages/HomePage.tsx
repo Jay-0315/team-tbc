@@ -126,7 +126,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen text-white bg-black">
       {/* 고정 헤더 */}
-      <div className="fixed top-0 left-0 right-0 z-50">
+      <div className="fixed top-0 right-0 left-0 z-50">
         <Header
           user={user || null}
           onLogout={handleLogout}
@@ -154,11 +154,11 @@ export default function HomePage() {
                 />
                 <div className={`absolute inset-0 bg-gradient-to-r ${banner.gradient} opacity-80`}></div>
               </div>
-              <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
+              <div className="flex relative z-10 justify-center items-center px-6 h-full text-center">
                 <div className="max-w-4xl">
-                  <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">{banner.title}</h1>
-                  <p className="text-xl md:text-2xl text-white/90 mb-8">{banner.desc}</p>
-                  <div className="flex flex-col sm:flex-row justify-center gap-4">
+                  <h1 className="mb-6 text-5xl font-bold leading-tight text-white md:text-7xl">{banner.title}</h1>
+                  <p className="mb-8 text-xl md:text-2xl text-white/90">{banner.desc}</p>
+                  <div className="flex flex-col gap-4 justify-center sm:flex-row">
                     {!isAuthenticated ? (
                       <>
                         <button 
@@ -234,10 +234,20 @@ export default function HomePage() {
                 allEvents.map((event: EventCardDTO) => (
                   <div
                     key={event.id}
-                    className="overflow-hidden bg-gray-900 rounded-2xl border border-gray-800 shadow-lg transition-all duration-300 transform hover:shadow-xl hover:-translate-y-2 group"
+                    className="overflow-hidden bg-gray-900 rounded-2xl border border-gray-800 shadow-lg transition-all duration-300 transform hover:shadow-xl hover:-translate-y-2 group cursor-pointer"
+                    role="link"
+                    aria-label={`${event.title} 상세로 이동`}
+                    tabIndex={0}
+                    onClick={() => navigate(`/events/${event.id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        navigate(`/events/${event.id}`)
+                      }
+                    }}
                   >
-                    <div className="relative h-48 overflow-hidden">
-                      <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-600 to-purple-600">
+                    <div className="overflow-hidden relative h-48">
+                      <div className="flex justify-center items-center w-full h-full bg-gradient-to-br from-blue-600 to-purple-600">
                         <span className="text-4xl font-bold text-white">{event.category}</span>
                       </div>
                       <div className="absolute top-4 left-4">
@@ -246,13 +256,13 @@ export default function HomePage() {
                         </span>
                       </div>
                       <div className="absolute top-4 right-4">
-                        <span className="px-3 py-1 text-sm text-black rounded-full backdrop-blur-sm bg-white/90 mr-2">
+                        <span className="px-3 py-1 mr-2 text-sm text-black rounded-full backdrop-blur-sm bg-white/90">
                           {event.minParticipants}~{event.maxParticipants}명
                         </span>
                         {/* 좋아요 버튼 */}
                         <button
                           type="button"
-                          className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 text-red-500 hover:bg-white transition"
+                          className="inline-flex justify-center items-center w-9 h-9 text-red-500 rounded-full transition bg-white/90 hover:bg-white"
                           aria-label="좋아요"
                           onClick={(e) => { e.stopPropagation(); /* TODO: /api/groups/:id/favorite 호출 */ }}
                         >
@@ -279,7 +289,7 @@ export default function HomePage() {
                       <button
                         type="button"
                         className="py-3 w-full font-semibold text-black bg-white rounded-xl transition-all duration-300 transform hover:bg-gray-100 hover:scale-105"
-                        onClick={() => navigate(`/groups/${event.id}`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/events/${event.id}`) }}
                       >
                         참가하기
                       </button>
