@@ -5,19 +5,19 @@ import type { User, LoginRequest, LoginResponse, SignupRequest, SignupResponse }
 // Auth API functions
 const authApi = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post('/auth/login', credentials) // /api 경로 추가
-    return response.data.data // Backend returns { data: { accessToken, refreshToken } }
+    const response = await apiClient.post('/auth/login', credentials)
+    return response.data.data // Backend returns ApiResponse<TokenPair>
   },
 
   signup: async (userData: SignupRequest): Promise<SignupResponse> => {
-    const response = await apiClient.post('/auth/signup', userData) // /api 경로 추가
-    return response.data.data
+    const response = await apiClient.post('/auth/signup', userData)
+    return response.data.data // Backend returns ApiResponse<SignupResponse>
   },
 
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      const response = await apiClient.get('/auth/me') // /api 경로 추가
-      return response.data.data ?? null
+      const response = await apiClient.get('/auth/me')
+      return response.data.data ?? null // Backend returns ApiResponse<User>
     } catch (err: any) {
       // 인증 실패는 '비로그인'으로 간주하고 null 반환
       if (err?.response?.status === 401) {
@@ -29,7 +29,7 @@ const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout') // /api 경로 추가
+    await apiClient.post('/auth/logout')
   }
 }
 
@@ -55,12 +55,12 @@ export function useAuth() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
+    onSuccess: (data: LoginResponse) => {
       console.log('Login success data:', data) // 디버깅용
       setAuthToken(data.accessToken) // accessToken 사용
       queryClient.invalidateQueries({ queryKey: authKeys.user() })
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Login failed:', error)
     }
   })
@@ -72,7 +72,7 @@ export function useAuth() {
       // After successful signup, user needs to login
       queryClient.invalidateQueries({ queryKey: authKeys.user() })
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Signup failed:', error)
     }
   })
@@ -84,7 +84,7 @@ export function useAuth() {
       setAuthToken(null)
       queryClient.setQueryData(authKeys.user(), null)
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Logout failed:', error)
       // Even if logout fails on server, clear local state
       setAuthToken(null)
