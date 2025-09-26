@@ -49,11 +49,11 @@ export default function EventFilters({
   )
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* 검색 입력 */}
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="이벤트 검색..."
@@ -64,14 +64,14 @@ export default function EventFilters({
                 onSearch(searchQuery)
               }
             }}
-            className="w-full pl-10 pr-4 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
             aria-label="이벤트 검색"
           />
         </div>
         <button
           type="button"
           onClick={() => onSearch(searchQuery)}
-          className="px-4 py-2 bg-black text-white rounded-lg hover:bg-zinc-800 focus:ring-2 focus:ring-black focus:ring-offset-2"
+          className="px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
           aria-label="검색 실행"
         >
           검색
@@ -80,7 +80,7 @@ export default function EventFilters({
 
       <div className="-mx-4 px-4">
         <div
-          className="flex gap-4 overflow-x-auto pb-2 no-scrollbar"
+          className="flex gap-3 overflow-x-auto pb-3 no-scrollbar"
           aria-label="카테고리 스크롤 영역"
           role="tablist"
         >
@@ -89,35 +89,37 @@ export default function EventFilters({
               key={c.key || 'all'}
               role="tab"
               aria-selected={(selectedCategory || '') === (c.key || '')}
-              className={`flex-shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
+              className={`flex-shrink-0 inline-flex items-center gap-3 px-4 py-2.5 rounded-full border transition-all duration-200 ${
                 (selectedCategory || '') === (c.key || '')
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-zinc-800 border-zinc-200'
+                  ? 'bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 shadow-md'
+                  : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
               }`}
               onClick={() => onChangeCategory(c.key || undefined)}
             >
-              <span className="w-7 h-7 rounded-full bg-zinc-200 overflow-hidden inline-flex items-center justify-center">
+              <span className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden inline-flex items-center justify-center">
                 {c.thumbnailUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={c.thumbnailUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-xs">{c.name.slice(0, 2)}</span>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{c.name.slice(0, 2)}</span>
                 )}
               </span>
-              <span className="text-sm whitespace-nowrap">{c.name}</span>
+              <span className="text-sm font-medium whitespace-nowrap">{c.name}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="이벤트 상태 탭">
+      <div className="flex flex-wrap gap-3" role="tablist" aria-label="이벤트 상태 탭">
         {statusTabs.map((t) => (
           <button
             key={t.key}
             role="tab"
             aria-selected={status === t.key}
-            className={`px-3 py-1.5 rounded-full border text-sm ${
-              status === t.key ? 'bg-black text-white border-black' : 'bg-white text-zinc-800 border-zinc-200'
+            className={`px-4 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 ${
+              status === t.key 
+                ? 'bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 shadow-md' 
+                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
             }`}
             onClick={() => onChangeStatus(t.key)}
           >
@@ -126,14 +128,16 @@ export default function EventFilters({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="정렬 옵션">
+      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="정렬 옵션">
         {sortOptions.map((o) => (
           <button
             key={o.key}
             role="radio"
             aria-checked={sort === o.key}
-            className={`px-3 py-1.5 rounded-full border text-sm ${
-              sort === o.key ? 'border-black bg-zinc-100' : 'border-zinc-200'
+            className={`px-4 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 ${
+              sort === o.key 
+                ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-sm' 
+                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
             }`}
             onClick={() => onChangeSort(o.key)}
           >
