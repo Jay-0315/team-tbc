@@ -37,8 +37,8 @@ public class EventController {
 
     @GetMapping
     @Operation(
-            summary = "이벤트 목록 조회 (varigroups 테이블 사용)",
-            description = "varigroups 테이블에서 그룹 데이터를 이벤트 형태로 조회합니다.",
+            summary = "이벤트 목록 조회 (events 테이블 사용)",
+            description = "events 테이블에서 그룹 데이터를 이벤트 형태로 조회합니다.",
             security = { @SecurityRequirement(name = "X-User-Id") }
     )
     @Parameters({
@@ -63,15 +63,15 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "CREATED_DESC") String sort,
             Pageable pageable
     ) {
-        // varigroups 테이블에서 데이터 조회
+        // events 테이블에서 데이터 조회
         Page<GroupCardDTO> page = groupReadFacade.findAll(pageable);
         return PageResponse.from(page);
     }
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "이벤트 상세 조회 (varigroups 테이블 사용)",
-            description = "varigroups 테이블에서 그룹 상세를 이벤트 형태로 조회합니다.",
+            summary = "이벤트 상세 조회 (events 테이블 사용)",
+            description = "events 테이블에서 그룹 상세를 이벤트 형태로 조회합니다.",
             security = { @SecurityRequirement(name = "X-User-Id") }
     )
     @ApiResponses({
