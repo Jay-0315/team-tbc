@@ -6,6 +6,7 @@ export const apiClient = axios.create({
     timeout: 15000,
     withCredentials: false,     // JWT Authorization header 방식이면 false로 유지
     headers: {
+        "X-User-Id": "1",
         'Content-Type': 'application/json',
         Accept: 'application/json',
     },

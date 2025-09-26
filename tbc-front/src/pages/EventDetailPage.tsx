@@ -1,5 +1,5 @@
-import { useParams } from 'react-router-dom'
-import { Clock, Copy, MapPin, Star } from 'lucide-react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Copy, Star, Home } from 'lucide-react'
 import { useEventDetail } from '../features/events/api/useEventDetail'
 import FavoriteButton from '../components/event/FavoriteButton'
 import JoinDialog from '../components/event/JoinDialog'
@@ -10,6 +10,7 @@ import { Button } from '../components/ui/button'
 import { useMemo, useState } from 'react'
 
 export default function EventDetailPage() {
+  const navigate = useNavigate()
   const { id } = useParams()
   const numericId = useMemo(() => (id ? Number(id) : undefined), [id])
   const { data, isLoading, isError, refetch } = useEventDetail(numericId)
@@ -28,6 +29,17 @@ export default function EventDetailPage() {
 
   return (
     <main role="main" aria-labelledby="page-title" className="px-4 py-6 mx-auto max-w-5xl">
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+          aria-label="홈으로 돌아가기"
+        >
+          <Home className="w-4 h-4" aria-hidden="true" />
+          홈으로 돌아가기
+        </button>
+      </div>
       <h1 id="page-title" className="sr-only">
         이벤트 상세 페이지
       </h1>
@@ -63,12 +75,10 @@ export default function EventDetailPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <section className="space-y-4 lg:col-span-2">
             <div className="overflow-hidden bg-white rounded-xl border border-zinc-200">
-              <img
-                src={data.coverUrl}
-                alt={`${data.title} 커버 이미지`}
-                className="w-full aspect-[16/9] object-cover"
-                loading="lazy"
-              />
+              {/* 커버 대체: 카테고리 그라디언트 */}
+              <div className="w-full aspect-[16/9] bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                <span className="text-2xl font-bold text-white">{data.category}</span>
+              </div>
               <div className="p-4">
                 <div className="mb-2">
                   <span className="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-[11px] text-zinc-700 bg-white">
@@ -76,15 +86,11 @@ export default function EventDetailPage() {
                   </span>
                 </div>
                 <h2 className="text-2xl font-bold">{data.title}</h2>
-                <div className="flex flex-col gap-2 mt-3 text-sm text-zinc-700">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4" aria-hidden="true" />
-                    <span>{new Date(data.startAt).toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4" aria-hidden="true" />
-                    <span>{data.location}</span>
-                  </div>
+                <div className="flex gap-2 mt-3 text-xs text-zinc-700">
+                  <span className="px-2 py-1 rounded border border-zinc-300">{data.mode}</span>
+                  <span className="px-2 py-1 rounded border border-zinc-300">
+                    {data.feeType === 'FREE' ? '무료' : `유료${data.feeAmount ? ` · ${data.feeAmount}원` : ''}`}
+                  </span>
                 </div>
                 <div className="mt-4">
                   <HostBadge host={{ name: data.hostName }} />
@@ -94,7 +100,7 @@ export default function EventDetailPage() {
 
             <article className="p-4 bg-white rounded-xl border border-zinc-200" aria-label="이벤트 소개">
               <h3 className="mb-2 text-lg font-semibold">소개</h3>
-              <ExpandableText text={data.description} />
+              <ExpandableText text={data.description || data.topic} />
             </article>
 
             {/* 리뷰 섹션 */}
