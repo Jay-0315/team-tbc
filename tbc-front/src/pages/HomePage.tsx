@@ -8,8 +8,8 @@ import { FloatingChatButton } from "@/components/FloatingChatButton"
 import { Heart } from 'lucide-react'
 import EventFilters from '../components/event/EventFilters'
 import { EventCardSkeletonGrid } from '../components/skeletons/EventCardSkeleton'
-import { useGroups } from '@/hooks/useGroups'
-import type { GroupCard } from '@/hooks/useGroups'
+import { useEvents } from '@/features/events/api/useEvents'
+import type { EventCardDTO } from '@/features/events/types'
 import type { EventStatus } from '@/features/events/types'
 
 export default function HomePage() {
@@ -64,15 +64,21 @@ export default function HomePage() {
   const status: EventStatus | undefined = allowedStatus.includes((statusParam as EventStatus)) ? (statusParam as EventStatus) : 'OPEN'
   const sort: typeof allowedSort[number] = allowedSort.includes((sortParam as typeof allowedSort[number])) ? (sortParam as typeof allowedSort[number]) : 'NEW_DESC'
 
-  // NOTE: groups API currently supports page & size; filters remain UI-only
-  const { data: groupsPage, isLoading, error } = useGroups(0, 12, category)
+  // 실제 이벤트 데이터 사용 (varigroups 테이블)
+  const { data: eventsPage, isLoading, error } = useEvents({
+    category,
+    status,
+    sort,
+    page: 0,
+    size: 12
+  })
   const isError = !!error
   const fetchNextPage = () => {}
   const isFetchingNextPage = false
   const hasNextPage = false
 
   // 모든 페이지의 이벤트를 평면화
-  const allGroups = useMemo(() => groupsPage?.content ?? [], [groupsPage])
+  const allEvents = useMemo(() => eventsPage?.content ?? [], [eventsPage])
 
   // URL 업데이트 함수
   const updateSearchParams = useCallback((updates: Record<string, string | undefined>) => {
@@ -172,7 +178,7 @@ export default function HomePage() {
                       <>
                         <Link to="/groups/create">
                           <button className="px-8 py-4 text-lg font-semibold text-black bg-white rounded-full shadow-xl transition-all duration-300 transform hover:bg-gray-100 hover:scale-105">
-                            소셜링 만들기
+                            그룹 만들기
                           </button>
                         </Link>
                       </>
@@ -189,12 +195,12 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl">
             <EventFilters
               categories={[
-                { key: 'music', name: '음악' },
-                { key: 'movie', name: '영화' },
-                { key: 'book', name: '독서' },
-                { key: 'game', name: '게임' },
-                { key: 'workshop', name: '워크숍' },
-                { key: 'networking', name: '네트워킹' },
+                { key: 'ETC', name: '기타' },
+                { key: 'GAME', name: '게임' },
+                { key: 'FOOD', name: '음식' },
+                { key: 'STUDY', name: '스터디' },
+                { key: 'SPORTS', name: '스포츠' },
+                { key: 'CULTURE', name: '문화' },
               ]}
               selectedCategory={category}
               onChangeCategory={(c) => updateSearchParams({ category: c })}
@@ -209,7 +215,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 그룹 목록 (채팅 연동 varigroups, 실제 DB) */}
+        {/* 그룹 목록 (varigroups 테이블 실제 데이터) */}
         <section className="px-6 py-10 bg-black">
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -220,27 +226,29 @@ export default function HomePage() {
                   데이터를 불러오는 중 오류가 발생했습니다.
                   {error && <div className="mt-2 text-sm text-red-300">{(error as Error).message}</div>}
                 </div>
-              ) : allGroups.length === 0 ? (
+              ) : allEvents.length === 0 ? (
                 <div className="col-span-full py-8 text-center text-gray-400">
-                  표시할 모임이 없습니다.
+                  표시할 그룹이 없습니다.
                 </div>
               ) : (
-                allGroups.map((group: GroupCard) => (
+                allEvents.map((event: EventCardDTO) => (
                   <div
-                    key={group.id}
+                    key={event.id}
                     className="overflow-hidden bg-gray-900 rounded-2xl border border-gray-800 shadow-lg transition-all duration-300 transform hover:shadow-xl hover:-translate-y-2 group"
                   >
                     <div className="relative h-48 overflow-hidden">
                       <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-600 to-purple-600">
-                        <span className="text-4xl font-bold text-white">{group.category}</span>
+                        <span className="text-4xl font-bold text-white">{event.category}</span>
                       </div>
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1 text-sm font-medium text-white rounded-full backdrop-blur-sm bg-black/90">
-                          {group.category}
+                          {event.category}
                         </span>
                       </div>
                       <div className="absolute top-4 right-4">
-                        <span className="px-3 py-1 text-sm text-black rounded-full backdrop-blur-sm bg-white/90 mr-2">{group.minParticipants}~{group.maxParticipants}명</span>
+                        <span className="px-3 py-1 text-sm text-black rounded-full backdrop-blur-sm bg-white/90 mr-2">
+                          {event.minParticipants}~{event.maxParticipants}명
+                        </span>
                         {/* 좋아요 버튼 */}
                         <button
                           type="button"
@@ -255,23 +263,23 @@ export default function HomePage() {
 
                     <div className="p-6">
                       <h3 className="mb-2 text-xl font-bold text-white transition-colors duration-300 group-hover:text-gray-300">
-                        {group.title}
+                        {event.title}
                       </h3>
-                      <p className="mb-2 text-gray-400">{group.topic}</p>
+                      <p className="mb-2 text-gray-400">{event.topic}</p>
 
                       <div className="flex gap-2 items-center mb-4">
                         <span className="px-2 py-1 text-xs text-gray-300 bg-gray-700 rounded">
-                          {group.mode}
+                          {event.mode}
                         </span>
                         <span className="px-2 py-1 text-xs text-gray-300 bg-gray-700 rounded">
-                          {group.feeType === 'FREE' ? '무료' : `${group.feeAmount ?? 0}원`}
+                          {event.feeType === 'FREE' ? '무료' : `${event.feeAmount ?? 0}원`}
                         </span>
                       </div>
 
                       <button
                         type="button"
                         className="py-3 w-full font-semibold text-black bg-white rounded-xl transition-all duration-300 transform hover:bg-gray-100 hover:scale-105"
-                        onClick={() => navigate(`/groups/${group.id}`)}
+                        onClick={() => navigate(`/groups/${event.id}`)}
                       >
                         참가하기
                       </button>

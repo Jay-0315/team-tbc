@@ -48,16 +48,15 @@ export function useJoinEvent(eventId: number) {
   })
 }
 
-// Events
+// Events - /api/groups 엔드포인트 사용 (varigroups 테이블)
 export async function fetchEvents(params: EventListParams = {}): Promise<Page<EventCardDTO>> {
-  const { data } = await apiClient.get<Page<EventCardDTO>>('/events', {
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
     params: {
       page: params.page ?? 0,
       size: params.size ?? 12,
+      // 검색 및 필터링 파라미터 추가
       ...(params.q && { q: params.q }),
       ...(params.category && { category: params.category }),
-      ...(params.status && { status: params.status }),
-      ...(params.sort && { sort: params.sort }),
     }
   })
   return data
@@ -80,5 +79,3 @@ export async function createReview(eventId: number, body: CreateReviewRequest): 
   const { data } = await apiClient.post<ReviewDTO>(`/events/${eventId}/reviews`, body)
   return data
 }
-
-
