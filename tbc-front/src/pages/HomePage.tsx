@@ -64,7 +64,7 @@ export default function HomePage() {
   const status: EventStatus | undefined = allowedStatus.includes((statusParam as EventStatus)) ? (statusParam as EventStatus) : 'OPEN'
   const sort: typeof allowedSort[number] = allowedSort.includes((sortParam as typeof allowedSort[number])) ? (sortParam as typeof allowedSort[number]) : 'NEW_DESC'
 
-  // 실제 이벤트 데이터 사용 (varigroups 테이블)
+  // 실제 이벤트 데이터 사용 (events 테이블)
   const { data: eventsPage, isLoading, error } = useEvents({
     category,
     status,
@@ -215,7 +215,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 그룹 목록 (varigroups 테이블 실제 데이터) */}
+        {/* 그룹 목록 (events 테이블 실제 데이터) */}
         <section className="px-6 py-10 bg-black">
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">

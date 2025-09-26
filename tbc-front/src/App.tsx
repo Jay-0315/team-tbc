@@ -5,14 +5,14 @@ import { useAuth } from '@/hooks/useAuth'
 import { setAuthToken } from '@/lib/api'
 import Header from '@/components/layout/Header'
 import HomePage from '@/pages/HomePage'
-import PostsPage from '@/pages/PostsPage'
+// import PostsPage from '@/pages/PostsPage'
 import NewPostPage from '@/pages/NewPostPage'
-import PostDetailPage from '@/pages/PostDetailPage'
+// import PostDetailPage from '@/pages/PostDetailPage'
 import PostChatPage from '@/pages/PostChatPage'
 import CreateWizard from '@/pages/groups/CreateWizard'
 import GroupChatPage from '@/pages/groups/GroupChatPage'
 import EventDetailPage from '@/pages/EventDetailPage'
-import GroupDetailPage from '@/pages/groups/GroupDetailPage'
+// import GroupDetailPage from '@/pages/groups/GroupDetailPage'
 import EventsPage from '@/pages/EventsPage'
 
 export default function App() {
@@ -62,11 +62,11 @@ export default function App() {
           <Route path="/" element={<EventsPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/events" element={<EventsPage />} />
-          <Route path="/groups/:id" element={<GroupDetailPage />} />
+          {/* <Route path="/groups/:id" element={<GroupDetailPage />} /> */}
           <Route path="/events/:id" element={<EventDetailPage />} />
-          <Route path="/posts" element={<PostsPage />} />
+          {/* <Route path="/posts" element={<PostsPage />} /> */}
           <Route path="/posts/new" element={<NewPostPage />} />
-          <Route path="/posts/:id" element={<PostDetailPage />} />
+          {/* <Route path="/posts/:id" element={<PostDetailPage />} /> */}
           <Route path="/posts/:id/chat" element={<PostChatPage />} />
           <Route 
             path="/groups/create" 

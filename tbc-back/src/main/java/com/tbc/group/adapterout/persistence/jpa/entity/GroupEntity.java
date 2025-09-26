@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="varigroups")
+@Table(name="events")
 @Entity
 public class GroupEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;

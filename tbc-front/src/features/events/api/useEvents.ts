@@ -7,7 +7,7 @@ export function useEvents(params: EventListParams) {
   return useQuery({
     queryKey: eventKeys.list(params),
     queryFn: async () => {
-      // /api/groups 엔드포인트 사용 (varigroups 테이블)
+      // /api/groups 엔드포인트 사용 (events 테이블)
       const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/groups', { 
         params: {
           page: params.page || 0,
