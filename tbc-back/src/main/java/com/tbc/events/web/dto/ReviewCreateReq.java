@@ -16,7 +16,28 @@ public class ReviewCreateReq {
     @Size(min = 1, max = 500)
     @Schema(description = "코멘트", example = "좋았어요!", minLength = 1, maxLength = 500)
     public String comment;
+
+    public ReviewCreateReq() {
+    }
+
+    public ReviewCreateReq(Integer rating, String comment) {
+        this.rating = rating;
+        this.comment = comment;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }
-
-
-

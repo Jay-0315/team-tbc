@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createReview } from '../../../services/events'
 import { eventKeys } from './keys'
+import { useAuth } from '../../../hooks/useAuth'
 import type { ReviewDTO } from '../../../types/review'
 
 type CreateReviewRequest = {
@@ -10,6 +11,7 @@ type CreateReviewRequest = {
 
 export function useCreateReview(eventId: number) {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   
   return useMutation({
     mutationFn: (body: CreateReviewRequest) => createReview(eventId, body),
@@ -23,7 +25,7 @@ export function useCreateReview(eventId: number) {
       // 낙관적 업데이트: 임시 리뷰를 리스트 앞에 추가
       const tempReview: ReviewDTO = {
         id: Date.now(), // 임시 ID
-        userId: 1, // 임시 사용자 ID (실제로는 서버에서 반환)
+        userId: user?.id || 0, // 실제 로그인한 사용자 ID 사용
         rating: newReview.rating as 1 | 2 | 3 | 4 | 5,
         comment: newReview.comment,
         createdAt: new Date().toISOString(),
