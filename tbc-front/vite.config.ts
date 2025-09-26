@@ -1,24 +1,34 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath, URL } from "node:url";
 
-// https://vite.dev/config/
+const API_TARGET = process.env.VITE_API_TARGET || "http://127.0.0.1:8080";
+
+
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
   server: {
-    host: true,
-    port: 5173,
     proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
+      "/api": {
+        target: API_TARGET,
         changeOrigin: true,
         secure: false,
+        ws: false,
+      },
+      "/ws": {
+        target: API_TARGET,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
       },
     },
   },
-})
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      global: "globalthis",
+    },
+  },
+  define: { global: "globalThis" },
+});

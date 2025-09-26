@@ -1,0 +1,85 @@
+:root{
+    --bg:#0b0b10;
+    --panel:#12121a;
+    --muted:#9aa0a6;
+    --text:#e8eaed;
+    --primary:#7c8cff;
+    --primary-2:#5a6cff;
+    --border:#262837;
+    --ok:#19c37d;
+    --no:#ff6b6b;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{margin:0;background:radial-gradient(1200px 600px at 70% -10%, #1a1b26 0%, #0b0b10 60%), var(--bg);color:var(--text);font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Apple SD Gothic Neo, sans-serif}
+
+.page{min-height:100%}
+
+/* HEADER */
+.site-header{position:sticky;top:0;background:rgba(11,11,16,0.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);z-index:10}
+.header-inner{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(90deg,var(--primary),#61dafb)}
+
+.nav{display:flex;gap:10px}
+
+/* BUTTONS */
+button, .ghost-btn, .primary-btn, .text-btn, .mini-btn, .link-btn, .icon-btn {
+    border:0; cursor:pointer; border-radius:10px; transition:.2s;
+    color:var(--text); background:transparent; font-weight:600;
+}
+.primary-btn{background:linear-gradient(180deg,var(--primary),var(--primary-2)); padding:12px 18px;}
+.primary-btn:hover{filter:brightness(1.1)}
+.ghost-btn{border:1px solid var(--border); padding:12px 18px; background:#11131a}
+.ghost-btn:hover{border-color:#3a3d52}
+.text-btn{background:transparent; padding:8px 10px}
+.text-btn:hover{opacity:.8}
+.mini-btn{padding:8px 10px; border:1px solid var(--border); background:#10121a}
+.link-btn{background:transparent; color:#b7c1ff}
+.icon-btn{width:32px;height:32px;border-radius:8px;background:#10121a;border:1px solid var(--border)}
+.w-full{width:100%}
+.center{display:flex; align-items:center; justify-content:center}
+.mt-6{margin-top:6px}
+.mt-8{margin-top:8px}
+.mt-10{margin-top:10px}
+
+/* HERO */
+.hero{max-width:1100px;margin:40px auto;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:0 20px}
+.hero-content h1{font-size:44px;margin:0 0 8px}
+.lead{color:var(--muted); margin:0 0 20px}
+.hero-actions{display:flex;gap:12px}
+
+.hero-visual{position:relative;height:360px}
+.glow{position:absolute; inset:-20px; background:radial-gradient(400px 240px at 70% 30%, #5a6cff33 0%, transparent 70%), radial-gradient(320px 220px at 20% 60%, #61dafb22 0%, transparent 70%); filter:blur(20px)}
+.glass{position:relative; border:1px solid var(--border); background:linear-gradient(180deg,#0f111a, #0c0e16); border-radius:16px; height:100%; padding:22px; display:flex; gap:14px; flex-direction:column; justify-content:center}
+.kpi{display:flex; align-items:baseline; gap:10px}
+.kpi-title{color:var(--muted)}
+.kpi-value{font-size:28px; font-weight:800}
+
+/* MODAL */
+.modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:20}
+.modal-card{background:#0f1118; border:1px solid var(--border); border-radius:16px; padding:18px 18px 22px}
+.modal-header{display:flex; align-items:center; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid var(--border)}
+.modal-header h3{margin:0; font-size:18px}
+.modal-body{padding-top:14px}
+
+/* FORM */
+.form{display:flex; flex-direction:column; gap:12px}
+label{display:flex; flex-direction:column; gap:8px; font-weight:600}
+input{border:1px solid var(--border); background:#0b0d14; color:var(--text); padding:12px 12px; border-radius:10px; outline:none}
+input:focus{border-color:#3a3d52}
+
+.form-error{color:var(--no); background:#3a0f14; border:1px solid #662b2b; padding:8px 10px; border-radius:8px}
+.ok{color:var(--ok)}
+.no{color:var(--no)}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.span-2{grid-column:span 2}
+.with-btn{display:flex; gap:8px}
+.with-btn input{flex:1}
+
+.tabs{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.tab{border:1px solid var(--border); border-radius:14px; padding:14px; background:#0e1018}
+.tab h4{margin:0 0 8px}
+

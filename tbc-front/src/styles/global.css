@@ -1,0 +1,391 @@
+/* ================== 기본 ================== */
+body {
+  margin: 0;
+  font-family: Pretendard, Arial, sans-serif;
+  background: #fff;
+  color: #000;
+  overflow-x: hidden;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ================== 헤더 ================== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth-buttons,
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-greeting {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ================== 버튼 ================== */
+.btn-black {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-black:hover {
+  background: #333;
+}
+
+.btn-white {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-white:hover {
+  background: #f5f5f5;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ================== 이벤트 배너 ================== */
+.event-banner {
+  position: relative;
+  width: 90%;
+  max-width: 1400px;
+  margin: 40px auto;
+  aspect-ratio: 21 / 5;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.banner-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.banner-slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-overlay-layer {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+
+.banner-text-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  text-align: center;
+  z-index: 2;
+  padding: 0 20px;
+}
+
+.banner-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.banner-desc {
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+
+.banner-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.banner-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.banner-nav.prev {
+  left: 20px;
+}
+
+.banner-nav.next {
+  right: 20px;
+}
+
+/* ================== 게시글 ================== */
+.post-section {
+  padding: 60px 0;
+  background: #f8f9fa;
+}
+
+.section-header {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.slider-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.slider {
+  overflow: hidden;
+}
+
+.slider-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.post-card {
+  flex: 0 0 25%;
+  padding: 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 0 8px;
+}
+
+.post-image img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.post-content {
+  padding: 10px;
+}
+
+.post-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.post-author {
+  font-size: 14px;
+  color: #555;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.slider-btn.prev { left: 10px; }
+.slider-btn.next { right: 10px; }
+
+/* ================== 모달 ================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 32px 28px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.modal-close {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* 입력 폼 */
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-row .form-input {
+  flex: 1;
+}
+
+.form-actions {
+  margin-top: 12px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background: #333;
+}
+
+/* 메시지 */
+.error-message {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.success-message {
+  color: #2e7d32;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* 하단 링크 */
+.modal-footer {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #0070f3;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ================== 반응형 ================== */
+@media (max-width: 1024px) {
+  .post-card { flex: 0 0 33.3%; }
+}
+
+@media (max-width: 768px) {
+  .post-card { flex: 0 0 50%; }
+  .banner-title { font-size: 1.6rem; }
+  .banner-desc { font-size: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .post-card { flex: 0 0 100%; }
+  .banner-title { font-size: 1.3rem; }
+  .banner-desc { font-size: 0.9rem; }
+}
