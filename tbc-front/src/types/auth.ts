@@ -11,8 +11,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string
-  refreshToken?: string
+  accessToken: string
+  refreshToken: string
 }
 
 export interface SignupRequest {
