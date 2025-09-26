@@ -62,4 +62,17 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getContentHtml(), e.getHostId()
         ));
     }
+
+    @Override
+    public Page<com.tbc.group.domain.model.Group> findAll(Pageable pageable, String searchQuery, String category) {
+        return repo.findAll(pageable, searchQuery, category).map(e -> new com.tbc.group.domain.model.Group(
+                e.getId(), e.getTitle(), e.getCategory(), e.getTopic(),
+                e.getMinParticipants(), e.getMaxParticipants(),
+                com.tbc.group.domain.model.Group.Mode.valueOf(e.getMode()),
+                com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
+                e.getFeeAmount(), e.getFeeInfo(),
+                e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
+                e.getContentHtml(), e.getHostId()
+        ));
+    }
 }

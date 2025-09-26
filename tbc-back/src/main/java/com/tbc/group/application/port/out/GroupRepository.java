@@ -10,4 +10,5 @@ public interface GroupRepository {
     Long save(Group group);
     Optional<Group> findById(Long id);
     Page<Group> findAll(Pageable pageable);
+    Page<Group> findAll(Pageable pageable, String searchQuery, String category);
 }

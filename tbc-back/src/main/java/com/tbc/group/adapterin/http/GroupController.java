@@ -29,10 +29,12 @@ public class GroupController {
     @GetMapping
     public Page<GroupCardDTO> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) String q,  // 검색어
+            @RequestParam(required = false) String category  // 카테고리 필터
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return groupReadFacade.findAll(pageable);
+        return groupReadFacade.findAll(pageable, q, category);
     }
 
     @GetMapping("/{groupId}")

@@ -29,6 +29,12 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
     }
 
     @Override
+    public Page<GroupCardDTO> findAll(Pageable pageable, String searchQuery, String category) {
+        Page<Group> groups = groupRepository.findAll(pageable, searchQuery, category);
+        return groups.map(GroupCardDTO::from);
+    }
+
+    @Override
     public GroupCardDTO findOne(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("group not found: " + groupId));
