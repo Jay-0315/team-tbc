@@ -1,4 +1,4 @@
-package com.tbc.config.config;
+package com.tbc.infrastructure.config;
 
 import com.tbc.login.adapter.out.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;

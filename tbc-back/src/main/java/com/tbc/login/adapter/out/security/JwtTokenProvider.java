@@ -5,13 +5,14 @@ import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 
 public class JwtTokenProvider {
 
-    private final Key key;
+    private final SecretKey key;
     private final Duration accessTtl;
     private final Duration refreshTtl;
 
@@ -38,12 +39,12 @@ public class JwtTokenProvider {
         Date exp = new Date(now + ttl.toMillis());
 
         return Jwts.builder()
-                .setId(UUID.randomUUID().toString())
-                .setSubject(subject)
-                .setIssuedAt(iat)
-                .setExpiration(exp)
+                .id(UUID.randomUUID().toString())
+                .subject(subject)
+                .issuedAt(iat)
+                .expiration(exp)
                 .claim("type", type)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)
                 .compact();
     }
 
@@ -62,11 +63,11 @@ public class JwtTokenProvider {
     }
 
     public Claims parseClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
+        return Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public Claims parseClaimsAllowExpired(String token) {

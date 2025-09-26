@@ -38,6 +38,11 @@ app:
   seed.always: false
   seed.reviews: false
 
+jwt:
+  secret: "mySecretKey123456789012345678901234567890"  # 32자 이상
+  access-token-expiration: "1h"
+  refresh-token-expiration: "7d"
+
 ---
 spring:
   config:
