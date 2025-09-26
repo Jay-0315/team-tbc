@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 import type { ReviewDTO } from '@/types/review'
 
 interface ReviewItemProps {
@@ -6,6 +7,7 @@ interface ReviewItemProps {
 }
 
 export function ReviewItem({ review }: ReviewItemProps) {
+  const { user } = useAuth()
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
@@ -51,7 +53,9 @@ export function ReviewItem({ review }: ReviewItemProps) {
         </div>
         
         <div className="flex gap-2 items-center text-sm text-gray-500">
-          <span>익명#{review.userId}</span>
+          <span>
+            {user && user.id === review.userId ? user.nickname : `익명#${review.userId}`}
+          </span>
           <span>•</span>
           <time dateTime={review.createdAt}>
             {formatDate(review.createdAt)}

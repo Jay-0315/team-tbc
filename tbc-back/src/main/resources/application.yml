@@ -51,7 +51,7 @@ logging:
     org.hibernate.SQL: warn
 
 jwt:
-  secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET_64+_CHARS
+  secret: TBC_JWT_SECRET_KEY_2024_SECURE_RANDOM_STRING_64_CHARS_LONG_ENOUGH_FOR_HS256_ALGORITHM
   access-expiration-minutes: 15
   refresh-expiration-days: 14
 
