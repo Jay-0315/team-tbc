@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 type Mode = "ONLINE" | "OFFLINE";
 type FeeType = "FREE" | "PAID";
@@ -350,24 +348,12 @@ export default function CreateWizard({ onCreated }: Props) {
                     <div className="space-y-6">
                         <div>
                             <label className="block text-sm font-medium text-white mb-2">상세 내용</label>
-                            <div className="prose w-full max-w-none">
-                                <CKEditor
-                                    editor={ClassicEditor as unknown as any}
-                                    data={form.contentHtml}
-                                    onChange={(_, editor: any) => onChange("contentHtml", editor.getData())}
-                                    config={{
-                                        toolbar: [
-                                            'heading', '|',
-                                            'bold', 'italic', '|',
-                                            'bulletedList', 'numberedList', '|',
-                                            'outdent', 'indent', '|',
-                                            'blockQuote', '|',
-                                            'undo', 'redo'
-                                        ],
-                                        placeholder: '모임에 대한 상세 내용을 작성해주세요...'
-                                    }}
-                                />
-                            </div>
+디레                            <textarea
+                                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                value={form.contentHtml}
+                                onChange={(e) => onChange("contentHtml", e.target.value)}
+                                placeholder="모임에 대한 상세 내용을 작성해주세요."
+                            />
                         </div>
 
                         <div className="flex justify-between">
