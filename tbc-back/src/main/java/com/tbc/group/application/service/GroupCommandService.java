@@ -13,6 +13,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Service @RequiredArgsConstructor
 public class GroupCommandService {
     private final GroupRepository groupRepo;
@@ -35,7 +38,10 @@ public class GroupCommandService {
                 FeeType.valueOf(req.feeType()),
                 req.feeAmount(), req.feeInfo(),
                 req.tags(), req.contentHtml(),
-                hostId
+                hostId,
+                req.location(),
+                req.eventDate() != null ? LocalDate.parse(req.eventDate()) : null,
+                req.eventTime() != null ? LocalTime.parse(req.eventTime()) : null
         );
 
         Long groupId = groupRepo.save(group);

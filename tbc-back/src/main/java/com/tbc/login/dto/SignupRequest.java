@@ -20,7 +20,9 @@ public class SignupRequest {
     @NotBlank(message = "닉네임은 공백일 수 없습니다.")
     private String nickname;
 
-    public SignupRequest() {}
+    public SignupRequest() {
+    }
+
     public SignupRequest(String email, String password, String realName, String nickname) {
         this.email = email;
         this.password = password;
@@ -28,8 +30,35 @@ public class SignupRequest {
         this.nickname = nickname;
     }
 
-    public String getEmail() { return email; }
-    public String getPassword() { return password; }
-    public String getRealName() { return realName; }
-    public String getNickname() { return nickname; }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

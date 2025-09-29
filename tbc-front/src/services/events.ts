@@ -48,7 +48,7 @@ export function useJoinEvent(eventId: number) {
   })
 }
 
-// Events - /api/groups 엔드포인트 사용 (varigroups 테이블)
+// Events - /api/groups 엔드포인트 사용 (events 테이블)
 export async function fetchEvents(params: EventListParams = {}): Promise<Page<EventCardDTO>> {
   const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
     params: {

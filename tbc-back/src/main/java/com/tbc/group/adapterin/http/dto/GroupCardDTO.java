@@ -3,7 +3,9 @@ package com.tbc.group.adapterin.http.dto;
 import com.tbc.group.domain.model.Group;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Schema(name = "GroupCardDTO", description = "그룹 카드 요약 정보")
@@ -40,7 +42,14 @@ public class GroupCardDTO {
 
     @Schema(description = "호스트 ID", example = "1")
     public Long hostId;
+    @Schema(description = "장소", example = "서울시 강남구")
+    public String location;
 
+    @Schema(description = "이벤트 날짜", example = "2025-09-10")
+    public LocalDate eventDate;
+
+    @Schema(description = "이벤트 시간", example = "14:30")
+    public LocalTime eventTime;
     @Schema(description = "생성일시", example = "2025-09-22T10:00:00")
     public LocalDateTime createdAt;
 
@@ -57,7 +66,9 @@ public class GroupCardDTO {
         dto.feeAmount = group.feeAmount();
         dto.tags = group.tags();
         dto.hostId = group.hostId();
-        dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용
+        dto.location = group.location();
+        dto.eventDate = group.eventDate();
+        dto.eventTime = group.eventTime();        dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용
         return dto;
     }
 }

@@ -1,7 +1,5 @@
 package com.tbc.group.domain.model;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public record Group(
@@ -17,10 +15,7 @@ public record Group(
         String feeInfo,
         List<String> tags,
         String contentHtml,
-        Long hostId,
-        String location,
-        LocalDate eventDate,
-        LocalTime eventTime
+        Long hostId
 ) {
     public static Group create(
             String title,
@@ -34,20 +29,17 @@ public record Group(
             String feeInfo,
             List<String> tags,
             String contentHtml,
-            Long hostId,
-            String location,
-            LocalDate eventDate,
-            LocalTime eventTime
+            Long hostId
     ) {
         return new Group(
                 null, title, category, topic,
                 minParticipants, maxParticipants, mode,
                 feeType, feeAmount, feeInfo,
-                tags, contentHtml, hostId,
-                location, eventDate, eventTime
+                tags, contentHtml, hostId
         );
     }
 
-    public enum Mode {ONLINE, OFFLINE}
+
+public enum Mode {ONLINE, OFFLINE}
     public enum FeeType {FREE, PAID}
 }
