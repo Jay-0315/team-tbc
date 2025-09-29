@@ -11,6 +11,7 @@ import GroupChatPage from '@/pages/groups/GroupChatPage'
 import EventDetailPage from '@/pages/EventDetailPage'
 // import GroupDetailPage from '@/pages/groups/GroupDetailPage'
 import EventsPage from '@/pages/EventsPage'
+import { FloatingChatButton } from '@/components/FloatingChatButton'
 
 export default function App() {
   const { user, logoutAsync, isLoading } = useAuth()
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="/groups/:id/chat" element={<GroupChatPage />} />
         </Routes>
       </main>
+      {user && <FloatingChatButton />}
     </div>
   )
 }

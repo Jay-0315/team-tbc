@@ -9,4 +9,5 @@ public interface GroupReadFacade {
     Page<GroupCardDTO> findAll(Pageable pageable);
     Page<GroupCardDTO> findAll(Pageable pageable, String searchQuery, String category);
     GroupCardDTO findOne(Long groupId);
+    Page<GroupCardDTO> findByUserId(Long userId, Pageable pageable);
 }
