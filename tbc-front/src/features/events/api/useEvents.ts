@@ -7,7 +7,13 @@ export function useEvents(params: EventListParams) {
   return useQuery({
     queryKey: eventKeys.list(params),
     queryFn: async () => {
-      const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/events', { params })
+      // /api/groups 엔드포인트 사용 (varigroups 테이블)
+      const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/groups', { 
+        params: {
+          page: params.page || 0,
+          size: params.size || 12
+        }
+      })
       return data
     },
     placeholderData: (prev) => prev, // keepPreviousData-like behavior
@@ -17,5 +23,3 @@ export function useEvents(params: EventListParams) {
     gcTime: 1000 * 60 * 5,
   })
 }
-
-
