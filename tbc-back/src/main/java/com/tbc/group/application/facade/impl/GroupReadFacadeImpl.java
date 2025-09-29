@@ -40,4 +40,10 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
                 .orElseThrow(() -> new IllegalArgumentException("group not found: " + groupId));
         return GroupCardDTO.from(group);
     }
+
+    @Override
+    public Page<GroupCardDTO> findByUserId(Long userId, Pageable pageable) {
+        Page<Group> groups = groupRepository.findByUserId(userId, pageable);
+        return groups.map(GroupCardDTO::from);
+    }
 }
