@@ -91,7 +91,7 @@ export default function HeroBanner({ isAuthenticated, onLoginClick, onSignupClic
                   <>
                     <Link to="/groups/create">
                       <button className="px-8 py-4 text-lg font-semibold text-black bg-white rounded-full shadow-xl transition-all duration-300 transform hover:bg-gray-100 hover:scale-105">
-                        이벤트 만들기
+                        소셜링 만들기
                       </button>
                     </Link>
                     <Link to="/events">

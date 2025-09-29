@@ -2,13 +2,14 @@ import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTheme } from 'next-themes'
 import { Plus } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import EventFilters from '../components/event/EventFilters'
 import EventCard from '../components/event/EventCard'
 import { EventCardSkeletonGrid } from '../components/skeletons/EventCardSkeleton'
 import { useInfiniteEvents } from '../features/events/api/useInfiniteEvents'
 import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/button'
-import CreateWizard from './groups/CreateWizard'
+import CreateEventWizard from './events/CreateEventWizard'
 import type { EventCardDTO, EventStatus } from '../features/events/types'
 
 const CATEGORIES = [
@@ -32,7 +33,7 @@ const LEGACY_CATEGORY_MAP: Record<string, string> = {
 
 const ALLOWED_CATEGORY_SET = new Set(CATEGORIES.map(c => c.key))
 
-type SortKey = 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC'
+type SortKey = 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC'
 
 type Page<T> = {
   content: T[]
@@ -47,6 +48,7 @@ export default function EventsPage() {
   const { theme } = useTheme()
   const { isAuthenticated } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
+  const queryClient = useQueryClient()
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [isDark, setIsDark] = useState(false)
@@ -71,9 +73,9 @@ export default function EventsPage() {
   const statusParam = searchParams.get('status')
   const status: EventStatus = allowedStatus.includes(statusParam as EventStatus) ? (statusParam as EventStatus) : 'OPEN'
 
-  const allowedSort: ReadonlyArray<SortKey> = ['DEADLINE_ASC','REVIEWS_DESC','START_ASC','NEW_DESC','CREATED_DESC']
+  const allowedSort: ReadonlyArray<SortKey> = ['DEADLINE_ASC','REVIEWS_DESC','START_ASC','NEW_DESC']
   const sortParam = searchParams.get('sort')
-  const sort: SortKey = allowedSort.includes(sortParam as SortKey) ? (sortParam as SortKey) : 'CREATED_DESC'
+  const sort: SortKey = allowedSort.includes(sortParam as SortKey) ? (sortParam as SortKey) : 'NEW_DESC'
 
   const params = useMemo(
     () => {
@@ -168,6 +170,11 @@ export default function EventsPage() {
   const handleGroupCreated = (groupId: number, roomId: number) => {
     setShowCreateWizard(false)
     console.log('그룹 생성됨:', groupId, '채팅방:', roomId)
+    
+    // React Query 캐시 무효화하여 이벤트 목록 새로고침
+    queryClient.invalidateQueries({ 
+      queryKey: ['events'] 
+    })
   }
 
   return (
@@ -270,7 +277,7 @@ export default function EventsPage() {
                 className="px-6 py-3 font-medium text-gray-700 bg-gray-100 rounded-lg transition-all duration-200 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 onClick={() => {
                   setSearchQuery('')
-                  updateSearchParams({ q: undefined, category: undefined, status: 'OPEN', sort: 'CREATED_DESC' })
+                  updateSearchParams({ q: undefined, category: undefined, status: 'OPEN', sort: 'NEW_DESC' })
                 }}
                 aria-label="검색 및 필터 초기화"
               >
@@ -325,18 +332,20 @@ export default function EventsPage() {
 
       {/* CreateWizard 모달 추가 - </main> 태그 바로 앞에 */}
       {showCreateWizard && (
-        <div className="flex fixed inset-0 z-[9999] justify-center items-center backdrop-blur-sm bg-black/50 p-4">
-          <div className="relative w-full h-full max-w-6xl max-h-[95vh] bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-black/50 p-4">
+          <div className="relative w-full max-w-6xl max-h-[95vh] bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden flex flex-col">
             <button
               onClick={() => setShowCreateWizard(false)}
-              className="absolute top-4 right-4 z-10 p-2 text-gray-500 rounded-full transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white/80 dark:bg-gray-800/80"
+              className="absolute top-4 right-4 z-20 p-2 text-gray-500 rounded-full transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
               aria-label="모달 닫기"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <CreateWizard onCreated={handleGroupCreated} />
+            <div className="flex-1 overflow-y-auto" style={{ maxHeight: 'calc(95vh - 2rem)' }}>
+              <CreateEventWizard onCreated={handleGroupCreated} />
+            </div>
           </div>
         </div>
       )}
