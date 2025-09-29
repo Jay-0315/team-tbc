@@ -35,7 +35,12 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .hostId(g.hostId())
                 .location(g.location())
                 .eventDate(g.eventDate())
-                .eventTime(g.eventTime())                .build();
+                .eventTime(g.eventTime())
+                .capacity(g.capacity()) // Added this field
+                .joined(g.joined())     // Added this field
+                .coverUrl(g.coverUrl()) // Added cover_url field
+                .startAt(g.startAt())   // Added start_at field
+                .build();
         return repo.save(e).getId();
     }
 
@@ -48,8 +53,10 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-                e.getContentHtml(), e.getHostId()
-                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
     }
 
     @Override
@@ -61,8 +68,10 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-                e.getContentHtml(), e.getHostId()
-                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
     }
 
     @Override
@@ -74,7 +83,9 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-                e.getContentHtml(), e.getHostId()
-                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
     }
 }

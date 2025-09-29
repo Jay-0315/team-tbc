@@ -63,7 +63,7 @@ export function useChat(roomId: number, userId: number) {
 
   // Initialize chat connection
   useEffect(() => {
-    const token = localStorage.getItem('authToken')
+    const token = localStorage.getItem('accessToken')
     if (!token) {
       setConnectionState('ERROR')
       return

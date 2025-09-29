@@ -8,6 +8,7 @@ class StompClientManager {
   private listeners: Map<string, (message: ChatMessage) => void> = new Map()
   private stateListeners: ((state: ConnectionState) => void)[] = []
   private pending: Array<() => void> = []
+  private currentRoomId: number | null = null
 
   constructor() {
     this.setupClient()
@@ -50,12 +51,12 @@ class StompClientManager {
   }
 
   /**
-   * Connect to STOMP server with a JWT token.
+   * Connect to STOMP server with a JWT token and room ID.
    * Note: SockJS's initial /ws/info XHR cannot include Authorization headers,
    * so backend must permit /ws/info (handled in SecurityConfig). Actual auth
    * should be performed on CONNECT frame using the header below.
    */
-  connect(token: string) {
+  connect(token: string, roomId: number) {
     if (!this.client) {
       this.setupClient()
     }
@@ -64,6 +65,7 @@ class StompClientManager {
       return
     }
 
+    this.currentRoomId = roomId
     this.connectionState = 'CONNECTING'
     this.notifyStateListeners()
 
@@ -83,6 +85,7 @@ class StompClientManager {
     if (this.client && this.connectionState === 'CONNECTED') {
       this.client.deactivate()
       this.connectionState = 'DISCONNECTED'
+      this.currentRoomId = null
       this.notifyStateListeners()
     }
   }
@@ -142,6 +145,10 @@ class StompClientManager {
 
   getConnectionState(): ConnectionState {
     return this.connectionState
+  }
+
+  getCurrentRoomId(): number | null {
+    return this.currentRoomId
   }
 
   cleanup() {

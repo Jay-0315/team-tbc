@@ -32,6 +32,11 @@ public class GroupEntity {
     @Column(nullable=false) Long hostId;
     @Column(length=200) String location;
     @Column LocalDate eventDate;
-    @Column LocalTime eventTime;    @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
+    @Column LocalTime eventTime;
+    @Column(nullable=false) int capacity; // Added this field
+    @Column(nullable=false) int joined;   // Added this field
+    @Column(length=500) String coverUrl;   // Added cover_url field
+    @Column(nullable=false) LocalDateTime startAt; // Added start_at field
+    @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
     @UpdateTimestamp   @Column(nullable=false) LocalDateTime updatedAt;
 }
