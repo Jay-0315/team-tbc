@@ -54,8 +54,10 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-                e.getContentHtml(), e.getHostId()
-                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
     }
 
     @Override
@@ -67,8 +69,10 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-                e.getContentHtml(), e.getHostId()
-                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
     }
 
     @Override
@@ -80,7 +84,24 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-                e.getContentHtml(), e.getHostId()
-                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
+    }
+
+    @Override
+    public Page<com.tbc.group.domain.model.Group> findByUserId(Long userId, Pageable pageable) {
+        return repo.findByUserId(userId, pageable).map(e -> new com.tbc.group.domain.model.Group(
+                e.getId(), e.getTitle(), e.getCategory(), e.getTopic(),
+                e.getMinParticipants(), e.getMaxParticipants(),
+                com.tbc.group.domain.model.Group.Mode.valueOf(e.getMode()),
+                com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
+                e.getFeeAmount(), e.getFeeInfo(),
+                e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
+                e.getContentHtml(), e.getHostId(),
+                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
+        ));
     }
 }

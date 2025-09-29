@@ -17,4 +17,9 @@ public interface GroupJpaRepository extends JpaRepository<GroupEntity, Long> {
     Page<GroupEntity> findAll(Pageable pageable, 
                              @Param("searchQuery") String searchQuery, 
                              @Param("category") String category);
+
+    @Query("SELECT g FROM GroupEntity g " +
+           "INNER JOIN GroupMemberEntity gm ON g.id = gm.groupId " +
+           "WHERE gm.userId = :userId AND gm.status = 'ACTIVE'")
+    Page<GroupEntity> findByUserId(@Param("userId") Long userId, Pageable pageable);
 }
