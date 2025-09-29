@@ -22,7 +22,10 @@ public class GroupController {
     @PostMapping
     public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
                                       @RequestHeader("X-User-Id") Long hostId) {
+        System.out.println("Received group creation request: " + req);
+        System.out.println("Host ID: " + hostId);
         Long id = groupFacade.createGroup(req, hostId);
+        System.out.println("Created group with ID: " + id);
         return new GroupCreateResponse(id);
     }
 

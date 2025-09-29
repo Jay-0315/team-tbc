@@ -13,7 +13,7 @@ type Page<T> = {
   last: boolean;
 }
 
-export function useEventReviews(eventId: number, size: number = 10) {
+export function useEventReviews(eventId: number, size: number = 10, options?: { enabled?: boolean }) {
   return useInfiniteQuery({
     queryKey: [...eventKeys.reviews(eventId), { size }],
     queryFn: ({ pageParam = 0 }) => fetchReviews(eventId, pageParam, size),
@@ -23,5 +23,6 @@ export function useEventReviews(eventId: number, size: number = 10) {
     },
     initialPageParam: 0,
     staleTime: 5 * 60 * 1000, // 5분
+    enabled: options?.enabled !== false, // 기본값은 true, false로 설정하면 쿼리 비활성화
   })
 }

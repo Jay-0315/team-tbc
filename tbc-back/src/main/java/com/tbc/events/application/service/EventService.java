@@ -34,12 +34,12 @@ public class EventService {
         if ("REVIEWS_DESC".equalsIgnoreCase(sort)) {
             Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
             return eventRepo.findListOrderByReviewCountDesc(normalizedQuery, normalizedCategory, status, p)
-                    .map(e -> EventCardDTO.from(e, userId != null ? Boolean.FALSE : null));
+                    .map(e -> EventCardDTO.from(e, null));
         }
         Sort s = mapSort(sort);
         Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), s);
         return eventRepo.findList(normalizedQuery, normalizedCategory, status, p)
-                .map(e -> EventCardDTO.from(e, userId != null ? Boolean.FALSE : null));
+                .map(e -> EventCardDTO.from(e, null));
     }
 
     private Sort mapSort(String sort) {

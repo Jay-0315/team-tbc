@@ -260,7 +260,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
       const roomId = r.data.roomId
 
       onCreated(groupId, roomId)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Event creation error:", error)
       console.error("Error response data:", JSON.stringify(error.response?.data, null, 2))
       console.error("Error status:", error.response?.status)
@@ -276,7 +276,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
   const progressValue = (step / 3) * 100
 
   return (
-    <div className="w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="w-full bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* 배경 패턴 */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-pink-500/5"></div>
@@ -292,12 +292,12 @@ export default function CreateEventWizard({ onCreated }: Props) {
           <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl shadow-lg">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-4">
             소셜링 만들기
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             새로운 사람들과 만나고 싶은 활동을 만들어보세요. 
-            <span className="font-semibold text-gray-800 dark:text-gray-200">단 3단계</span>로 쉽고 빠르게!
+            <span className="font-semibold text-gray-800">단 3단계</span>로 쉽고 빠르게!
           </p>
         </div>
 

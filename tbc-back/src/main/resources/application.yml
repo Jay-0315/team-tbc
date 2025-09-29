@@ -21,6 +21,11 @@ spring:
     name: tbc
   jackson:
     time-zone: UTC
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+    serialization:
+      write-dates-as-timestamps: false
 
   datasource:
     url: jdbc:mysql://57.180.2.19:13306/tbc_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
