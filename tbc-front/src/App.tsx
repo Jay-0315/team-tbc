@@ -8,7 +8,7 @@ import HomePage from '@/pages/HomePage'
 import NewPostPage from '@/pages/NewPostPage'
 // import PostDetailPage from '@/pages/PostDetailPage'
 import PostChatPage from '@/pages/PostChatPage'
-import CreateWizard from '@/pages/groups/CreateWizard'
+import CreateEventWizard from '@/pages/events/CreateEventWizard'
 import GroupChatPage from '@/pages/groups/GroupChatPage'
 import EventDetailPage from '@/pages/EventDetailPage'
 // import GroupDetailPage from '@/pages/groups/GroupDetailPage'
@@ -70,7 +70,7 @@ export default function App() {
           <Route path="/posts/:id/chat" element={<PostChatPage />} />
           <Route 
             path="/groups/create" 
-            element={<CreateWizard onCreated={handleGroupCreated} />} 
+            element={<CreateEventWizard onCreated={handleGroupCreated} />} 
           />
           <Route path="/groups/:id/chat" element={<GroupChatPage />} />
         </Routes>
