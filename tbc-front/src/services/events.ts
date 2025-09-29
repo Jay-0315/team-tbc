@@ -26,19 +26,19 @@ export function useToggleFavorite(eventId: number) {
   })
 }
 
-// Join
-type JoinRequest = { qty: number }
-type JoinResponse = { ok: true }
+// Join (switch to groups join endpoint, self-only)
+export type JoinRequest = { qty?: number }
+export type JoinResponse = { ok: true }
 
-async function joinEventRequest(eventId: number, body: JoinRequest): Promise<JoinResponse> {
-  const { data } = await apiClient.post<JoinResponse>(`/events/${eventId}/join`, body)
-  return data
+async function joinEventRequest(eventId: number): Promise<JoinResponse> {
+  await apiClient.post(`/groups/${eventId}/join`)
+  return { ok: true }
 }
 
 export function useJoinEvent(eventId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (body: JoinRequest) => joinEventRequest(eventId, body),
+    mutationFn: () => joinEventRequest(eventId),
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: eventKeys.root }),
@@ -63,7 +63,7 @@ export async function fetchEvents(params: EventListParams = {}): Promise<Page<Ev
 }
 
 // Reviews
-type CreateReviewRequest = {
+export type CreateReviewRequest = {
   rating: number;
   comment: string;
 }

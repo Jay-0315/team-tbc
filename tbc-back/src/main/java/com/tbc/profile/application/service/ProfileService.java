@@ -1,6 +1,6 @@
 package com.tbc.profile.application.service;
 
-import com.tbc.profile.application.port.out.ProfileRepository;
+import com.tbc.profile.domain.repository.ProfileRepository;
 import com.tbc.profile.domain.model.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

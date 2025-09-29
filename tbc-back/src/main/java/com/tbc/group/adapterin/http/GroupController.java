@@ -1,11 +1,13 @@
 package com.tbc.group.adapterin.http;
 
+import com.tbc.common.util.JwtUtils;
 import com.tbc.common.util.UserUtils;
 import com.tbc.group.adapterin.http.dto.GroupCreateRequest;
 import com.tbc.group.adapterin.http.dto.GroupCreateResponse;
 import com.tbc.group.adapterin.http.dto.GroupCardDTO;
 import com.tbc.group.application.facade.GroupFacade;
 import com.tbc.group.application.facade.GroupReadFacade;
+import com.tbc.group.application.port.out.GroupMemberRepository;
 import com.tbc.login.domain.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -23,6 +27,8 @@ public class GroupController {
     private final GroupReadFacade groupReadFacade;  // 읽기 파사드(채팅방 ID 조회)
     private final UserUtils userUtils;              // 사용자 유틸리티
     private final UserService userService;          // 사용자 서비스
+    private final GroupMemberRepository memberRepository;
+    private final JwtUtils jwtUtils;
 
     @PostMapping
     public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
@@ -32,6 +38,21 @@ public class GroupController {
         Long id = groupFacade.createGroup(req, hostId);
         System.out.println("Created group with ID: " + id);
         return new GroupCreateResponse(id);
+    }
+
+    // 본인만 신청: 수량 입력 제거, 즉시 MEMBER로 등록
+    @PostMapping("/{groupId}/join")
+    public ResponseEntity<Void> join(@PathVariable Long groupId, HttpServletRequest request) {
+        Long userId = jwtUtils.getUserIdFromRequest(request);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            memberRepository.addMember(groupId, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping
