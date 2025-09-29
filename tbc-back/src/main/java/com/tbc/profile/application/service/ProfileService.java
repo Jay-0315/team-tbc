@@ -8,12 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
+import com.tbc.login.domain.UserService;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final UserService userService;
 
     @Transactional
     public Profile createOrUpdateProfile(Long userId, String displayName,
@@ -47,6 +49,14 @@ public class ProfileService {
         }
 
         Long savedId = profileRepository.save(profileToSave);
+
+        // 닉네임 동기화: profiles.display_name -> users.nickname
+        try {
+            if (displayName != null && !displayName.isBlank()) {
+                userService.updateNickname(userId, displayName);
+            }
+        } catch (Exception ignored) {}
+
         return profileToSave.withId(savedId);
     }
 
