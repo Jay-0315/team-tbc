@@ -50,13 +50,13 @@ export default function Header({ user, onLogout }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur supports-[backdrop-filter] transition-colors duration-300">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex justify-between items-center px-4 h-16">
         <div className="flex items-center">
           <Link 
             to="/" 
             className="flex items-center space-x-2 text-xl font-bold text-gray-900 transition-colors duration-300 hover:opacity-80"
           >
-            <span>TEAM-TBC</span>
+            <span>HolaPoP</span>
           </Link>
         </div>
         
@@ -65,7 +65,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
           <div className="relative dropdown-container">
             <button
               onClick={handleUserIconClick}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex justify-center items-center w-10 h-10 bg-gray-100 rounded-full transition-colors duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               aria-haspopup="menu"
               aria-expanded={isDropdownOpen}
               aria-label={isAuthenticated ? "사용자 메뉴" : "로그인"}
@@ -76,7 +76,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
             {/* 로그인된 상태에서만 드롭다운 메뉴 표시 */}
             {isAuthenticated && isDropdownOpen && (
               <div
-                className="absolute right-0 mt-2 w-48 rounded-md shadow-lg border border-gray-200 bg-white transition-all duration-200 z-50"
+                className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
                 role="menu"
               >
                 <div className="py-1">
@@ -88,14 +88,14 @@ export default function Header({ user, onLogout }: HeaderProps) {
                       setIsDropdownOpen(false)
                       window.location.href = '/mypage'
                     }}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                    className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                     role="menuitem"
                   >
                     마이페이지
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                    className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                     role="menuitem"
                   >
                     로그아웃
