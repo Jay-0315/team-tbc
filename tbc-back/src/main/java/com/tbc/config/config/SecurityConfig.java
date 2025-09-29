@@ -45,10 +45,11 @@ public class SecurityConfig {
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // CORS 설정에서 ** 패턴 사용 시 문제가 발생할 수 있으므로 구체적인 패턴으로 변경
+        // 프런트가 /api/** 하위의 모든 경로를 호출하므로 심화 경로까지 허용
         source.registerCorsConfiguration("/api", configuration);
         source.registerCorsConfiguration("/api/", configuration);
         source.registerCorsConfiguration("/api/*", configuration);
+        source.registerCorsConfiguration("/api/**", configuration);
         return source;
     }
 
@@ -73,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/api/groups").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/groups/").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/groups/*").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/groups/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/events").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/events/").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/events/*").permitAll()
@@ -94,9 +96,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/api/users/check-email").permitAll()
                         .requestMatchers("/api/users/check-nickname").permitAll()
+                        // 그룹 목록/상세/하위 리소스는 공개 조회 허용, 조인 POST는 토큰 기반 유틸이 처리
                         .requestMatchers("/api/groups").permitAll()
                         .requestMatchers("/api/groups/").permitAll()
                         .requestMatchers("/api/groups/*").permitAll()
+                        .requestMatchers("/api/groups/**").permitAll()
                         .requestMatchers("/api/events").permitAll()
                         .requestMatchers("/api/events/").permitAll()
                         .requestMatchers("/api/events/*").permitAll()

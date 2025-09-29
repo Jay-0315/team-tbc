@@ -60,6 +60,10 @@ jwt:
   access-expiration-minutes: 15
   refresh-expiration-days: 14
 
+toss:
+  base-url: https://api.tosspayments.com
+  secret-key: test_sk_ORzdMaqN3wxk9k42gJODV5AkYXQG
+
 springdoc:
   swagger-ui:
     path: /swagger-ui
