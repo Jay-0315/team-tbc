@@ -338,7 +338,7 @@ export default function CreateWizard({ onCreated }: Props) {
                         {form.feeType === "PAID" && (
                             <div className="space-y-3">
                                 <NumberInput
-                                    label="참가비 (원)"
+                                    label="참가비 (팝콘)"
                                     value={form.feeAmount || 0}
                                     onChange={(v) => onChange("feeAmount", v)}
                                     min={0}

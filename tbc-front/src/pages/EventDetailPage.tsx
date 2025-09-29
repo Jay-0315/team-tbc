@@ -7,8 +7,9 @@ import HostBadge from '../components/event/HostBadge'
 import { EventReviews } from '../components/review/EventReviews'
 import { ReviewFormDialog } from '../components/review/ReviewFormDialog'
 import { Button } from '../components/ui/button'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import apiClient from '../lib/api'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
@@ -18,6 +19,30 @@ export default function EventDetailPage() {
   const { isAuthenticated } = useAuth()
   const [copied, setCopied] = useState(false)
   const [openJoin, setOpenJoin] = useState(false)
+  const [hostNickname, setHostNickname] = useState<string>('')
+
+  // derive fields with broad fallbacks
+  const feePopcorn = (data as unknown as { fee_amount?: number })?.fee_amount ?? (data as unknown as { feeAmount?: number })?.feeAmount ?? 0
+  const hostId = (data as unknown as { host_id?: number })?.host_id
+    ?? (data as unknown as { hostId?: number })?.hostId
+    ?? (data as unknown as { host?: { id?: number } })?.host?.id
+  const contentHtml = (data as unknown as { content_html?: string })?.content_html
+    ?? (data as unknown as { contentHtml?: string })?.contentHtml
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchNickname = async () => {
+      if (!hostId) return
+      try {
+        const res = await apiClient.get<{ displayName?: string }>(`/profile/${hostId}`)
+        if (!cancelled) setHostNickname(res.data?.displayName || `사용자 ${hostId}`)
+      } catch {
+        if (!cancelled) setHostNickname(`사용자 ${hostId}`)
+      }
+    }
+    fetchNickname()
+    return () => { cancelled = true }
+  }, [hostId])
 
   const handleCopy = async () => {
     try {
@@ -89,22 +114,36 @@ export default function EventDetailPage() {
                   </span>
                 </div>
                 <h2 className="text-2xl font-bold">{data.title}</h2>
-                <div className="flex gap-2 mt-3 text-xs text-gray-600">
+                <div className="flex flex-wrap gap-2 mt-3 text-xs text-gray-600">
                   <span className="px-2 py-1 rounded border border-gray-100 bg-gray-50">{data.mode || 'OFFLINE'}</span>
                   <span className="px-2 py-1 rounded border border-gray-100 bg-gray-50">
-                    {data.feeType === 'FREE' ? '무료' : `유료${data.feeAmount ? ` · ${data.feeAmount}원` : ''}`}
+                    {data.feeType === 'FREE' ? '무료' : `${feePopcorn} 팝콘`}
                   </span>
                 </div>
                 <div className="mt-4">
-                  <HostBadge host={{ name: data.hostName }} />
+                  <HostBadge host={{ name: hostNickname || data.hostName }} />
                 </div>
               </div>
             </div>
 
-            <article className="p-4 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200 shadow-xl" aria-label="이벤트 소개">
-              <h3 className="mb-2 text-lg font-semibold">소개</h3>
-              <ExpandableText text={data.description || data.topic || '상세 정보가 없습니다.'} />
-            </article>
+            {/* 소개 (content_html 우선) */}
+            {(() => {
+              const html = contentHtml
+              if (html && html.trim().length > 0) {
+                return (
+                  <article className="p-4 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200 shadow-xl" aria-label="이벤트 소개">
+                    <h3 className="mb-2 text-lg font-semibold">소개</h3>
+                    <div className="prose max-w-none prose-zinc" dangerouslySetInnerHTML={{ __html: html }} />
+                  </article>
+                )
+              }
+              return (
+                <article className="p-4 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200 shadow-xl" aria-label="이벤트 소개">
+                  <h3 className="mb-2 text-lg font-semibold">소개</h3>
+                  <ExpandableText text={data.description || '상세 정보가 없습니다.'} />
+                </article>
+              )
+            })()}
 
             {/* 리뷰 섹션 */}
             {isAuthenticated ? (

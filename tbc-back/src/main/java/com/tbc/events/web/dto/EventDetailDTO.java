@@ -18,6 +18,9 @@ public class EventDetailDTO extends EventCardDTO {
     @Schema(description = "호스트 이름", example = "TEAM-TBC")
     public String hostName;
 
+    @Schema(description = "컨텐츠 HTML", example = "<p>리치 텍스트</p>")
+    public String contentHtml;
+
     @ArraySchema(arraySchema = @Schema(description = "태그 목록"), schema = @Schema(example = "react"))
     public List<String> tags;
 
@@ -34,10 +37,16 @@ public class EventDetailDTO extends EventCardDTO {
         dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atOffset(ZoneOffset.UTC).toInstant();
         dto.location = e.getLocation();
         dto.eventDate = e.getEventDate();
-        dto.eventTime = e.getEventTime();        dto.favorited = favorited;
+        dto.eventTime = e.getEventTime();
+        dto.favorited = favorited;
         dto.description = e.getDescription();
         dto.tags = tags;
         dto.hostName = hostName;
+        // 추가 매핑
+        dto.feeType = e.getFeeType();
+        dto.feeAmount = e.getFeeAmount();
+        dto.hostId = e.getHostId();
+        dto.contentHtml = e.getContentHtml();
         return dto;
     }
 }
