@@ -82,7 +82,7 @@ export default function HomePage() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 text-gray-900">
+    <div className="min-h-screen text-gray-900 bg-gradient-to-br from-purple-50 to-pink-50">
       {/* 헤더 높이만큼 여백 추가 */}
       <div className="pt-16">
         {/* Hero 섹션 */}
@@ -99,38 +99,38 @@ export default function HomePage() {
             }}></div>
           </div>
 
-          <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+          <div className="relative z-10 px-6 mx-auto max-w-6xl text-center">
             {/* 상단 배지 */}
             <div className="mb-8">
-              <span className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-purple-500 bg-white/80 rounded-full backdrop-blur-sm border border-purple-100 shadow-lg">
+              <span className="inline-flex gap-2 items-center px-6 py-3 text-sm font-semibold text-purple-500 rounded-full border border-purple-100 shadow-lg backdrop-blur-sm bg-white/80">
                 <Sparkles className="w-5 h-5 text-yellow-500" />
                 새로운 소셜링 플랫폼
               </span>
             </div>
 
             {/* 메인 타이틀 */}
-            <h1 className="mb-6 text-6xl md:text-8xl lg:text-9xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                TEAM-TBC
+            <h1 className="mb-6 text-6xl font-bold leading-tight md:text-8xl lg:text-9xl">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                HolaPoP
               </span>
             </h1>
             
-            <p className="mb-12 text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-gray-700 md:text-2xl">
               관심사가 같은 사람들과 함께하는 특별한 경험을 시작하세요
             </p>
 
             {/* CTA 버튼들 */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col gap-6 justify-center items-center sm:flex-row">
               {!isAuthenticated ? (
                 <>
                   <button 
-                    className="group px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl shadow-2xl transition-all duration-300 transform hover:from-purple-500 hover:to-pink-500 hover:scale-105 hover:shadow-purple-300/30"
+                    className="px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl shadow-2xl transition-all duration-300 transform group hover:from-purple-500 hover:to-pink-500 hover:scale-105 hover:shadow-purple-300/30"
                     onClick={() => {
                       setAuthModalMode('login')
                       setIsAuthModalOpen(true)
                     }}
                   >
-                    <span className="flex items-center gap-3">
+                    <span className="flex gap-3 items-center">
                       <Users className="w-6 h-6" />
                       로그인 후 참여하기
                     </span>
@@ -148,8 +148,8 @@ export default function HomePage() {
               ) : (
                 <>
                   <Link to="/groups/create">
-                    <button className="group px-12 py-6 text-2xl font-bold text-white bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl shadow-2xl transition-all duration-300 transform hover:from-purple-500 hover:to-pink-500 hover:scale-110 hover:shadow-purple-300/40">
-                      <span className="flex items-center gap-4">
+                    <button className="px-12 py-6 text-2xl font-bold text-white bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl shadow-2xl transition-all duration-300 transform group hover:from-purple-500 hover:to-pink-500 hover:scale-110 hover:shadow-purple-300/40">
+                      <span className="flex gap-4 items-center">
                         <Plus className="w-7 h-7" />
                         소셜링 만들기
                       </span>
@@ -157,7 +157,7 @@ export default function HomePage() {
                   </Link>
                   <Link to="/events">
                     <button className="px-8 py-4 text-lg font-semibold text-purple-500 rounded-2xl border-2 border-purple-200 backdrop-blur-sm transition-all duration-300 transform hover:bg-purple-25 hover:border-purple-300 hover:scale-105">
-                      <span className="flex items-center gap-2">
+                      <span className="flex gap-2 items-center">
                         <Calendar className="w-5 h-5" />
                         이벤트 둘러보기
                       </span>
@@ -172,7 +172,7 @@ export default function HomePage() {
 
         {/* 인기 소셜링 섹션 */}
         <section className="px-6 py-16">
-          <div className="max-w-6xl mx-auto">
+          <div className="mx-auto max-w-6xl">
             <div className="mb-12 text-center">
               <h2 className="mb-4 text-4xl font-bold text-gray-800">인기 소셜링</h2>
               <p className="text-xl text-gray-600">다양한 카테고리의 소셜링을 만나보세요</p>
@@ -202,12 +202,12 @@ export default function HomePage() {
             </div>
 
             {/* 이벤트 카드 그리드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {isLoading ? (
                 <EventCardSkeletonGrid count={12} />
               ) : isError ? (
                 <div className="col-span-full py-16 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 mb-4 text-red-500 bg-red-100 rounded-full">
+                  <div className="inline-flex justify-center items-center mb-4 w-16 h-16 text-red-500 bg-red-100 rounded-full">
                     <AlertCircle className="w-8 h-8" />
                   </div>
                   <h3 className="mb-2 text-xl font-semibold text-gray-800">데이터를 불러오는 중 오류가 발생했습니다</h3>
@@ -215,11 +215,11 @@ export default function HomePage() {
                 </div>
               ) : allEvents.length === 0 ? (
                 <div className="col-span-full py-16 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 mb-4 text-purple-400 bg-purple-50 rounded-full">
+                  <div className="inline-flex justify-center items-center mb-4 w-16 h-16 text-purple-400 bg-purple-50 rounded-full">
                     <Calendar className="w-8 h-8" />
                   </div>
                   <h3 className="mb-2 text-xl font-semibold text-gray-800">표시할 소셜링이 없습니다</h3>
-                  <p className="text-gray-600 mb-8">새로운 소셜링을 만들어보세요!</p>
+                  <p className="mb-8 text-gray-600">새로운 소셜링을 만들어보세요!</p>
                   {isAuthenticated && (
                     <Link to="/groups/create">
                       <button className="px-8 py-4 font-semibold text-white bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl transition-all duration-300 transform hover:from-purple-500 hover:to-pink-500 hover:scale-105">
@@ -232,7 +232,7 @@ export default function HomePage() {
                 allEvents.map((event: EventCardDTO) => (
                   <div
                     key={event.id}
-                    className="group overflow-hidden bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200 shadow-xl transition-all duration-300 transform hover:shadow-purple-200/50 hover:-translate-y-3 hover:border-purple-300 cursor-pointer"
+                    className="overflow-hidden rounded-3xl border border-gray-200 shadow-xl backdrop-blur-sm transition-all duration-300 transform cursor-pointer group bg-white/80 hover:shadow-purple-200/50 hover:-translate-y-3 hover:border-purple-300"
                     role="link"
                     aria-label={`${event.title} 상세로 이동`}
                     tabIndex={0}
@@ -245,10 +245,10 @@ export default function HomePage() {
                     }}
                   >
                     {/* 카드 헤더 */}
-                    <div className="relative h-48 overflow-hidden">
+                    <div className="overflow-hidden relative h-48">
                       <div className="flex justify-center items-center w-full h-full bg-gradient-to-br from-purple-100 to-pink-100">
                         <div className="text-center">
-                          <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center shadow-2xl">
+                          <div className="flex justify-center items-center mx-auto mb-3 w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full shadow-2xl">
                             <span className="text-3xl font-bold text-white">{event.category.charAt(0)}</span>
                           </div>
                           <span className="text-lg font-semibold text-gray-700">{event.category}</span>
@@ -257,20 +257,20 @@ export default function HomePage() {
                       
                       {/* 카테고리 배지 */}
                       <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 text-sm font-medium text-gray-700 rounded-full backdrop-blur-sm bg-white/80 border border-gray-200">
+                        <span className="px-3 py-1 text-sm font-medium text-gray-700 rounded-full border border-gray-200 backdrop-blur-sm bg-white/80">
                           {event.category}
                         </span>
                       </div>
                       
                       {/* 인원수 및 좋아요 */}
-                      <div className="absolute top-4 right-4 flex items-center gap-2">
-                        <span className="px-3 py-1 text-sm text-gray-700 rounded-full backdrop-blur-sm bg-white/80 border border-gray-200">
-                          <Users className="inline w-4 h-4 mr-1" />
+                      <div className="flex absolute top-4 right-4 gap-2 items-center">
+                        <span className="px-3 py-1 text-sm text-gray-700 rounded-full border border-gray-200 backdrop-blur-sm bg-white/80">
+                          <Users className="inline mr-1 w-4 h-4" />
                           {event.joined}/{event.capacity}명
                         </span>
                         <button
                           type="button"
-                          className="inline-flex justify-center items-center w-9 h-9 text-pink-500 rounded-full transition-all bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-pink-500 hover:text-white hover:scale-110"
+                          className="inline-flex justify-center items-center w-9 h-9 text-pink-500 rounded-full border border-gray-200 backdrop-blur-sm transition-all bg-white/80 hover:bg-pink-500 hover:text-white hover:scale-110"
                           aria-label="좋아요"
                           onClick={(e) => { e.stopPropagation(); /* TODO: /api/groups/:id/favorite 호출 */ }}
                         >
