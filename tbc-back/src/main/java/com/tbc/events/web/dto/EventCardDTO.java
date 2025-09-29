@@ -5,6 +5,8 @@ import com.tbc.events.domain.model.Event;
 import com.tbc.events.domain.model.EventStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -34,7 +36,11 @@ public class EventCardDTO {
 
     @Schema(description = "장소", example = "Seoul")
     public String location;
+    @Schema(description = "이벤트 날짜", example = "2025-09-10")
+    public LocalDate eventDate;
 
+    @Schema(description = "이벤트 시간", example = "14:30")
+    public LocalTime eventTime;
     @Schema(description = "총 정원", example = "100")
     public Integer capacity;
 
@@ -56,7 +62,8 @@ public class EventCardDTO {
         dto.remainingSeats = Math.max(0, e.getCapacity() - e.getJoined());
         dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atOffset(ZoneOffset.UTC).toInstant();
         dto.location = e.getLocation();
-        dto.favorited = favorited;
+        dto.eventDate = e.getEventDate();
+        dto.eventTime = e.getEventTime();        dto.favorited = favorited;
         return dto;
     }
 }

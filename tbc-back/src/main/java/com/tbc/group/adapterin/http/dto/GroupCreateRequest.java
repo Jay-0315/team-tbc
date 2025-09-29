@@ -13,5 +13,8 @@ public record GroupCreateRequest(
         Integer feeAmount,        // PAID일 때 필수
         String feeInfo,
         List<String> tags,
-        String contentHtml
+        String contentHtml,
+        String location,
+        String eventDate,
+        String eventTime
 ) {}

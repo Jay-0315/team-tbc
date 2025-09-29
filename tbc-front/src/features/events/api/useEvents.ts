@@ -7,11 +7,14 @@ export function useEvents(params: EventListParams) {
   return useQuery({
     queryKey: eventKeys.list(params),
     queryFn: async () => {
-      // /api/groups 엔드포인트 사용 (events 테이블)
-      const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/groups', { 
+      // /api/events 엔드포인트 사용 (올바른 이벤트 엔드포인트)
+      const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/events', { 
         params: {
           page: params.page || 0,
-          size: params.size || 12
+          size: params.size || 12,
+          category: params.category,
+          status: params.status,
+          sort: params.sort || 'CREATED_DESC'
         }
       })
       return data
