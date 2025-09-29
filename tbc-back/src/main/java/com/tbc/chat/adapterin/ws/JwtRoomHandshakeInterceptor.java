@@ -1,7 +1,7 @@
 package com.tbc.chat.adapterin.ws;
 
-import com.tbc.chat.jwt.JwtVerifier;             // 패키지 prefix com.back → com.tbc 로 맞추기
-import com.tbc.chat.domain.port.MembershipPort;      // 동일하게 com.tbc 로
+import com.tbc.chat.jwt.JwtVerifier;
+import com.tbc.chat.domain.port.MembershipPort;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,36 +28,48 @@ public class JwtRoomHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        //  반드시 ServletServerHttpRequest 로 캐스팅해서 HttpServletRequest 꺼내야 함
         HttpServletRequest servletReq = ((ServletServerHttpRequest) request).getServletRequest();
+        String uri = servletReq.getRequestURI();
 
-        // 1) roomId 추출
-        String uri = servletReq.getRequestURI(); // 예: /chat/1
+        // SockJS의 내부 요청들은 허용 (예: /ws/022/ti40becc/xhr_streaming)
+        if (uri.startsWith("/ws/") && !uri.matches("/chat/\\d+")) {
+            log.debug("Allowing SockJS internal request: {}", uri);
+            return true;
+        }
+
+        // 채팅방 요청만 처리
         Matcher m = ROOM_PATTERN.matcher(uri);
-        if (!m.find()) return false;
+        if (!m.find()) {
+            log.warn("Invalid room URI pattern: {}", uri);
+            return false;
+        }
+
         Long roomId = Long.valueOf(m.group(1));
         attributes.put("roomId", roomId);
 
-        // 2) token 추출 (Authorization 헤더 > ?token= 쿼리)
+        // JWT 토큰 검증
         String auth = servletReq.getHeader("Authorization");
         String token = null;
-        if (auth != null && auth.startsWith("Bearer ")) token = auth.substring(7);
-        if (token == null) token = servletReq.getParameter("token");
+        if (auth != null && auth.startsWith("Bearer ")) {
+            token = auth.substring(7);
+        }
+        if (token == null) {
+            token = servletReq.getParameter("token");
+        }
 
-//        Long userId = jwtVerifier.verifyAndGetUserId(token);
-//        if (userId == null) {
-//            log.warn("JWT verify failed. uri={}, token={}", uri, token);
-//            return false;
-//        }
+        Long userId = jwtVerifier.verifyAndGetUserId(token);
+        if (userId == null) {
+            log.warn("JWT verify failed. uri={}, token={}", uri, token);
+            response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+            return false;
+        }
 
-        Long userId = 77L; // 테스트 이후 원복 예정
-
-        // 3) 멤버십 권한 체크 테스트 이후 원복 예정
-//        if (!membershipPort.isMember(roomId, userId)) {
-//            log.warn("Not a member: roomId={}, userId={}", roomId, userId);
-//            return false;
-//        }
-
+        // 멤버십 권한 체크
+        if (!membershipPort.isMember(roomId, userId)) {
+            log.warn("Not a member: roomId={}, userId={}", roomId, userId);
+            response.setStatusCode(org.springframework.http.HttpStatus.FORBIDDEN);
+            return false;
+        }
 
         attributes.put("userId", userId);
         return true;
@@ -66,6 +78,8 @@ public class JwtRoomHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                WebSocketHandler wsHandler, Exception exception) {
-        // 필요 시 로깅/후처리
+        if (exception != null) {
+            log.error("WebSocket handshake failed", exception);
+        }
     }
 }

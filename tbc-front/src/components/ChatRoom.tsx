@@ -54,14 +54,14 @@ export function ChatRoom({ roomId, userId, roomName }: ChatRoomProps) {
   useEffect(() => {
     if (!user) return
 
-    const token = localStorage.getItem('authToken')
+    const token = localStorage.getItem('accessToken')
     if (!token) {
       toast.error('인증 토큰이 없습니다. 다시 로그인해주세요.')
       return
     }
 
     // Start connect
-    stompClient.connect(token)
+    stompClient.connect(token, roomId)
 
     let roomSubscription: any = null
 
