@@ -33,7 +33,8 @@ public class EventDetailDTO extends EventCardDTO {
         dto.remainingSeats = Math.max(0, e.getCapacity() - e.getJoined());
         dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atOffset(ZoneOffset.UTC).toInstant();
         dto.location = e.getLocation();
-        dto.favorited = favorited;
+        dto.eventDate = e.getEventDate();
+        dto.eventTime = e.getEventTime();        dto.favorited = favorited;
         dto.description = e.getDescription();
         dto.tags = tags;
         dto.hostName = hostName;

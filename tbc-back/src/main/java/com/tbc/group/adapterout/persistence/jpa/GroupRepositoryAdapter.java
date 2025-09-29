@@ -33,7 +33,9 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .tagsCsv(String.join(",", g.tags()))
                 .contentHtml(g.contentHtml())
                 .hostId(g.hostId())
-                .build();
+                .location(g.location())
+                .eventDate(g.eventDate())
+                .eventTime(g.eventTime())                .build();
         return repo.save(e).getId();
     }
 
@@ -47,7 +49,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId()
-        ));
+                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
     }
 
     @Override
@@ -60,7 +62,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId()
-        ));
+                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
     }
 
     @Override
@@ -73,6 +75,6 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId()
-        ));
+                , e.getLocation(), e.getEventDate(), e.getEventTime()        ));
     }
 }

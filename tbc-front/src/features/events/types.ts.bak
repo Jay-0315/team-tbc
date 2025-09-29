@@ -1,20 +1,19 @@
 export type EventStatus = 'OPEN' | 'UPCOMING' | 'WAITLIST' | 'CLOSED'
 
-// 백엔드 EventCardDTO와 일치하는 타입
+// GroupCardDTO를 EventCardDTO로 사용
 export interface EventCardDTO {
   id: number
   title: string
-  coverUrl: string
   category: string
-  status: EventStatus
-  remainingSeats: number
-  startAt: string // UTC ISO string
-  location: string
-  eventDate?: string // YYYY-MM-DD 형식
-  eventTime?: string // HH:MM 형식
-  capacity: number
-  joined: number
-  favorited?: boolean
+  topic: string
+  minParticipants: number
+  maxParticipants: number
+  mode: string
+  feeType: string
+  feeAmount: number | null
+  tags: string[]
+  hostId: number
+  createdAt: string
 }
 
 export interface EventHost {
@@ -25,7 +24,6 @@ export interface EventHost {
 export interface EventDetailDTO extends EventCardDTO {
   description: string
   hostName: string
-  tags: string[]
 }
 
 export interface PageResponse<T> {
@@ -37,9 +35,8 @@ export interface PageResponse<T> {
 }
 
 export interface EventListParams {
-  q?: string
   category?: string
-  status?: EventStatus
+  status?: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED'
   sort?: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC'
   page?: number
   size?: number

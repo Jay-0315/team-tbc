@@ -1,10 +1,14 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTheme } from 'next-themes'
+import { Plus } from 'lucide-react'
 import EventFilters from '../components/event/EventFilters'
 import EventCard from '../components/event/EventCard'
 import { EventCardSkeletonGrid } from '../components/skeletons/EventCardSkeleton'
 import { useInfiniteEvents } from '../features/events/api/useInfiniteEvents'
+import { useAuth } from '../hooks/useAuth'
+import { Button } from '../components/ui/button'
+import CreateWizard from './groups/CreateWizard'
 import type { EventCardDTO, EventStatus } from '../features/events/types'
 
 const CATEGORIES = [
@@ -41,10 +45,12 @@ type Page<T> = {
 
 export default function EventsPage() {
   const { theme } = useTheme()
+  const { isAuthenticated } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [isDark, setIsDark] = useState(false)
+  const [showCreateWizard, setShowCreateWizard] = useState(false)
 
   // 테마 변경 감지
   useEffect(() => {
@@ -158,6 +164,12 @@ export default function EventsPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [])
 
+  // 소셜링 생성 완료 핸들러 추가
+  const handleGroupCreated = (groupId: number, roomId: number) => {
+    setShowCreateWizard(false)
+    console.log('그룹 생성됨:', groupId, '채팅방:', roomId)
+  }
+
   return (
     <main 
       className="min-h-screen transition-colors duration-300" 
@@ -190,10 +202,24 @@ export default function EventsPage() {
                 다양한 카테고리의 이벤트를 찾아보고 참여해보세요. 
                 음악, 영화, 독서, 게임, 워크숍, 네트워킹 등 다양한 활동을 만나보실 수 있습니다.
               </p>
+
+              {/* 소셜링 생성하기 버튼 - 로그인된 사용자만 표시 */}
+              {isAuthenticated && (
+                <div className="flex justify-center">
+                  <Button
+                    onClick={() => setShowCreateWizard(true)}
+                    size="lg"
+                    className="inline-flex gap-2 items-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl shadow-lg transition-all duration-200 hover:bg-blue-700 hover:shadow-xl hover:scale-105"
+                    aria-label="새 소셜링 생성하기"
+                  >
+                    <Plus className="w-5 h-5" />
+                    소셜링 생성하기
+                  </Button>
+                </div>
+              )}
             </header>
           </div>
         </div>
-
         {/* 컨텐츠 섹션 */}
         <div className="px-4 py-8 mx-auto max-w-7xl">
       
@@ -296,6 +322,24 @@ export default function EventsPage() {
 
       </section>
         </div>
+
+      {/* CreateWizard 모달 추가 - </main> 태그 바로 앞에 */}
+      {showCreateWizard && (
+        <div className="flex fixed inset-0 z-[9999] justify-center items-center backdrop-blur-sm bg-black/50 p-4">
+          <div className="relative w-full h-full max-w-6xl max-h-[95vh] bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
+            <button
+              onClick={() => setShowCreateWizard(false)}
+              className="absolute top-4 right-4 z-10 p-2 text-gray-500 rounded-full transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white/80 dark:bg-gray-800/80"
+              aria-label="모달 닫기"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <CreateWizard onCreated={handleGroupCreated} />
+          </div>
+        </div>
+      )}
     </main>
   )
 }
