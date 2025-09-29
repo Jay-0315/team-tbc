@@ -6,11 +6,11 @@ interface EventFiltersProps {
   selectedCategory?: string
   onChangeCategory: (category?: string) => void
 
-  status: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED'
-  onChangeStatus: (status: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED') => void
+  status: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED' | undefined
+  onChangeStatus: (status: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED' | undefined) => void
 
-  sort: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC'
-  onChangeSort: (sort: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC') => void
+  sort: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC'
+  onChangeSort: (sort: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC') => void
 
   searchQuery?: string
   onSearchChange: (query: string) => void
@@ -53,7 +53,7 @@ export default function EventFilters({
       {/* 검색 입력 */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
             placeholder="이벤트 검색..."
@@ -64,14 +64,14 @@ export default function EventFilters({
                 onSearch(searchQuery)
               }
             }}
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
             aria-label="이벤트 검색"
           />
         </div>
         <button
           type="button"
           onClick={() => onSearch(searchQuery)}
-          className="px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
           aria-label="검색 실행"
         >
           검색
@@ -91,17 +91,17 @@ export default function EventFilters({
               aria-selected={(selectedCategory || '') === (c.key || '')}
               className={`flex-shrink-0 inline-flex items-center gap-3 px-4 py-2.5 rounded-full border transition-all duration-200 ${
                 (selectedCategory || '') === (c.key || '')
-                  ? 'bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 shadow-md'
-                  : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                  : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50 hover:shadow-sm'
               }`}
               onClick={() => onChangeCategory(c.key || undefined)}
             >
-              <span className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden inline-flex items-center justify-center">
+              <span className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden inline-flex items-center justify-center">
                 {c.thumbnailUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={c.thumbnailUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{c.name.slice(0, 2)}</span>
+                  <span className="text-sm font-medium text-gray-600">{c.name.slice(0, 2)}</span>
                 )}
               </span>
               <span className="text-sm font-medium whitespace-nowrap">{c.name}</span>
@@ -118,8 +118,8 @@ export default function EventFilters({
             aria-selected={status === t.key}
             className={`px-4 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 ${
               status === t.key 
-                ? 'bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 shadow-md' 
-                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
+                ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50 hover:shadow-sm'
             }`}
             onClick={() => onChangeStatus(t.key)}
           >
@@ -136,8 +136,8 @@ export default function EventFilters({
             aria-checked={sort === o.key}
             className={`px-4 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 ${
               sort === o.key 
-                ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-sm' 
-                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
+                ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' 
+                : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:shadow-sm'
             }`}
             onClick={() => onChangeSort(o.key)}
           >

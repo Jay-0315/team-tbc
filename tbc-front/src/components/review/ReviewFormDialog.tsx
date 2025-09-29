@@ -12,7 +12,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateReview } from '@/features/events/api/useCreateReview'
 import { useAuth } from '@/hooks/useAuth'
-import AuthModal from '@/components/AuthModal'
+import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
 import { toast } from 'sonner'
 
 interface ReviewFormDialogProps {
@@ -170,14 +170,10 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
       </Dialog>
       
       {/* 로그인 모달 */}
-      <AuthModal 
+      <UnifiedAuthModal 
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
-        onAuthSuccess={() => {
-          setAuthModalOpen(false)
-          // 로그인 성공 후 리뷰 작성 모달 열기
-          setOpen(true)
-        }}
+        initialMode="login"
       />
     </>
   )

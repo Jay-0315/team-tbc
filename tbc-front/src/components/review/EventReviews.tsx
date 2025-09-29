@@ -2,12 +2,15 @@ import { Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEventReviews } from '@/features/events/api/useEventReviews'
 import { ReviewItem } from './ReviewItem'
+import { useAuth } from '@/hooks/useAuth'
 
 interface EventReviewsProps {
   eventId: number
 }
 
 export function EventReviews({ eventId }: EventReviewsProps) {
+  const { isAuthenticated } = useAuth()
+  
   const {
     data: reviewsData,
     fetchNextPage,
@@ -16,14 +19,19 @@ export function EventReviews({ eventId }: EventReviewsProps) {
     isLoading,
     error,
     refetch
-  } = useEventReviews(eventId, 10)
+  } = useEventReviews(eventId, 10, { enabled: isAuthenticated })
 
-  const reviews = reviewsData?.pages.flatMap(page => page.content) ?? []
+  const reviews = reviewsData?.pages.flatMap((page: any) => page.content) ?? []
   
   // 평균 평점 계산
   const averageRating = reviews.length > 0 
-    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+    ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
     : 0
+
+  // 인증되지 않은 사용자는 아무것도 렌더링하지 않음 (상위 컴포넌트에서 처리)
+  if (!isAuthenticated) {
+    return null
+  }
 
   // 로딩 상태
   if (isLoading) {
@@ -102,7 +110,7 @@ export function EventReviews({ eventId }: EventReviewsProps) {
       {/* 후기 목록 */}
       {reviews.length > 0 && (
         <div className="space-y-4">
-          {reviews.map((review) => (
+          {reviews.map((review: any) => (
             <ReviewItem key={review.id} review={review} />
           ))}
 

@@ -26,16 +26,22 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .topic(g.topic())
                 .minParticipants(g.minParticipants())
                 .maxParticipants(g.maxParticipants())
+                .capacity(g.maxParticipants())  // capacity는 maxParticipants와 동일
+                .joined(0)  // 기본값으로 0 설정
+                .coverUrl("")  // 기본값으로 빈 문자열 설정
                 .mode(g.mode().name())
                 .feeType(g.feeType().name())
                 .feeAmount(g.feeAmount())
                 .feeInfo(g.feeInfo())
-                .tagsCsv(String.join(",", g.tags()))
+                .tagsCsv(g.tags() == null ? "" : String.join(",", g.tags()))
                 .contentHtml(g.contentHtml())
                 .hostId(g.hostId())
                 .location(g.location())
                 .eventDate(g.eventDate())
-                .eventTime(g.eventTime())                .build();
+                .eventTime(g.eventTime())
+                .startAt(g.eventDate() != null && g.eventTime() != null ? 
+                    g.eventDate().atTime(g.eventTime()) : null)
+                .build();
         return repo.save(e).getId();
     }
 

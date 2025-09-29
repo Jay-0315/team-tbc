@@ -1,7 +1,5 @@
 package com.tbc.events.web.controller;
 
-import com.tbc.group.adapterin.http.dto.GroupCardDTO;
-import com.tbc.group.application.facade.GroupReadFacade;
 import com.tbc.events.application.facade.EventFacade;
 import com.tbc.events.web.dto.PageResponse;
 import com.tbc.events.web.dto.ReviewDTO;
@@ -38,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EventController {
 
-        private final GroupReadFacade groupReadFacade;
         private final EventFacade eventFacade;
         private final UserService userService;
 
@@ -57,7 +54,7 @@ public class EventController {
                         @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = PageResponse.class))),
                         @ApiResponse(responseCode = "400", description = "요청 오류", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
         })
-        public PageResponse<GroupCardDTO> list(
+        public PageResponse<com.tbc.events.web.dto.EventCardDTO> list(
                         @RequestHeader(value = "X-User-Id", required = false) Long userId,
                         @RequestParam(required = false) String q,
                         @RequestParam(required = false) String category,
@@ -65,7 +62,7 @@ public class EventController {
                         @RequestParam(required = false, defaultValue = "CREATED_DESC") String sort,
                         Pageable pageable) {
                 // events 테이블에서 데이터 조회
-                Page<GroupCardDTO> page = groupReadFacade.findAll(pageable);
+                Page<com.tbc.events.web.dto.EventCardDTO> page = eventFacade.getEventList(q, category, status, sort, pageable);
                 return PageResponse.from(page);
         }
 
@@ -73,13 +70,13 @@ public class EventController {
         @Operation(summary = "이벤트 상세 조회 (events 테이블 사용)", description = "events 테이블에서 그룹 상세를 이벤트 형태로 조회합니다.", security = {
                         @SecurityRequirement(name = "X-User-Id") })
         @ApiResponses({
-                        @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = GroupCardDTO.class))),
+                        @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = com.tbc.events.web.dto.EventDetailDTO.class))),
                         @ApiResponse(responseCode = "404", description = "미존재", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
         })
-        public GroupCardDTO detail(
+        public com.tbc.events.web.dto.EventDetailDTO detail(
                         @Parameter(name = "id", description = "이벤트 ID", example = "1") @PathVariable Long id,
                         @RequestHeader(value = "X-User-Id", required = false) Long userId) {
-                return groupReadFacade.findOne(id);
+                return eventFacade.getEventDetail(id);
         }
 
         @GetMapping("/{id}/reviews")

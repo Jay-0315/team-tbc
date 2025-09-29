@@ -23,6 +23,9 @@ public class GroupEntity {
     @Column(nullable=false, length=120) String topic;
     @Column(nullable=false) int minParticipants;
     @Column(nullable=false) int maxParticipants;
+    @Column(nullable=false) int capacity;                // 최대 인원 (maxParticipants와 동일)
+    @Column(nullable=false) int joined = 0;              // 현재 참가자 수 (기본값: 0)
+    @Column(length=500, nullable=false) String coverUrl = "";  // 커버 이미지 URL (기본값: 빈 문자열)
     @Column(nullable=false, length=16) String mode;      // ONLINE/OFFLINE
     @Column(nullable=false, length=8)  String feeType;   // FREE/PAID
     Integer feeAmount;
@@ -32,6 +35,8 @@ public class GroupEntity {
     @Column(nullable=false) Long hostId;
     @Column(length=200) String location;
     @Column LocalDate eventDate;
-    @Column LocalTime eventTime;    @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
+    @Column LocalTime eventTime;
+    @Column LocalDateTime startAt;  // 시작 시간 (eventDate + eventTime 조합)
+    @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
     @UpdateTimestamp   @Column(nullable=false) LocalDateTime updatedAt;
 }

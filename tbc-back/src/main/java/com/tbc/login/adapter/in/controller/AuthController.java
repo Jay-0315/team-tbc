@@ -36,13 +36,20 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<SignupResponse>> signup(@Valid @RequestBody SignupRequest request) {
-        User user = userService.signup(request);
-        SignupResponse body = new SignupResponse(
-                user.getId(), user.getEmail(), user.getRealName(), user.getNickname()
-        );
-        return ResponseEntity
-                .created(URI.create("/api/users/" + user.getId()))
-                .body(ApiResponse.ok(body));
+        System.out.println("Signup request received: " + request.getEmail() + ", " + request.getRealName() + ", " + request.getNickname());
+        try {
+            User user = userService.signup(request);
+            SignupResponse body = new SignupResponse(
+                    user.getId(), user.getEmail(), user.getRealName(), user.getNickname()
+            );
+            return ResponseEntity
+                    .created(URI.create("/api/users/" + user.getId()))
+                    .body(ApiResponse.ok(body));
+        } catch (Exception e) {
+            System.out.println("Signup error: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PostMapping("/login")

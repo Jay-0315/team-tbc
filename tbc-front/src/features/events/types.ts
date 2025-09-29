@@ -15,6 +15,9 @@ export interface EventCardDTO {
   capacity: number
   joined: number
   favorited?: boolean
+  mode?: string
+  feeType?: string
+  feeAmount?: number
 }
 
 export interface EventHost {
@@ -23,7 +26,7 @@ export interface EventHost {
 }
 
 export interface EventDetailDTO extends EventCardDTO {
-  description: string
+  description?: string
   hostName: string
   tags: string[]
 }
@@ -40,7 +43,7 @@ export interface EventListParams {
   q?: string
   category?: string
   status?: EventStatus
-  sort?: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC'
+  sort?: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC'
   page?: number
   size?: number
 }

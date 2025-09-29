@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useTheme } from 'next-themes'
 import { Plus } from 'lucide-react'
+// @ts-ignore
 import { useQueryClient } from '@tanstack/react-query'
 import EventFilters from '../components/event/EventFilters'
 import EventCard from '../components/event/EventCard'
@@ -45,19 +45,12 @@ type Page<T> = {
 }
 
 export default function EventsPage() {
-  const { theme } = useTheme()
   const { isAuthenticated } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const queryClient = useQueryClient()
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
-  const [isDark, setIsDark] = useState(false)
   const [showCreateWizard, setShowCreateWizard] = useState(false)
-
-  // 테마 변경 감지
-  useEffect(() => {
-    setIsDark(theme === 'dark')
-  }, [theme])
 
   // URL에서 초기값 복원 + 카테고리 정규화
   const rawCategory = searchParams.get('category') || undefined
@@ -71,7 +64,7 @@ export default function EventsPage() {
 
   const allowedStatus: ReadonlyArray<EventStatus> = ['UPCOMING','OPEN','WAITLIST','CLOSED']
   const statusParam = searchParams.get('status')
-  const status: EventStatus = allowedStatus.includes(statusParam as EventStatus) ? (statusParam as EventStatus) : 'OPEN'
+  const status: EventStatus | undefined = allowedStatus.includes(statusParam as EventStatus) ? (statusParam as EventStatus) : undefined
 
   const allowedSort: ReadonlyArray<SortKey> = ['DEADLINE_ASC','REVIEWS_DESC','START_ASC','NEW_DESC']
   const sortParam = searchParams.get('sort')
@@ -178,34 +171,15 @@ export default function EventsPage() {
   }
 
   return (
-    <main 
-      className="min-h-screen transition-colors duration-300" 
-      style={{ 
-        backgroundColor: isDark ? '#111827' : '#ffffff',
-        color: isDark ? '#f9fafb' : '#111827'
-      }}
-    >
+    <main className="min-h-screen bg-white text-gray-900 transition-colors duration-300">
         {/* 넷플릭스 스타일 히어로 섹션 */}
-        <div 
-          className="relative transition-colors duration-300"
-          style={{
-            background: isDark 
-              ? 'linear-gradient(to bottom, #111827, #1f2937)' 
-              : 'linear-gradient(to bottom, #f9fafb, #ffffff)'
-          }}
-        >
+        <div className="relative bg-gradient-to-b from-gray-50 to-white transition-colors duration-300">
           <div className="px-4 py-12 mx-auto max-w-7xl">
             <header className="mb-12 text-center">
-              <h1 
-                className="mb-6 text-5xl font-bold tracking-tight"
-                style={{ color: isDark ? '#f9fafb' : '#111827' }}
-              >
+              <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900">
                 TEAM-TBC 이벤트
               </h1>
-              <p 
-                className="mx-auto max-w-3xl text-xl leading-relaxed"
-                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
-              >
+              <p className="mx-auto max-w-3xl text-xl leading-relaxed text-gray-600">
                 다양한 카테고리의 이벤트를 찾아보고 참여해보세요. 
                 음악, 영화, 독서, 게임, 워크숍, 네트워킹 등 다양한 활동을 만나보실 수 있습니다.
               </p>
@@ -250,14 +224,14 @@ export default function EventsPage() {
         {/* 에러 상태 */}
         {isError && (
           <div role="alert" className="py-16 text-center">
-            <div className="p-8 mx-auto max-w-md bg-red-50 rounded-xl border border-red-200 dark:bg-red-900/20 dark:border-red-800">
-              <p className="mb-6 text-lg font-medium text-red-700 dark:text-red-300">
+            <div className="p-8 mx-auto max-w-md bg-red-50 rounded-xl border border-red-200">
+              <p className="mb-6 text-lg font-medium text-red-700">
                 데이터를 불러오지 못했습니다.
-                {error && <span className="block mt-2 text-sm text-red-600 dark:text-red-400">{error.message}</span>}
+                {error && <span className="block mt-2 text-sm text-red-600">{error.message}</span>}
               </p>
               <button
                 type="button"
-                className="px-6 py-3 font-medium text-white bg-red-600 rounded-lg transition-all duration-200 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                className="px-6 py-3 font-medium text-white bg-red-600 rounded-lg transition-all duration-200 hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                 onClick={() => refetch()}
                 aria-label="다시 시도"
               >
@@ -270,11 +244,11 @@ export default function EventsPage() {
         {/* 빈 상태 */}
         {!isLoading && !isError && allEvents.length === 0 && (
           <div className="py-16 text-center">
-            <div className="p-8 mx-auto max-w-md bg-gray-50 rounded-xl border border-gray-200 dark:bg-gray-800/50 dark:border-gray-700">
-              <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">조건에 맞는 이벤트가 없어요</p>
+            <div className="p-8 mx-auto max-w-md bg-gray-50 rounded-xl border border-gray-200">
+              <p className="mb-6 text-lg text-gray-600">조건에 맞는 이벤트가 없어요</p>
               <button
                 type="button"
-                className="px-6 py-3 font-medium text-gray-700 bg-gray-100 rounded-lg transition-all duration-200 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                className="px-6 py-3 font-medium text-gray-700 bg-gray-100 rounded-lg transition-all duration-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                 onClick={() => {
                   setSearchQuery('')
                   updateSearchParams({ q: undefined, category: undefined, status: 'OPEN', sort: 'NEW_DESC' })
@@ -308,9 +282,9 @@ export default function EventsPage() {
         {/* 로딩 상태 메시지 */}
         {isFetchingNextPage && (
           <div role="status" className="py-8 text-center" aria-live="polite">
-            <div className="inline-flex gap-3 items-center px-6 py-3 bg-gray-100 rounded-full dark:bg-gray-800">
-              <div className="w-4 h-4 rounded-full border-2 border-blue-600 animate-spin dark:border-blue-400 border-t-transparent"></div>
-              <p className="font-medium text-gray-600 dark:text-gray-300">다음 페이지 로딩 중...</p>
+            <div className="inline-flex gap-3 items-center px-6 py-3 bg-gray-100 rounded-full">
+              <div className="w-4 h-4 rounded-full border-2 border-blue-600 animate-spin border-t-transparent"></div>
+              <p className="font-medium text-gray-600">다음 페이지 로딩 중...</p>
             </div>
           </div>
         )}
@@ -318,9 +292,9 @@ export default function EventsPage() {
         {/* 마지막 페이지 메시지 */}
         {!hasNextPage && allEvents.length > 0 && (
           <div role="status" className="py-8 text-center" aria-live="polite">
-            <div className="inline-flex gap-2 items-center px-4 py-2 bg-gray-50 rounded-lg dark:bg-gray-800/50">
-              <p className="font-medium text-gray-500 dark:text-gray-400">마지막입니다</p>
-              <span className="px-2 py-1 text-xs text-gray-400 bg-gray-200 rounded dark:text-gray-500 dark:bg-gray-700">
+            <div className="inline-flex gap-2 items-center px-4 py-2 bg-gray-50 rounded-lg">
+              <p className="font-medium text-gray-500">마지막입니다</p>
+              <span className="px-2 py-1 text-xs text-gray-400 bg-gray-200 rounded">
                 총 {allEvents.length}개
               </span>
             </div>
@@ -333,10 +307,10 @@ export default function EventsPage() {
       {/* CreateWizard 모달 추가 - </main> 태그 바로 앞에 */}
       {showCreateWizard && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-black/50 p-4">
-          <div className="relative w-full max-w-6xl max-h-[95vh] bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+          <div className="relative w-full max-w-6xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
             <button
               onClick={() => setShowCreateWizard(false)}
-              className="absolute top-4 right-4 z-20 p-2 text-gray-500 rounded-full transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
+              className="absolute top-4 right-4 z-20 p-2 text-gray-500 rounded-full transition-colors hover:text-gray-700 bg-white/80 backdrop-blur-sm"
               aria-label="모달 닫기"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
