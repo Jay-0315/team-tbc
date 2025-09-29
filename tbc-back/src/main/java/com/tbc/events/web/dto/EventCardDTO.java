@@ -50,6 +50,14 @@ public class EventCardDTO {
     @Schema(description = "즐겨찾기 여부(로그인 헤더 있을 때만 포함)", example = "false", nullable = true)
     public Boolean favorited;
 
+    // 추가 노출 필드
+    @Schema(description = "요금 유형", example = "PAID")
+    public String feeType;
+    @Schema(description = "요금(팝콘)", example = "10")
+    public Integer feeAmount;
+    @Schema(description = "호스트 사용자 ID", example = "42")
+    public Long hostId;
+
     public static EventCardDTO from(Event e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
         dto.id = e.getId();
@@ -63,7 +71,12 @@ public class EventCardDTO {
         dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atOffset(ZoneOffset.UTC).toInstant();
         dto.location = e.getLocation();
         dto.eventDate = e.getEventDate();
-        dto.eventTime = e.getEventTime();        dto.favorited = favorited;
+        dto.eventTime = e.getEventTime();
+        dto.favorited = favorited;
+        // 추가 매핑
+        dto.feeType = e.getFeeType();
+        dto.feeAmount = e.getFeeAmount();
+        dto.hostId = e.getHostId();
         return dto;
     }
 }

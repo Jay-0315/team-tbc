@@ -25,18 +25,18 @@ public class GroupEntity {
     @Column(nullable=false) int maxParticipants;
     @Column(nullable=false) int capacity;                // 최대 인원 (maxParticipants와 동일)
     @Column(nullable=false) int joined = 0;              // 현재 참가자 수 (기본값: 0)
-    @Column(length=500, nullable=false) String coverUrl = "";  // 커버 이미지 URL (기본값: 빈 문자열)
+    @Column(name="cover_url", length=500, nullable=false) String coverUrl = "";  // 커버 이미지 URL (기본값: 빈 문자열)
     @Column(nullable=false, length=16) String mode;      // ONLINE/OFFLINE
-    @Column(nullable=false, length=8)  String feeType;   // FREE/PAID
-    Integer feeAmount;
-    @Lob String feeInfo;
-    @Lob String tagsCsv;          // 간단하게 CSV 저장(필요 시 별도 테이블로 확장)
-    @Lob String contentHtml;
-    @Column(nullable=false) Long hostId;
+    @Column(name="fee_type", nullable=false, length=8)  String feeType;   // FREE/PAID
+    @Column(name="fee_amount") Integer feeAmount;
+    @Lob @Column(name="fee_info") String feeInfo;
+    @Lob @Column(name="tags_csv") String tagsCsv;          // 간단하게 CSV 저장(필요 시 별도 테이블로 확장)
+    @Lob @Column(name="content_html") String contentHtml;
+    @Column(name="host_id", nullable=false) Long hostId;
     @Column(length=200) String location;
-    @Column LocalDate eventDate;
-    @Column LocalTime eventTime;
-    @Column LocalDateTime startAt;  // 시작 시간 (eventDate + eventTime 조합)
-    @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
-    @UpdateTimestamp   @Column(nullable=false) LocalDateTime updatedAt;
+    @Column(name="event_date") LocalDate eventDate;
+    @Column(name="event_time") LocalTime eventTime;
+    @Column(name="start_at") LocalDateTime startAt;  // 시작 시간 (eventDate + eventTime 조합)
+    @CreationTimestamp @Column(name="created_at", nullable=false, updatable=false) LocalDateTime createdAt;
+    @UpdateTimestamp   @Column(name="updated_at", nullable=false) LocalDateTime updatedAt;
 }

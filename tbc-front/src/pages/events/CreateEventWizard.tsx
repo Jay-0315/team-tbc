@@ -276,7 +276,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
   const progressValue = (step / 3) * 100
 
   return (
-    <div className="w-full bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="w-full bg-gradient-to-br via-white from-slate-50 to-slate-100">
       {/* 배경 패턴 */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-pink-500/5"></div>
@@ -286,16 +286,16 @@ export default function CreateEventWizard({ onCreated }: Props) {
         }}></div>
       </div>
       
-      <div className="relative w-full px-4 py-8 min-h-full">
+      <div className="relative px-4 py-8 w-full min-h-full">
         {/* 헤더 */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl shadow-lg">
+        <div className="mb-12 text-center">
+          <div className="inline-flex justify-center items-center mb-6 w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl shadow-lg">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-4">
+          <h1 className="mb-4 text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
             소셜링 만들기
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto max-w-2xl text-xl leading-relaxed text-gray-600">
             새로운 사람들과 만나고 싶은 활동을 만들어보세요. 
             <span className="font-semibold text-gray-800">단 3단계</span>로 쉽고 빠르게!
           </p>
@@ -331,8 +331,8 @@ export default function CreateEventWizard({ onCreated }: Props) {
           </div>
           
           {/* 단계별 제목 */}
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <div className="mb-6 text-center">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
               {step === 1 && "기본 정보 입력"}
               {step === 2 && "상세 정보 설정"}
               {step === 3 && "내용 작성 및 완료"}
@@ -344,7 +344,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
             </p>
           </div>
           
-          <Progress value={progressValue} className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <Progress value={progressValue} className="overflow-hidden h-3 bg-gray-200 rounded-full dark:bg-gray-700">
             <div className="h-full bg-gradient-to-r from-red-500 to-pink-500 transition-all duration-500 ease-out" 
                  style={{ width: `${progressValue}%` }} />
           </Progress>
@@ -352,8 +352,8 @@ export default function CreateEventWizard({ onCreated }: Props) {
 
         {/* 에러 메시지 */}
         {errors.submit && (
-          <div className="mb-8 p-6 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-3 text-red-700 dark:text-red-300 shadow-lg">
-            <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+          <div className="flex gap-3 items-center p-6 mb-8 text-red-700 bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl border border-red-200 shadow-lg dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-800 dark:text-red-300">
+            <div className="flex flex-shrink-0 justify-center items-center w-8 h-8 bg-red-100 rounded-full dark:bg-red-900/30">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
@@ -365,10 +365,10 @@ export default function CreateEventWizard({ onCreated }: Props) {
 
         {/* 1단계: 기본 정보 */}
         {step === 1 && (
-          <Card className="border-0 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 border-b border-gray-100 dark:border-gray-700">
-              <CardTitle className="flex items-center gap-3 text-2xl">
-                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+          <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
+            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
+              <CardTitle className="flex gap-3 items-center text-2xl">
+                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 기본 정보
@@ -398,7 +398,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                   maxLength={50}
                 />
                 {errors.title && (
-                  <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
                     <AlertCircle className="w-4 h-4 text-red-500" />
                     <p className="text-sm text-red-600 dark:text-red-400">{errors.title}</p>
                   </div>
@@ -436,7 +436,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                   </SelectContent>
                 </Select>
                 {errors.category && (
-                  <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
                     <AlertCircle className="w-4 h-4 text-red-500" />
                     <p className="text-sm text-red-600 dark:text-red-400">{errors.category}</p>
                   </div>
@@ -457,7 +457,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                   aria-label="소셜링 주제"
                 />
                 {errors.topic && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="flex gap-1 items-center text-sm text-red-600">
                     <AlertCircle className="w-4 h-4" />
                     {errors.topic}
                   </p>
@@ -465,7 +465,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
               </div>
 
               {/* 인원 수 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="minParticipants" className="text-sm font-medium">
                     최소 인원 *
@@ -481,7 +481,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                     aria-label="최소 참가 인원"
                   />
                   {errors.minParticipants && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="flex gap-1 items-center text-sm text-red-600">
                       <AlertCircle className="w-4 h-4" />
                       {errors.minParticipants}
                     </p>
@@ -503,7 +503,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                     aria-label="최대 참가 인원"
                   />
                   {errors.maxParticipants && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="flex gap-1 items-center text-sm text-red-600">
                       <AlertCircle className="w-4 h-4" />
                       {errors.maxParticipants}
                     </p>
@@ -515,10 +515,10 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 <Button 
                   onClick={next} 
                   size="lg" 
-                  className="h-12 px-8 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
                 >
                   다음 단계
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Button>
@@ -529,10 +529,10 @@ export default function CreateEventWizard({ onCreated }: Props) {
 
         {/* 2단계: 상세 정보 */}
         {step === 2 && (
-          <Card className="border-0 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 border-b border-gray-100 dark:border-gray-700">
-              <CardTitle className="flex items-center gap-3 text-2xl">
-                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+          <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
+            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
+              <CardTitle className="flex gap-3 items-center text-2xl">
+                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
                   <CalendarIcon className="w-5 h-5 text-white" />
                 </div>
                 상세 정보
@@ -561,7 +561,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
-                      <MapPin className="w-8 h-8 mb-2" />
+                      <MapPin className="mb-2 w-8 h-8" />
                       <span className="font-semibold">오프라인</span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">직접 만나서 진행</span>
                     </Label>
@@ -577,7 +577,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
-                      <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="mb-2 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                       <span className="font-semibold">온라인</span>
@@ -606,7 +606,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
-                      <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="mb-2 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                       </svg>
                       <span className="font-semibold">무료</span>
@@ -624,7 +624,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
-                      <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="mb-2 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                       <span className="font-semibold">유료</span>
@@ -634,10 +634,10 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 </RadioGroup>
 
                 {form.feeType === "PAID" && (
-                  <div className="space-y-6 p-6 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/10 dark:to-yellow-900/10 rounded-2xl border border-orange-200 dark:border-orange-800">
+                  <div className="p-6 space-y-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-200 dark:from-orange-900/10 dark:to-yellow-900/10 dark:border-orange-800">
                     <div className="space-y-3">
                       <Label htmlFor="feeAmount" className="text-base font-semibold text-gray-900 dark:text-white">
-                        참가비 (원) *
+                        필요 팝콘 (개) *
                       </Label>
                       <Input
                         id="feeAmount"
@@ -645,7 +645,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                         min="0"
                         value={form.feeAmount || ""}
                         onChange={(e) => updateForm("feeAmount", parseInt(e.target.value) || null)}
-                        placeholder="예: 15000"
+                        placeholder="예: 100"
                         className={cn(
                           "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                           errors.feeAmount 
@@ -655,7 +655,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                         aria-label="참가비 금액"
                       />
                       {errors.feeAmount && (
-                        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                        <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
                           <AlertCircle className="w-4 h-4 text-red-500" />
                           <p className="text-sm text-red-600 dark:text-red-400">{errors.feeAmount}</p>
                         </div>
@@ -681,7 +681,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                         rows={3}
                       />
                       {errors.feeInfo && (
-                        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                        <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
                           <AlertCircle className="w-4 h-4 text-red-500" />
                           <p className="text-sm text-red-600 dark:text-red-400">{errors.feeInfo}</p>
                         </div>
@@ -692,7 +692,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
               </div>
 
               {/* 날짜와 시간 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">이벤트 날짜 *</Label>
                   <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
@@ -707,7 +707,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                             : "border-gray-200 dark:border-gray-600 focus:border-red-500"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <CalendarIcon className="mr-2 w-4 h-4" />
                         {form.eventDate ? (
                           format(form.eventDate, "yyyy년 M월 d일 (E)", { locale: ko })
                         ) : (
@@ -715,7 +715,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                         )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="p-0 w-auto" align="start">
                       <Calendar
                         mode="single"
                         selected={form.eventDate}
@@ -769,7 +769,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                     </PopoverContent>
                   </Popover>
                   {errors.eventDate && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="flex gap-1 items-center text-sm text-red-600">
                       <AlertCircle className="w-4 h-4" />
                       {errors.eventDate}
                     </p>
@@ -796,7 +796,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                     </SelectContent>
                   </Select>
                   {errors.eventTime && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="flex gap-1 items-center text-sm text-red-600">
                       <AlertCircle className="w-4 h-4" />
                       {errors.eventTime}
                     </p>
@@ -806,7 +806,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
 
               {/* 장소 */}
               <div className="space-y-2">
-                <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
+                <Label htmlFor="location" className="flex gap-2 items-center text-sm font-medium">
                   <MapPin className="w-4 h-4" />
                   장소 *
                 </Label>
@@ -819,7 +819,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                   aria-label="모임 장소"
                 />
                 {errors.location && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="flex gap-1 items-center text-sm text-red-600">
                     <AlertCircle className="w-4 h-4" />
                     {errors.location}
                   </p>
@@ -828,7 +828,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
 
               {/* 태그 */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium flex items-center gap-2">
+                <Label className="flex gap-2 items-center text-sm font-medium">
                   <Tag className="w-4 h-4" />
                   태그 (선택사항)
                 </Label>
@@ -855,7 +855,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 {form.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {form.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      <Badge key={tag} variant="secondary" className="flex gap-1 items-center">
                         {tag}
                         <button
                           type="button"
@@ -878,9 +878,9 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 <Button 
                   variant="outline" 
                   onClick={prev}
-                  className="h-12 px-6 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl font-semibold transition-all duration-200"
+                  className="px-6 h-12 font-semibold text-gray-700 rounded-xl border-2 border-gray-300 transition-all duration-200 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   이전 단계
@@ -888,10 +888,10 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 <Button 
                   onClick={next} 
                   size="lg" 
-                  className="h-12 px-8 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
                 >
                   다음 단계
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Button>
@@ -902,10 +902,10 @@ export default function CreateEventWizard({ onCreated }: Props) {
 
         {/* 3단계: 내용 작성 */}
         {step === 3 && (
-          <Card className="border-0 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 border-b border-gray-100 dark:border-gray-700">
-              <CardTitle className="flex items-center gap-3 text-2xl">
-                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+          <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
+            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
+              <CardTitle className="flex gap-3 items-center text-2xl">
+                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
                   <Tag className="w-5 h-5 text-white" />
                 </div>
                 내용 작성
@@ -938,7 +938,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">미리보기</Label>
                   <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 min-h-[100px]">
-                    <div className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+                    <div className="text-sm text-gray-700 whitespace-pre-wrap dark:text-gray-300">
                       {form.contentHtml}
                     </div>
                   </div>
@@ -949,9 +949,9 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 <Button 
                   variant="outline" 
                   onClick={prev}
-                  className="h-12 px-6 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl font-semibold transition-all duration-200"
+                  className="px-6 h-12 font-semibold text-gray-700 rounded-xl border-2 border-gray-300 transition-all duration-200 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   이전 단계
@@ -960,11 +960,11 @@ export default function CreateEventWizard({ onCreated }: Props) {
                   onClick={onSubmit}
                   disabled={loading}
                   size="lg"
-                  className="h-12 px-8 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {loading ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="mr-3 -ml-1 w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
@@ -973,7 +973,7 @@ export default function CreateEventWizard({ onCreated }: Props) {
                   ) : (
                     <>
                       소셜링 만들기
-                      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
                     </>
