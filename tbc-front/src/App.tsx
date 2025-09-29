@@ -12,6 +12,7 @@ import EventDetailPage from '@/pages/EventDetailPage'
 // import GroupDetailPage from '@/pages/groups/GroupDetailPage'
 import EventsPage from '@/pages/EventsPage'
 import { FloatingChatButton } from '@/components/FloatingChatButton'
+import { MyPage } from '@/pages/MyPage'
 
 export default function App() {
   const { user, logoutAsync, isLoading } = useAuth()
@@ -58,6 +59,7 @@ export default function App() {
             element={<CreateEventWizard onCreated={handleGroupCreated} />} 
           />
           <Route path="/groups/:id/chat" element={<GroupChatPage />} />
+          <Route path="/mypage" element={<MyPage />} />
         </Routes>
       </main>
       {user && <FloatingChatButton />}

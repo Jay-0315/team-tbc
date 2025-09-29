@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react'
 import { User } from 'lucide-react'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
 
+import type { User as TbcUser } from '@/types/auth'
+
 interface HeaderProps {
-  user: any
+  user: TbcUser | null
   onLogout: () => void
 }
 
@@ -84,7 +86,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                   <button
                     onClick={() => {
                       setIsDropdownOpen(false)
-                      // 마이페이지로 이동 (추후 구현)
+                      window.location.href = '/mypage'
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                     role="menuitem"
