@@ -13,11 +13,11 @@ export default function HostBadge({ host }: HostBadgeProps) {
           <img src={host.avatarUrl} className="w-full h-full object-cover" alt="호스트 아바타" />
         ) : (
           <span className="text-xs" aria-hidden="true">
-            {host.name.slice(0, 1)}
+            {host?.name?.slice(0, 1) || "?"}
           </span>
         )}
       </span>
-      <span className="text-sm text-zinc-700">{host.name}</span>
+      <span className="text-sm text-zinc-700">{host?.name || "호스트"}</span>
     </div>
   )
 }
