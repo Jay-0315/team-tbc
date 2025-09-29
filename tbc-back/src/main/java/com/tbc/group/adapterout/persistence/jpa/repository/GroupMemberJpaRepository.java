@@ -10,4 +10,5 @@ public interface GroupMemberJpaRepository extends JpaRepository<GroupMemberEntit
     int countByGroupIdAndStatus(Long groupId, String status);
     List<GroupMemberEntity> findByUserIdAndStatus(Long userId, String status);
     List<GroupMemberEntity> findByUserId(Long userId);
+    boolean existsByGroupIdAndUserIdAndStatus(Long groupId, Long userId, String status);
 }

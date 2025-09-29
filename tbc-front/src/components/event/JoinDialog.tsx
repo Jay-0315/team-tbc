@@ -10,7 +10,6 @@ interface JoinDialogProps {
 export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const firstFocusable = useRef<HTMLButtonElement | null>(null)
-  const [qty, setQty] = useState<number>(1)
   const [agree, setAgree] = useState<boolean>(false)
   const { mutateAsync, isPending } = useJoinEvent(eventId)
 
@@ -45,12 +44,12 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
     }
   }
 
-  const canSubmit = qty >= 1 && agree && !isPending
+  const canSubmit = agree && !isPending
 
   const submit = async () => {
     if (!canSubmit) return
     try {
-      await mutateAsync({ qty })
+      await mutateAsync({ qty: 1 })
       showToast('신청 완료')
       onOpenChange(false)
     } catch (e: unknown) {
@@ -63,50 +62,19 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="flex fixed inset-0 z-50 justify-center items-center"
       role="dialog"
       aria-labelledby="join-title"
       aria-describedby="join-desc"
       aria-modal="true"
     >
       <div className="absolute inset-0 bg-black/40" onClick={() => onOpenChange(false)} />
-      <div ref={dialogRef} className="relative z-10 w-full max-w-md rounded-xl bg-white p-4 shadow-lg">
+      <div ref={dialogRef} className="relative z-10 p-4 w-full max-w-md bg-white rounded-xl shadow-lg">
         <h2 id="join-title" className="text-lg font-semibold">참가 신청</h2>
-        <p id="join-desc" className="text-sm text-zinc-600 mt-1">수량을 선택하고 약관에 동의해주세요.</p>
+        <p id="join-desc" className="mt-1 text-sm text-zinc-600">약관에 동의해주세요.</p>
 
         <div className="mt-4 space-y-3">
-          <div>
-            <label className="text-sm font-medium">수량</label>
-            <div className="mt-1 inline-flex items-center rounded border border-zinc-300 overflow-hidden">
-              <button
-                ref={firstFocusable}
-                type="button"
-                className="px-3 py-2 hover:bg-zinc-50"
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                aria-label="수량 감소"
-              >
-                -
-              </button>
-              <input
-                type="number"
-                min={1}
-                value={qty}
-                onChange={(e) => setQty(Math.max(1, Number(e.target.value)))}
-                className="w-16 text-center py-2 outline-none"
-                aria-label="수량"
-              />
-              <button
-                type="button"
-                className="px-3 py-2 hover:bg-zinc-50"
-                onClick={() => setQty((q) => q + 1)}
-                aria-label="수량 증가"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <label className="inline-flex items-center gap-2 text-sm">
+          <label className="inline-flex gap-2 items-center text-sm">
             <input
               type="checkbox"
               checked={agree}
@@ -117,7 +85,7 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
           </label>
         </div>
 
-        <div className="mt-5 flex justify-end gap-2">
+        <div className="flex gap-2 justify-end mt-5">
           <button
             type="button"
             className="px-4 h-10 rounded border border-zinc-300 hover:bg-zinc-50"
@@ -127,7 +95,7 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
           </button>
           <button
             type="button"
-            className="px-4 h-10 rounded bg-black text-white disabled:opacity-50"
+            className="px-4 h-10 text-white bg-black rounded disabled:opacity-50"
             disabled={!canSubmit}
             onClick={submit}
             aria-busy={isPending}
