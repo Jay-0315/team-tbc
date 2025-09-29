@@ -128,4 +128,23 @@ public class UserService {
     public boolean isNicknameAvailable(String nickname) {
         return !userRepository.existsByNickname(nickname);
     }
+
+    @Transactional
+    public void updateNickname(Long userId, String newNickname) {
+        if (userId == null || newNickname == null || newNickname.trim().isEmpty()) {
+            return;
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        String trimmed = newNickname.trim();
+        if (trimmed.equals(user.getNickname())) {
+            return; // 변경 없음
+        }
+        // 다른 사용자가 이미 사용 중인지 확인
+        userRepository.findByNickname(trimmed)
+                .filter(u -> !u.getId().equals(userId))
+                .ifPresent(u -> { throw new IllegalArgumentException("이미 사용 중인 닉네임입니다"); });
+        user.setNickname(trimmed);
+        userRepository.save(user);
+    }
 }
