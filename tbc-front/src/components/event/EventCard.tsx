@@ -1,13 +1,20 @@
 import { useNavigate } from 'react-router-dom'
 import { Heart, MapPin, Calendar, Clock } from 'lucide-react'
+import { useState } from 'react'
 import type { EventCardDTO } from '../../features/events/types'
+import { useAuth } from '../../hooks/useAuth'
+import { useToggleFavorite } from '../../services/events'
 
 interface EventCardProps {
   event: EventCardDTO
+  onLoginRequired?: () => void
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const [isFavorited, setIsFavorited] = useState(event.favorited || false)
+  const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
 
   // 날짜와 시간 포맷팅
   const formatDate = (dateStr?: string) => {
@@ -21,12 +28,40 @@ export default function EventCard({ event }: EventCardProps) {
     return timeStr
   }
 
+  const handleCardClick = () => {
+    if (!isAuthenticated) {
+      if (onLoginRequired) {
+        onLoginRequired()
+      }
+      return
+    }
+    navigate(`/events/${event.id}`)
+  }
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    if (!isAuthenticated) {
+      if (onLoginRequired) {
+        onLoginRequired()
+      }
+      return
+    }
+
+    try {
+      const result = await toggleFavorite()
+      setIsFavorited(result.favorited)
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error)
+    }
+  }
+
   return (
     <div
       role="article"
       aria-label={`이벤트 카드: ${event.title}`}
       className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
-      onClick={() => navigate(`/events/${event.id}`)}
+      onClick={handleCardClick}
     >
       {/* 썸네일 */}
       <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -69,21 +104,17 @@ export default function EventCard({ event }: EventCardProps) {
           </div>
         </div>
 
-        {/* 우측 하단: 좋아요 수 */}
+        {/* 우측 하단: 좋아요 */}
         <div className="absolute bottom-3 right-3">
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              // 좋아요 토글 로직
-            }}
-            className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full hover:bg-white transition-colors"
+            onClick={handleFavoriteClick}
+            disabled={isPending}
+            aria-label={isFavorited ? '찜 해제' : '찜하기'}
+            className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Heart
-              className={`w-4 h-4 ${event.favorited ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+              className={`w-4 h-4 transition-all duration-200 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-400'}`}
             />
-            <span className="text-xs font-medium text-gray-700">
-              {event.favorited ? '1' : '0'}
-            </span>
           </button>
         </div>
       </div>

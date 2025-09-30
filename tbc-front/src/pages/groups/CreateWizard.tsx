@@ -208,9 +208,9 @@ export default function CreateWizard({ onCreated }: Props) {
     };
 
     return (
-        <div className="p-6 min-h-screen text-white bg-black">
+        <div className="p-6 min-h-screen text-gray-900 bg-white">
             <div className="mx-auto max-w-4xl">
-                <h1 className="mb-8 text-3xl font-bold">소셜링 만들기</h1>
+                <h1 className="mb-8 text-3xl font-bold text-gray-900">소셜링 만들기</h1>
 
                 {/* Step indicator */}
                 <div className="flex justify-center items-center mb-8">
@@ -239,25 +239,25 @@ export default function CreateWizard({ onCreated }: Props) {
                 {step === 1 && (
                     <div className="space-y-4">
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">제목 *</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">제목 *</label>
                             <input
                                 type="text"
                                 value={form.title}
                                 onChange={(e) => onChange("title", e.target.value)}
                                 placeholder="모임 제목을 입력하세요"
-                                className="px-3 py-2 w-full placeholder-gray-400 text-white bg-black rounded-xl border border-gray-600"
+                                className="px-3 py-2 w-full placeholder-gray-400 text-gray-900 bg-white rounded-xl border border-gray-300"
                             />
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">카테고리 *</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">카테고리 *</label>
                             <select
                                 value={form.category}
                                 onChange={(e) => onChange("category", e.target.value)}
-                                className="px-3 py-2 w-full text-white bg-black rounded-xl border border-gray-600"
+                                className="px-3 py-2 w-full text-gray-900 bg-white rounded-xl border border-gray-300"
                             >
                                 {CATEGORIES.map((cat) => (
-                                    <option key={cat} value={cat} className="text-white bg-black">
+                                    <option key={cat} value={cat} className="text-gray-900 bg-white">
                                         {cat}
                                     </option>
                                 ))}
@@ -265,13 +265,13 @@ export default function CreateWizard({ onCreated }: Props) {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">주제 *</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">주제 *</label>
                             <input
                                 type="text"
                                 value={form.topic}
                                 onChange={(e) => onChange("topic", e.target.value)}
                                 placeholder="모임 주제를 입력하세요"
-                                className="px-3 py-2 w-full placeholder-gray-400 text-white bg-black rounded-xl border border-gray-600"
+                                className="px-3 py-2 w-full placeholder-gray-400 text-gray-900 bg-white rounded-xl border border-gray-300"
                             />
                         </div>
 
@@ -293,7 +293,7 @@ export default function CreateWizard({ onCreated }: Props) {
                         <div className="flex justify-end">
                             <button
                                 onClick={onNext}
-                                className="px-4 py-2 font-semibold text-black bg-white rounded-xl transition-colors hover:bg-gray-100"
+                                className="px-4 py-2 font-semibold text-gray-900 bg-gray-100 rounded-xl transition-colors hover:bg-gray-200"
                             >
                                 다음
                             </button>
@@ -304,7 +304,7 @@ export default function CreateWizard({ onCreated }: Props) {
                 {step === 2 && (
                     <div className="space-y-4">
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">모임 방식 *</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">모임 방식 *</label>
                             <div className="space-y-2">
                                 <Radio
                                     label="오프라인"
@@ -320,7 +320,7 @@ export default function CreateWizard({ onCreated }: Props) {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">참가비 *</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">참가비 *</label>
                             <div className="space-y-2">
                                 <Radio
                                     label="무료"
@@ -344,13 +344,13 @@ export default function CreateWizard({ onCreated }: Props) {
                                     min={0}
                                 />
                                 <div>
-                                    <label className="block mb-1 text-sm font-medium text-white">참가비 안내</label>
+                                    <label className="block mb-1 text-sm font-medium text-gray-900">참가비 안내</label>
                                     <input
                                         type="text"
                                         value={form.feeInfo || ""}
                                         onChange={(e) => onChange("feeInfo", e.target.value)}
                                         placeholder="참가비 사용처나 환불 정책 등을 안내해주세요"
-                                        className="px-3 py-2 w-full placeholder-gray-400 text-white bg-black rounded-xl border border-gray-600"
+                                        className="px-3 py-2 w-full placeholder-gray-400 text-gray-900 bg-white rounded-xl border border-gray-300"
                                     />
                                 </div>
                             </div>
@@ -359,21 +359,21 @@ export default function CreateWizard({ onCreated }: Props) {
                         {/* 아이폰 다이얼식 날짜/시간 선택 */}
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block mb-1 text-sm font-medium text-white">이벤트 날짜 *</label>
+                                <label className="block mb-1 text-sm font-medium text-gray-900">이벤트 날짜 *</label>
                                 <button
                                     type="button"
                                     onClick={() => setShowDatePicker(true)}
-                                    className="px-3 py-2 w-full text-left text-white bg-black rounded-xl border border-gray-600 transition-colors hover:bg-gray-800"
+                                    className="px-3 py-2 w-full text-left text-gray-900 bg-white rounded-xl border border-gray-300 transition-colors hover:bg-gray-50"
                                 >
                                     {formatDate(form.eventDate)}
                                 </button>
                             </div>
                             <div>
-                                <label className="block mb-1 text-sm font-medium text-white">이벤트 시간 *</label>
+                                <label className="block mb-1 text-sm font-medium text-gray-900">이벤트 시간 *</label>
                                 <button
                                     type="button"
                                     onClick={() => setShowTimePicker(true)}
-                                    className="px-3 py-2 w-full text-left text-white bg-black rounded-xl border border-gray-600 transition-colors hover:bg-gray-800"
+                                    className="px-3 py-2 w-full text-left text-gray-900 bg-white rounded-xl border border-gray-300 transition-colors hover:bg-gray-50"
                                 >
                                     {formatTime(form.eventTime)}
                                 </button>
@@ -381,18 +381,18 @@ export default function CreateWizard({ onCreated }: Props) {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">장소 *</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">장소 *</label>
                             <input
                                 type="text"
                                 value={form.location}
                                 onChange={(e) => onChange("location", e.target.value)}
                                 placeholder="모임 장소를 입력하세요"
-                                className="px-3 py-2 w-full placeholder-gray-400 text-white bg-black rounded-xl border border-gray-600"
+                                className="px-3 py-2 w-full placeholder-gray-400 text-gray-900 bg-white rounded-xl border border-gray-300"
                             />
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">태그</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">태그</label>
                             <div className="flex gap-2 mb-2">
                                 <input
                                     type="text"
@@ -400,12 +400,12 @@ export default function CreateWizard({ onCreated }: Props) {
                                     onChange={(e) => setTagInput(e.target.value)}
                                     onKeyPress={(e) => e.key === "Enter" && addTag()}
                                     placeholder="태그를 입력하고 Enter를 누르세요"
-                                    className="flex-1 px-3 py-2 placeholder-gray-400 text-white bg-black rounded-xl border border-gray-600"
+                                    className="flex-1 px-3 py-2 placeholder-gray-400 text-gray-900 bg-white rounded-xl border border-gray-300"
                                 />
                                 <button
                                     type="button"
                                     onClick={addTag}
-                                    className="px-3 py-2 text-white rounded-xl border border-gray-600 hover:bg-gray-800"
+                                    className="px-3 py-2 text-gray-900 bg-gray-100 rounded-xl border border-gray-300 hover:bg-gray-200"
                                 >
                                     추가
                                 </button>
@@ -414,7 +414,7 @@ export default function CreateWizard({ onCreated }: Props) {
                                 {form.tags.map((tag) => (
                                     <span
                                         key={tag}
-                                        className="inline-flex gap-1 items-center px-2 py-1 text-xs text-white bg-gray-700 rounded-full"
+                                        className="inline-flex gap-1 items-center px-2 py-1 text-xs text-white bg-orange-500 rounded-full"
                                     >
                                         {tag}
                                         <button
@@ -432,13 +432,13 @@ export default function CreateWizard({ onCreated }: Props) {
                         <div className="flex justify-between">
                             <button
                                 onClick={onPrev}
-                                className="px-4 py-2 text-gray-300 rounded-xl border border-gray-600 hover:bg-gray-800"
+                                className="px-4 py-2 text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-50"
                             >
                                 이전
                             </button>
                             <button
                                 onClick={onNext}
-                                className="px-4 py-2 font-semibold text-black bg-white rounded-xl transition-colors hover:bg-gray-100"
+                                className="px-4 py-2 font-semibold text-gray-900 bg-gray-100 rounded-xl transition-colors hover:bg-gray-200"
                             >
                                 다음
                             </button>
@@ -449,9 +449,9 @@ export default function CreateWizard({ onCreated }: Props) {
                 {step === 3 && (
                     <div className="space-y-4">
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-white">상세 내용</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-900">상세 내용</label>
                             <textarea
-                                className="px-3 py-2 w-full h-32 placeholder-gray-400 text-white bg-black rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                                className="px-3 py-2 w-full h-32 placeholder-gray-400 text-gray-900 bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 value={form.contentHtml}
                                 onChange={(e) => onChange("contentHtml", e.target.value)}
                                 placeholder="모임에 대한 상세 내용을 작성해주세요."
@@ -461,7 +461,7 @@ export default function CreateWizard({ onCreated }: Props) {
                         <div className="flex justify-between">
                             <button
                                 onClick={onPrev}
-                                className="px-4 py-2 text-gray-300 rounded-xl border border-gray-600 hover:bg-gray-800"
+                                className="px-4 py-2 text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-50"
                             >
                                 이전
                             </button>
@@ -674,7 +674,7 @@ function TimePicker({ selectedTime, onSelect, onCancel }: {
 function Radio({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
     return (
         <label className="inline-flex gap-2 items-center">
-            <input type="radio" checked={checked} onChange={onChange} className="w-4 h-4 text-white bg-black border-gray-600 focus:ring-white" />
+            <input type="radio" checked={checked} onChange={onChange} className="w-4 h-4 text-orange-500 bg-white border-gray-300 focus:ring-orange-500" />
             <span className="text-white">{label}</span>
         </label>
     );
@@ -683,8 +683,8 @@ function Radio({ label, checked, onChange }: { label: string; checked: boolean; 
 function NumberInput({ label, value, onChange, min = 0 }: { label: string; value: number; onChange: (v: number) => void; min?: number }) {
     return (
         <div>
-            <label className="block mb-1 text-sm font-medium text-white">{label}</label>
-            <input type="number" min={min} value={value} onChange={(e) => onChange(Number(e.target.value))} className="px-3 py-2 w-full text-white bg-black rounded-xl border border-gray-600" />
+            <label className="block mb-1 text-sm font-medium text-gray-900">{label}</label>
+            <input type="number" min={min} value={value} onChange={(e) => onChange(Number(e.target.value))} className="px-3 py-2 w-full text-gray-900 bg-white rounded-xl border border-gray-300" />
         </div>
     );
 }

@@ -369,7 +369,7 @@ export default function EventDetailPage() {
 
               <div className="flex gap-2 items-center">
                 <div className="inline-flex flex-1 justify-center items-center h-11 rounded-2xl border border-gray-100 hover:bg-gray-50">
-                  {numericId ? <FavoriteButton eventId={numericId} initialFavorited={false} size={20} /> : null}
+                  {numericId ? <FavoriteButton eventId={numericId} initialFavorited={data?.favorited || false} size={20} /> : null}
                 </div>
                 <button
                   type="button"

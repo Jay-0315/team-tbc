@@ -58,20 +58,21 @@ export default function Header({ user, onLogout }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white transition-colors duration-300">
-      <div className="container flex justify-between items-center px-4 h-16">
-        <div className="flex items-center">
-          <Link 
-            to="/" 
-            className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80"
-          >
-            {/* HolaPop 로고 */}
-            <img 
-              src="/holapop-logo.png" 
-              alt="HolaPop" 
-              className="w-auto h-30"
-            />
-          </Link>
-        </div>
+      <div className="px-6">
+        <div className="max-w-7xl mx-auto flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <Link 
+              to="/" 
+              className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80"
+            >
+              {/* HolaPop 로고 */}
+              <img 
+                src="/holapop-logo.png" 
+                alt="HolaPop" 
+                className="w-auto h-30"
+              />
+            </Link>
+          </div>
         
         <div className="flex items-center space-x-4">
           {isAuthenticated ? (
@@ -81,7 +82,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                 onClick={handleUserIconClick}
                 className="flex overflow-hidden justify-center items-center w-10 h-10 bg-white rounded-full border-2 border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 aria-haspopup="menu"
-                aria-expanded={isDropdownOpen ? 'true' : 'false'}
+                aria-expanded={isDropdownOpen}
                 aria-label="사용자 메뉴"
               >
                 {profile?.profileImageUrl ? (
@@ -156,6 +157,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import com.tbc.login.port.out.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +17,16 @@ public class UserJpaRepository implements UserRepositoryPort {
     @Override
     public User save(User user) {
         return repo.save(user);
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return repo.findById(id);
+    }
+
+    @Override
+    public List<User> findByIdIn(List<Long> ids) {
+        return repo.findAllById(ids);
     }
 
     @Override
