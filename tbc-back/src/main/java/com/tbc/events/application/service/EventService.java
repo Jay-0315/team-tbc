@@ -5,6 +5,10 @@ import com.tbc.events.domain.repository.FavoriteRepo;
 import com.tbc.events.web.dto.EventCardDTO;
 import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
 import com.tbc.group.adapterout.persistence.jpa.repository.GroupJpaRepository;
+import com.tbc.profile.adapterin.persistence.jpa.entity.ProfileEntity;
+import com.tbc.profile.adapterin.persistence.jpa.repository.ProfileJpaRepository;
+import com.tbc.login.adapter.out.persistence.UserJpaRepository;
+import com.tbc.login.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +22,15 @@ public class EventService {
 
     private final GroupJpaRepository groupRepository;
     private final FavoriteRepo favoriteRepo;
+    private final ProfileJpaRepository profileRepository;
+    private final UserJpaRepository userRepository;
 
-    public EventService(GroupJpaRepository groupRepository, FavoriteRepo favoriteRepo) {
+    public EventService(GroupJpaRepository groupRepository, FavoriteRepo favoriteRepo, 
+                       ProfileJpaRepository profileRepository, UserJpaRepository userRepository) {
         this.groupRepository = groupRepository;
         this.favoriteRepo = favoriteRepo;
+        this.profileRepository = profileRepository;
+        this.userRepository = userRepository;
     }
 
     public Page<EventCardDTO> list(Long userId, String q, String category, EventStatus status, String sort, Pageable pageable) {
@@ -33,7 +42,28 @@ public class EventService {
         Sort s = mapSort(sort);
         Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), s);
         return groupRepository.findAll(p, normalizedQuery, normalizedCategory)
-                .map(e -> EventCardDTO.fromGroupEntity(e, null));
+                .map(e -> enrichWithHostInfo(EventCardDTO.fromGroupEntity(e, null)));
+    }
+    
+    private EventCardDTO enrichWithHostInfo(EventCardDTO dto) {
+        if (dto.hostId == null) {
+            return dto;
+        }
+        
+        // 프로필 정보 조회
+        profileRepository.findByUserId(dto.hostId).ifPresent(profile -> {
+            dto.hostNickname = profile.getDisplayName();
+            dto.hostProfileImage = profile.getProfileImageUrl();
+        });
+        
+        // 프로필이 없으면 User 정보에서 닉네임 가져오기
+        if (dto.hostNickname == null) {
+            userRepository.findById(dto.hostId).ifPresent(user -> {
+                dto.hostNickname = user.getNickname() != null ? user.getNickname() : user.getRealName();
+            });
+        }
+        
+        return dto;
     }
 
     private Sort mapSort(String sort) {

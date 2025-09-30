@@ -67,6 +67,26 @@ export async function fetchEvents(params: EventListParams = {}): Promise<Page<Ev
   return data
 }
 
+// 찜한 모임 조회
+export async function fetchFavoriteEvents(page: number = 0, size: number = 12): Promise<Page<EventCardDTO>> {
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/events/favorites', {
+    params: { page, size }
+  })
+  return data
+}
+
+// 인기 모임 조회 (리뷰 많은 순)
+export async function fetchPopularEvents(page: number = 0, size: number = 12): Promise<Page<EventCardDTO>> {
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
+    params: { 
+      page, 
+      size,
+      sort: 'REVIEWS_DESC' // 리뷰 많은 순으로 정렬
+    }
+  })
+  return data
+}
+
 // Reviews
 export type CreateReviewRequest = {
   rating: number;

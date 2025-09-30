@@ -724,3 +724,12 @@ body.modal-open {
     min-height: 32px;
   }
 }
+
+/* Swiper 스크롤바 숨기기 */
+.swiper {
+  overflow: hidden !important;
+}
+
+.swiper-wrapper {
+  overflow: visible !important;
+}

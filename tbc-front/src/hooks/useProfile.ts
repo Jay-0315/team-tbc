@@ -6,6 +6,7 @@ export interface Profile {
   userId: number
   profileImageUrl?: string | null
   displayName: string
+  nickname?: string
   gender?: 'MALE' | 'FEMALE' | 'OTHER'
   bio?: string
   interests: string[]
@@ -29,6 +30,7 @@ export function useProfile() {
       return data
     },
     retry: false,
+    staleTime: 0, // 항상 최신 데이터 가져오기
   })
 }
 
