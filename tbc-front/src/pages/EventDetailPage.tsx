@@ -9,12 +9,10 @@ import { ReviewFormDialog } from '../components/review/ReviewFormDialog'
 import { EditEventDialog } from '../components/event/EditEventDialog'
 import { DeleteEventDialog } from '../components/event/DeleteEventDialog'
 import { Button } from '../components/ui/button'
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import apiClient from '../lib/api'
 import Map from '../components/Map'
 import { useParticipants } from '@/features/events/api/useParticipants'
-import { fetchProfile } from '@/services/profile'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
@@ -25,8 +23,9 @@ export default function EventDetailPage() {
   const { data: participants = [] } = useParticipants(numericId)
   const [copied, setCopied] = useState(false)
   const [openJoin, setOpenJoin] = useState(false)
-  const [hostNickname, setHostNickname] = useState<string>('')
-  const [hostImageUrl, setHostImageUrl] = useState<string | null>(null)
+  // API 응답에서 호스트 정보를 직접 사용
+  const hostNickname = data?.hostNickname || data?.hostName || ''
+  const hostImageUrl = data?.hostProfileImage || null
 
   // derive fields with broad fallbacks
   const feePopcorn = (data as unknown as { fee_amount?: number })?.fee_amount ?? (data as unknown as { feeAmount?: number })?.feeAmount ?? 0
@@ -42,41 +41,10 @@ export default function EventDetailPage() {
   const location = data?.location || ''
   const imagePath = data?.imagePath ?? null
 
+
   // 호스트 여부 확인
   const isHost = user && hostId && user.id === hostId
 
-  useEffect(() => {
-    let cancelled = false
-    const fetchNickname = async () => {
-      if (!hostId) return
-      try {
-        const res = await apiClient.get<{ displayName?: string }>(`/profile/${hostId}`)
-        if (!cancelled) setHostNickname(res.data?.displayName || `사용자 ${hostId}`)
-      } catch {
-        if (!cancelled) setHostNickname(`사용자 ${hostId}`)
-      }
-    }
-    fetchNickname()
-    return () => { cancelled = true }
-  }, [hostId])
-
-  useEffect(() => {
-    let cancelled = false
-    const fetchHostProfile = async () => {
-      if (!hostId) return
-      try {
-        const prof = await fetchProfile(hostId)
-        if (!cancelled) {
-          setHostNickname(prof.displayName || `사용자 ${hostId}`)
-          setHostImageUrl(prof.profileImageUrl ?? null)
-        }
-      } catch {
-        // ignore
-      }
-    }
-    fetchHostProfile()
-    return () => { cancelled = true }
-  }, [hostId])
 
   const handleCopy = async () => {
     try {
@@ -157,7 +125,7 @@ export default function EventDetailPage() {
                 {imagePath ? (
                   <div className="overflow-hidden relative w-full aspect-[16/9]">
                     <img
-                      src={`http://localhost:8080${imagePath}`}
+                      src={`http://localhost:8080/img/${imagePath.split('/').pop()}`}
                       alt={data.title}
                       className="object-cover w-full h-full"
                       onError={(e) => {

@@ -18,6 +18,12 @@ public class EventDetailDTO extends EventCardDTO {
     @Schema(description = "호스트 이름", example = "TEAM-TBC")
     public String hostName;
 
+    @Schema(description = "호스트 닉네임", example = "홍길동")
+    public String hostNickname;
+
+    @Schema(description = "호스트 프로필 이미지 URL", example = "https://example.com/profile.jpg")
+    public String hostProfileImage;
+
     @Schema(description = "컨텐츠 HTML", example = "<p>리치 텍스트</p>")
     public String contentHtml;
 
@@ -27,7 +33,7 @@ public class EventDetailDTO extends EventCardDTO {
     @Schema(description = "요금 정보", example = "무료")
     public String feeInfo;
 
-    public static EventDetailDTO fromGroupEntity(GroupEntity e, Boolean favorited, List<String> tags, String hostName) {
+    public static EventDetailDTO fromGroupEntity(GroupEntity e, Boolean favorited, List<String> tags, String hostName, String hostNickname, String hostProfileImage) {
         EventDetailDTO dto = new EventDetailDTO();
         dto.id = e.getId();
         dto.title = e.getTitle();
@@ -47,6 +53,8 @@ public class EventDetailDTO extends EventCardDTO {
                 ? Arrays.asList(e.getTagsCsv().split(",")) 
                 : Collections.emptyList());
         dto.hostName = hostName;
+        dto.hostNickname = hostNickname;
+        dto.hostProfileImage = hostProfileImage;
         dto.feeType = e.getFeeType();
         dto.feeAmount = e.getFeeAmount();
         dto.feeInfo = e.getFeeInfo();
@@ -54,6 +62,7 @@ public class EventDetailDTO extends EventCardDTO {
         dto.contentHtml = e.getContentHtml();
         dto.latitude = e.getLatitude();
         dto.longitude = e.getLongitude();
+        dto.imagePath = e.getImagePath();
         return dto;
     }
 }

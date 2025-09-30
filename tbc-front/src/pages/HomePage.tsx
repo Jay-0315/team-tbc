@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react"
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
 import { Calendar, AlertCircle, ChevronDown } from 'lucide-react'
@@ -12,7 +12,11 @@ import type { EventStatus } from '@/features/events/types'
 import EventBanner from '@/components/EventBanner'
 import EventCard from '@/components/event/EventCard'
 
-export default function HomePage() {
+interface HomePageProps {
+  onCreateSocialing?: () => void
+}
+
+export default function HomePage({ onCreateSocialing }: HomePageProps) {
   const { isAuthenticated } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -206,11 +210,12 @@ export default function HomePage() {
                   <h3 className="mb-2 text-xl font-semibold text-gray-800">표시할 소셜링이 없습니다</h3>
                   <p className="text-gray-600 mb-8">새로운 소셜링을 만들어보세요!</p>
                   {isAuthenticated && (
-                    <Link to="/groups/create">
-                      <button className="px-8 py-4 font-semibold text-black bg-gradient-to-r from-[#FFA700] to-[#FFFFFF] rounded-2xl transition-all duration-300 transform hover:from-[#FFA700]/80 hover:to-[#FFFFFF]/80 hover:scale-105">
-                        소셜링 만들기
-                      </button>
-                    </Link>
+                    <button 
+                      onClick={onCreateSocialing}
+                      className="px-8 py-4 font-semibold text-black bg-gradient-to-r from-[#FFA700] to-[#FFFFFF] rounded-2xl transition-all duration-300 transform hover:from-[#FFA700]/80 hover:to-[#FFFFFF]/80 hover:scale-105"
+                    >
+                      소셜링 만들기
+                    </button>
                   )}
                 </div>
               ) : (

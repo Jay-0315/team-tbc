@@ -1,6 +1,7 @@
 package com.tbc.group.adapterout.persistence.jpa.repository;
 
 import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
+import com.tbc.events.web.dto.EventCardDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,5 @@ public interface GroupJpaRepository extends JpaRepository<GroupEntity, Long> {
     Page<GroupEntity> findByUserId(@Param("userId") Long userId, Pageable pageable);
     
     List<GroupEntity> findByHostId(Long hostId);
+    
 }

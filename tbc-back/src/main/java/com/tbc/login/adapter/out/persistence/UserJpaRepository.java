@@ -48,4 +48,8 @@ public class UserJpaRepository implements UserRepositoryPort {
     public boolean existsByNickname(String nickname) {
         return repo.existsByNickname(nickname);
     }
+
+    public List<User> findAllById(List<Long> ids) {
+        return repo.findAllById(ids);
+    }
 }

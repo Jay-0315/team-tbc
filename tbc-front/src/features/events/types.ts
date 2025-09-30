@@ -4,9 +4,9 @@ export type EventStatus = 'OPEN' | 'UPCOMING' | 'WAITLIST' | 'CLOSED'
 export interface EventCardDTO {
   id: number
   title: string
-  coverUrl: string
+  coverUrl?: string  // 선택적으로 변경 (기존 호환성 유지)
   imageUrl?: string
-  imagePath?: string  // 업로드된 이미지 경로
+  imagePath?: string  // 업로드된 이미지 경로 (우선 사용)
   category: string
   status: EventStatus
   remainingSeats: number
@@ -38,9 +38,12 @@ export interface EventDetailDTO extends EventCardDTO {
   feeInfo?: string
   description?: string
   hostName: string
+  hostNickname?: string
+  hostProfileImage?: string
   tags: string[]
   latitude?: number
   longitude?: number
+  imagePath?: string  // 이미지 경로
 }
 
 export interface PageResponse<T> {

@@ -75,6 +75,38 @@ public class EventCardDTO {
     @Schema(description = "호스트 프로필 이미지 URL", example = "https://example.com/profile.jpg")
     public String hostProfileImage;
 
+    // 기본 생성자
+    public EventCardDTO() {}
+
+    // DTO Projection을 위한 생성자 (쿼리 매개변수 순서와 정확히 일치)
+    public EventCardDTO(Long id, String title, String coverUrl, String category, String status,
+                       Integer capacity, Integer joined, Integer remainingSeats, Instant startAt,
+                       String location, LocalDate eventDate, LocalTime eventTime, Boolean favorited,
+                       String feeType, Integer feeAmount, Long hostId, Double latitude, Double longitude,
+                       String imagePath, String hostNickname, String hostProfileImage) {
+        this.id = id;
+        this.title = title;
+        this.coverUrl = coverUrl;
+        this.category = category;
+        this.status = status;
+        this.capacity = capacity;
+        this.joined = joined;
+        this.remainingSeats = remainingSeats;
+        this.startAt = startAt;
+        this.location = location;
+        this.eventDate = eventDate;
+        this.eventTime = eventTime;
+        this.favorited = favorited;
+        this.feeType = feeType;
+        this.feeAmount = feeAmount;
+        this.hostId = hostId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.imagePath = imagePath;
+        this.hostNickname = hostNickname;
+        this.hostProfileImage = hostProfileImage;
+    }
+
     public static EventCardDTO fromGroupEntity(GroupEntity e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
         dto.id = e.getId();

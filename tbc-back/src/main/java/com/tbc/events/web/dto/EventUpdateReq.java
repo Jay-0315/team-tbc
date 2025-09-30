@@ -38,6 +38,12 @@ public class EventUpdateReq {
     @Schema(description = "장소", example = "강남역 스타벅스", minLength = 1, maxLength = 200)
     public String location;
 
+    @Schema(description = "위도", example = "37.5665")
+    public Double latitude;
+
+    @Schema(description = "경도", example = "126.9780")
+    public Double longitude;
+
     @Schema(description = "참가비 타입", example = "FREE")
     public String feeType;
 

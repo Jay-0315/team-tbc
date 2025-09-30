@@ -98,6 +98,10 @@ public class SecurityConfig {
                         .requestMatchers("/ws/info/").permitAll()
                         .requestMatchers("/ws/info/*").permitAll()
 
+                        // 정적 리소스 허용
+                        .requestMatchers("/img/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        
                         // 인증 없이 허용하는 경로들
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()

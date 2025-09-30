@@ -9,6 +9,8 @@ export interface EventUpdateRequest {
   eventDate: string
   eventTime: string
   location: string
+  latitude?: number
+  longitude?: number
   description?: string
   feeType?: string
   feeAmount?: number
