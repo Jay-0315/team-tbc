@@ -15,8 +15,8 @@ export default function PostDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
+        <div className="container px-4 py-8 mx-auto">
+          <div className="flex justify-center items-center h-64">
             <div className="text-lg">게시글을 불러오는 중...</div>
           </div>
         </div>
@@ -27,8 +27,8 @@ export default function PostDetailPage() {
   if (error || !post) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
+        <div className="container px-4 py-8 mx-auto">
+          <div className="flex justify-center items-center h-64">
             <div className="text-lg text-red-600">
               게시글을 찾을 수 없습니다: {error?.message}
             </div>
@@ -58,8 +58,8 @@ export default function PostDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="container px-4 py-8 mx-auto">
+        <div className="mx-auto max-w-4xl">
           {/* Back button */}
           <div className="mb-6">
             <Link to="/posts">
@@ -69,14 +69,14 @@ export default function PostDetailPage() {
             </Link>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="overflow-hidden bg-white rounded-lg shadow-md">
             {/* Post Image */}
             {post.imageUrl && (
-              <div className="aspect-video bg-gray-200">
+              <div className="bg-gray-200 aspect-video">
                 <img
                   src={post.imageUrl}
                   alt={post.title}
-                  className="w-full h-full object-cover"
+                  className="object-cover w-full h-full"
                 />
               </div>
             )}
@@ -84,12 +84,12 @@ export default function PostDetailPage() {
             <div className="p-6">
               {/* Post Header */}
               <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                <h1 className="mb-4 text-3xl font-bold text-gray-900">
                   {post.title}
                 </h1>
                 
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                  <div className="flex items-center gap-4">
+                <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+                  <div className="flex gap-4 items-center">
                     <span>작성자: {post.author.nickname}</span>
                     <span>작성일: {formatDate(post.createdAt)}</span>
                   </div>
@@ -100,8 +100,8 @@ export default function PostDetailPage() {
               </div>
 
               {/* Post Content */}
-              <div className="prose max-w-none mb-8">
-                <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+              <div className="mb-8 max-w-none prose">
+                <div className="leading-relaxed text-gray-800 whitespace-pre-wrap">
                   {post.content}
                 </div>
               </div>
@@ -127,9 +127,9 @@ export default function PostDetailPage() {
           </div>
 
           {/* Comments Section - TODO: Implement comments */}
-          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">댓글</h2>
-            <div className="text-center text-gray-500 py-8">
+          <div className="p-6 mt-8 bg-white rounded-lg shadow-md">
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">댓글</h2>
+            <div className="py-8 text-center text-gray-500">
               댓글 기능은 곧 구현될 예정입니다.
             </div>
           </div>

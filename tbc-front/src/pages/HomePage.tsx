@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
-import { FloatingChatButton } from "@/components/FloatingChatButton"
 import { Heart, Plus, Users, Calendar, Sparkles, AlertCircle } from 'lucide-react'
 import EventFilters from '../components/event/EventFilters'
 import { EventCardSkeletonGrid } from '../components/skeletons/EventCardSkeleton'
@@ -320,8 +319,6 @@ export default function HomePage() {
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authModalMode}
       />
-
-      <FloatingChatButton />
     </div>
   )
 }

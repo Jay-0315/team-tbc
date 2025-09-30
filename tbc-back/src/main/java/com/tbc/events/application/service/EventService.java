@@ -1,10 +1,10 @@
 package com.tbc.events.application.service;
 
 import com.tbc.events.domain.model.EventStatus;
-import com.tbc.events.domain.model.Event;
-import com.tbc.events.domain.repository.EventRepo;
 import com.tbc.events.domain.repository.FavoriteRepo;
 import com.tbc.events.web.dto.EventCardDTO;
+import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
+import com.tbc.group.adapterout.persistence.jpa.repository.GroupJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class EventService {
 
-    private final EventRepo eventRepo;
+    private final GroupJpaRepository groupRepository;
     private final FavoriteRepo favoriteRepo;
 
-    public EventService(EventRepo eventRepo, FavoriteRepo favoriteRepo) {
-        this.eventRepo = eventRepo;
+    public EventService(GroupJpaRepository groupRepository, FavoriteRepo favoriteRepo) {
+        this.groupRepository = groupRepository;
         this.favoriteRepo = favoriteRepo;
     }
 
@@ -28,34 +28,23 @@ public class EventService {
         String normalizedCategory = (category == null || category.isBlank()) ? null : category;
         String normalizedQuery = (q == null || q.isBlank()) ? null : q.trim();
         
-        // 디버그 로그 추가
         System.out.println("EventService.list - q: '" + q + "', normalizedQuery: '" + normalizedQuery + "'");
         
-        if ("REVIEWS_DESC".equalsIgnoreCase(sort)) {
-            Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-            return eventRepo.findListOrderByReviewCountDesc(normalizedQuery, normalizedCategory, status, p)
-                    .map(e -> EventCardDTO.from(e, null));
-        }
         Sort s = mapSort(sort);
         Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), s);
-        return eventRepo.findList(normalizedQuery, normalizedCategory, status, p)
-                .map(e -> EventCardDTO.from(e, null));
+        return groupRepository.findAll(p, normalizedQuery, normalizedCategory)
+                .map(e -> EventCardDTO.fromGroupEntity(e, null));
     }
 
     private Sort mapSort(String sort) {
         if ("DEADLINE_ASC".equalsIgnoreCase(sort) || "START_ASC".equalsIgnoreCase(sort)) {
             return Sort.by(Sort.Direction.ASC, "startAt");
         }
-        if ("REVIEWS_DESC".equalsIgnoreCase(sort)) {
-            // 별도 쿼리(findListOrderByReviewCountDesc)에서 처리
-            return Sort.unsorted();
-        }
-        // CREATED_DESC, NEW_DESC: createdAt desc
         return Sort.by(Sort.Direction.DESC, "createdAt");
     }
 
-    public Event getByIdOrThrow(Long id) {
-        return eventRepo.findById(id)
+    public GroupEntity getByIdOrThrow(Long id) {
+        return groupRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이벤트입니다."));
     }
 
@@ -83,17 +72,62 @@ public class EventService {
         if (qty < 1) {
             throw new IllegalArgumentException("신청 수량은 1 이상이어야 합니다.");
         }
-        Event e = getByIdOrThrow(eventId);
+        GroupEntity e = getByIdOrThrow(eventId);
         int remaining = Math.max(0, e.getCapacity() - e.getJoined());
         if (qty <= remaining) {
             e.setJoined(e.getJoined() + qty);
+            groupRepository.save(e);
             return com.tbc.events.web.dto.JoinRes.of("APPLIED", e.getJoined(), Math.max(0, e.getCapacity() - e.getJoined()));
         } else {
-            // 대기 등록 처리
             return com.tbc.events.web.dto.JoinRes.of("WAITLISTED", e.getJoined(), remaining);
         }
     }
+
+    @Transactional
+    public com.tbc.events.web.dto.EventDetailDTO updateEvent(Long eventId, com.tbc.events.web.dto.EventUpdateReq updateReq, Long userId) {
+        GroupEntity event = groupRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
+        
+        if (!event.getHostId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException("이벤트를 수정할 권한이 없습니다.");
+        }
+        
+        // 필수 필드 업데이트
+        event.setTitle(updateReq.title);
+        event.setCategory(updateReq.category);
+        event.setCapacity(updateReq.capacity);
+        event.setEventDate(updateReq.eventDate);
+        event.setEventTime(updateReq.eventTime);
+        event.setLocation(updateReq.location);
+        event.setFeeType(updateReq.feeType);
+        event.setFeeAmount(updateReq.feeAmount);
+        event.setFeeInfo(updateReq.feeInfo);
+        event.setContentHtml(updateReq.contentHtml);
+        
+        // coverUrl null 체크 - null이면 기존 값 유지하거나 기본값 설정
+        if (updateReq.coverUrl != null && !updateReq.coverUrl.trim().isEmpty()) {
+            event.setCoverUrl(updateReq.coverUrl);
+        } else if (event.getCoverUrl() == null || event.getCoverUrl().trim().isEmpty()) {
+            event.setCoverUrl(""); // 기본값 설정
+        }
+        
+        if (updateReq.eventDate != null && updateReq.eventTime != null) {
+            event.setStartAt(java.time.LocalDateTime.of(updateReq.eventDate, updateReq.eventTime));
+        }
+        
+        GroupEntity updatedEvent = groupRepository.save(event);
+        return com.tbc.events.web.dto.EventDetailDTO.fromGroupEntity(updatedEvent, false, java.util.Collections.emptyList(), "호스트");
+    }
+
+    @Transactional
+    public void deleteEvent(Long eventId, Long userId) {
+        GroupEntity event = groupRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
+        
+        if (!event.getHostId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException("이벤트를 삭제할 권한이 없습니다.");
+        }
+        
+        groupRepository.delete(event);
+    }
 }
-
-
-

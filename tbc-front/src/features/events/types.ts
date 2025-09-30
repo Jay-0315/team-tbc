@@ -26,6 +26,8 @@ export interface EventHost {
 }
 
 export interface EventDetailDTO extends EventCardDTO {
+  hostId?: number
+  feeInfo?: string
   description?: string
   hostName: string
   tags: string[]

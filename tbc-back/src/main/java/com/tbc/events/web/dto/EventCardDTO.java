@@ -1,14 +1,13 @@
 package com.tbc.events.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.tbc.events.domain.model.Event;
-import com.tbc.events.domain.model.EventStatus;
+import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(name = "EventCardDTO", description = "이벤트 카드 요약 정보")
@@ -26,7 +25,7 @@ public class EventCardDTO {
     public String category;
 
     @Schema(description = "상태", example = "OPEN")
-    public EventStatus status;
+    public String status;
 
     @Schema(description = "남은 좌석 수", example = "90")
     public Integer remainingSeats;
@@ -36,11 +35,13 @@ public class EventCardDTO {
 
     @Schema(description = "장소", example = "Seoul")
     public String location;
+    
     @Schema(description = "이벤트 날짜", example = "2025-09-10")
     public LocalDate eventDate;
 
     @Schema(description = "이벤트 시간", example = "14:30")
     public LocalTime eventTime;
+    
     @Schema(description = "총 정원", example = "100")
     public Integer capacity;
 
@@ -50,21 +51,22 @@ public class EventCardDTO {
     @Schema(description = "즐겨찾기 여부(로그인 헤더 있을 때만 포함)", example = "false", nullable = true)
     public Boolean favorited;
 
-    // 추가 노출 필드
     @Schema(description = "요금 유형", example = "PAID")
     public String feeType;
+    
     @Schema(description = "요금(팝콘)", example = "10")
     public Integer feeAmount;
+    
     @Schema(description = "호스트 사용자 ID", example = "42")
     public Long hostId;
 
-    public static EventCardDTO from(Event e, Boolean favorited) {
+    public static EventCardDTO fromGroupEntity(GroupEntity e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
         dto.id = e.getId();
         dto.title = e.getTitle();
         dto.coverUrl = e.getCoverUrl();
         dto.category = e.getCategory();
-        dto.status = e.getStatus();
+        dto.status = "OPEN"; // GroupEntity는 status 필드가 없으므로 기본값 설정
         dto.capacity = e.getCapacity();
         dto.joined = e.getJoined();
         dto.remainingSeats = Math.max(0, e.getCapacity() - e.getJoined());
@@ -73,13 +75,9 @@ public class EventCardDTO {
         dto.eventDate = e.getEventDate();
         dto.eventTime = e.getEventTime();
         dto.favorited = favorited;
-        // 추가 매핑
         dto.feeType = e.getFeeType();
         dto.feeAmount = e.getFeeAmount();
         dto.hostId = e.getHostId();
         return dto;
     }
 }
-
-
-

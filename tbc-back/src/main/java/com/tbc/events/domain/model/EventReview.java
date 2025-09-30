@@ -1,5 +1,6 @@
 package com.tbc.events.domain.model;
 
+import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
 import jakarta.persistence.*;
 import java.time.Instant;
 
@@ -15,7 +16,7 @@ public class EventReview {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
+    private GroupEntity event;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -35,17 +36,14 @@ public class EventReview {
     }
 
     public Long getId() { return id; }
-    public Event getEvent() { return event; }
+    public GroupEntity getEvent() { return event; }
     public Long getUserId() { return userId; }
     public Integer getRating() { return rating; }
     public String getComment() { return comment; }
     public Instant getCreatedAt() { return createdAt; }
 
-    public void setEvent(Event event) { this.event = event; }
+    public void setEvent(GroupEntity event) { this.event = event; }
     public void setUserId(Long userId) { this.userId = userId; }
     public void setRating(Integer rating) { this.rating = rating; }
     public void setComment(String comment) { this.comment = comment; }
 }
-
-
-
