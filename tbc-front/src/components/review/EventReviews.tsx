@@ -111,7 +111,7 @@ export function EventReviews({ eventId }: EventReviewsProps) {
       {reviews.length > 0 && (
         <div className="space-y-4">
           {reviews.map((review: any) => (
-            <ReviewItem key={review.id} review={review} />
+            <ReviewItem key={review.id} eventId={eventId} review={review} />
           ))}
 
           {/* 더 보기 버튼 */}

@@ -1,23 +1,14 @@
 package com.tbc.events.web.controller;
 
 import com.tbc.events.application.facade.EventFacade;
-import com.tbc.events.web.dto.PageResponse;
-import com.tbc.events.web.dto.ReviewDTO;
-import com.tbc.events.web.dto.ReviewCreateReq;
+import com.tbc.events.web.dto.*;
 import com.tbc.login.domain.UserService;
 import com.tbc.login.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
 
@@ -54,15 +45,14 @@ public class EventController {
                         @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = PageResponse.class))),
                         @ApiResponse(responseCode = "400", description = "요청 오류", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
         })
-        public PageResponse<com.tbc.events.web.dto.EventCardDTO> list(
+        public PageResponse<EventCardDTO> list(
                         @RequestHeader(value = "X-User-Id", required = false) Long userId,
                         @RequestParam(required = false) String q,
                         @RequestParam(required = false) String category,
                         @RequestParam(required = false) String status,
                         @RequestParam(required = false, defaultValue = "CREATED_DESC") String sort,
                         Pageable pageable) {
-                // events 테이블에서 데이터 조회
-                Page<com.tbc.events.web.dto.EventCardDTO> page = eventFacade.getEventList(q, category, status, sort, pageable);
+                Page<EventCardDTO> page = eventFacade.getEventList(q, category, status, sort, pageable);
                 return PageResponse.from(page);
         }
 
@@ -70,10 +60,10 @@ public class EventController {
         @Operation(summary = "이벤트 상세 조회 (events 테이블 사용)", description = "events 테이블에서 그룹 상세를 이벤트 형태로 조회합니다.", security = {
                         @SecurityRequirement(name = "X-User-Id") })
         @ApiResponses({
-                        @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = com.tbc.events.web.dto.EventDetailDTO.class))),
+                        @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = EventDetailDTO.class))),
                         @ApiResponse(responseCode = "404", description = "미존재", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
         })
-        public com.tbc.events.web.dto.EventDetailDTO detail(
+        public EventDetailDTO detail(
                         @Parameter(name = "id", description = "이벤트 ID", example = "1") @PathVariable Long id,
                         @RequestHeader(value = "X-User-Id", required = false) Long userId) {
                 return eventFacade.getEventDetail(id);
@@ -104,14 +94,80 @@ public class EventController {
                         @PathVariable Long id,
                         @RequestBody @Valid ReviewCreateReq reviewCreateReq,
                         Authentication authentication) {
-                Long userId = null;
-                if (authentication != null && authentication.isAuthenticated()) {
-                        String email = authentication.getName();
-                        User user = userService.findByEmailOptional(email)
-                                        .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException(
-                                                        "사용자를 찾을 수 없습니다."));
-                        userId = user.getId();
-                }
+                Long userId = getUserId(authentication);
                 return eventFacade.createEventReview(id, reviewCreateReq, userId);
+        }
+
+        @PutMapping("/{id}")
+        @Operation(summary = "이벤트 수정", description = "본인이 작성한 이벤트를 수정합니다.")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "수정 성공"),
+                        @ApiResponse(responseCode = "403", description = "권한 없음"),
+                        @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음")
+        })
+        public EventDetailDTO updateEvent(
+                        @PathVariable Long id,
+                        @RequestBody @Valid EventUpdateReq updateReq,
+                        Authentication authentication) {
+                Long userId = getUserId(authentication);
+                return eventFacade.updateEvent(id, updateReq, userId);
+        }
+
+        @DeleteMapping("/{id}")
+        @Operation(summary = "이벤트 삭제", description = "본인이 작성한 이벤트를 삭제합니다.")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "204", description = "삭제 성공"),
+                        @ApiResponse(responseCode = "403", description = "권한 없음"),
+                        @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음")
+        })
+        public ResponseEntity<Void> deleteEvent(
+                        @PathVariable Long id,
+                        Authentication authentication) {
+                Long userId = getUserId(authentication);
+                eventFacade.deleteEvent(id, userId);
+                return ResponseEntity.noContent().build();
+        }
+
+        @PutMapping("/{id}/reviews/{reviewId}")
+        @Operation(summary = "이벤트 후기 수정", description = "본인이 작성한 후기를 수정합니다.", tags = { "Reviews" })
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "수정 성공"),
+                        @ApiResponse(responseCode = "403", description = "권한 없음"),
+                        @ApiResponse(responseCode = "404", description = "후기를 찾을 수 없음")
+        })
+        public ReviewDTO updateReview(
+                        @PathVariable Long id,
+                        @PathVariable Long reviewId,
+                        @RequestBody @Valid ReviewUpdateReq req,
+                        Authentication authentication) {
+                Long userId = getUserId(authentication);
+                return eventFacade.updateReview(id, reviewId, req, userId);
+        }
+
+        @DeleteMapping("/{id}/reviews/{reviewId}")
+        @Operation(summary = "이벤트 후기 삭제", description = "본인이 작성한 후기를 삭제합니다.", tags = { "Reviews" })
+        @ApiResponses({
+                        @ApiResponse(responseCode = "204", description = "삭제 성공"),
+                        @ApiResponse(responseCode = "403", description = "권한 없음"),
+                        @ApiResponse(responseCode = "404", description = "후기를 찾을 수 없음")
+        })
+        public ResponseEntity<Void> deleteReview(
+                        @PathVariable Long id,
+                        @PathVariable Long reviewId,
+                        Authentication authentication) {
+                Long userId = getUserId(authentication);
+                eventFacade.deleteReview(id, reviewId, userId);
+                return ResponseEntity.noContent().build();
+        }
+
+        private Long getUserId(Authentication authentication) {
+                if (authentication == null || !authentication.isAuthenticated()) {
+                        return null;
+                }
+                String email = authentication.getName();
+                User user = userService.findByEmailOptional(email)
+                                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException(
+                                                "사용자를 찾을 수 없습니다."));
+                return user.getId();
         }
 }

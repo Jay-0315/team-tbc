@@ -2,15 +2,13 @@ package com.tbc.events.application.facade;
 
 import com.tbc.events.application.service.EventService;
 import com.tbc.events.application.service.ReviewService;
-import com.tbc.events.domain.model.Event;
-import com.tbc.events.domain.model.EventReview;
+import com.tbc.events.domain.model.EventStatus;
 import com.tbc.events.web.dto.*;
+import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class EventFacade {
@@ -25,10 +23,10 @@ public class EventFacade {
      * 이벤트 목록 조회 - 파사드 패턴으로 외부 인터페이스 제공
      */
     public Page<EventCardDTO> getEventList(String q, String category, String status, String sort, Pageable pageable) {
-        com.tbc.events.domain.model.EventStatus eventStatus = null;
+        EventStatus eventStatus = null;
         if (status != null) {
             try {
-                eventStatus = com.tbc.events.domain.model.EventStatus.valueOf(status);
+                eventStatus = EventStatus.valueOf(status);
             } catch (IllegalArgumentException e) {
                 // Invalid status, keep as null
             }
@@ -40,8 +38,8 @@ public class EventFacade {
      * 이벤트 상세 조회
      */
     public EventDetailDTO getEventDetail(Long id) {
-        var event = eventService.getByIdOrThrow(id);
-        return EventDetailDTO.from(event, null, java.util.List.of("react","frontend"), "TEAM-TBC");
+        GroupEntity event = eventService.getByIdOrThrow(id);
+        return EventDetailDTO.fromGroupEntity(event, null, null, "TEAM-TBC");
     }
     
     /**
@@ -71,5 +69,33 @@ public class EventFacade {
     public FavoriteResponse toggleFavorite(Long eventId, Long userId) {
         boolean favorited = eventService.toggleFavorite(userId, eventId);
         return new FavoriteResponse(favorited);
+    }
+
+    /**
+     * 이벤트 수정 - 본인 작성 이벤트만 수정 가능
+     */
+    public EventDetailDTO updateEvent(Long eventId, EventUpdateReq updateReq, Long userId) {
+        return eventService.updateEvent(eventId, updateReq, userId);
+    }
+
+    /**
+     * 이벤트 삭제 - 본인 작성 이벤트만 삭제 가능
+     */
+    public void deleteEvent(Long eventId, Long userId) {
+        eventService.deleteEvent(eventId, userId);
+    }
+
+    /**
+     * 이벤트 리뷰 수정 - 본인 작성 리뷰만 수정 가능
+     */
+    public ReviewDTO updateReview(Long eventId, Long reviewId, ReviewUpdateReq req, Long userId) {
+        return reviewService.update(userId, eventId, reviewId, req);
+    }
+
+    /**
+     * 이벤트 리뷰 삭제 - 본인 작성 리뷰만 삭제 가능
+     */
+    public void deleteReview(Long eventId, Long reviewId, Long userId) {
+        reviewService.delete(userId, eventId, reviewId);
     }
 }
