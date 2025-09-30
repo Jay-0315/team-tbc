@@ -35,4 +35,11 @@ public class User {
     public static User of(String email, String realName, String password, String nickname) {
         return new User(email, realName, password, nickname);
     }
+<<<<<<< HEAD
+=======
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+>>>>>>> origin/dev
 }

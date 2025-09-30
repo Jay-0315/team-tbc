@@ -13,5 +13,16 @@ public record GroupCreateRequest(
         Integer feeAmount,        // PAID일 때 필수
         String feeInfo,
         List<String> tags,
+<<<<<<< HEAD
         String contentHtml
 ) {}
+=======
+        String contentHtml,
+        String location,
+        Double latitude,          // 위도
+        Double longitude,         // 경도
+        String imagePath,         // 이미지 경로
+        String eventDate,
+        String eventTime
+) {}
+>>>>>>> origin/dev

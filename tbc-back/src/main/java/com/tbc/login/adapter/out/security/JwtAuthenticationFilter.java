@@ -23,8 +23,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final List<String> WHITELIST_PREFIXES = List.of(
+<<<<<<< HEAD
             "/api/auth", "/actuator"
     );
+=======
+            "/api/auth/login", "/api/auth/signup", "/api/auth/register", "/actuator");
+>>>>>>> origin/dev
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -32,8 +36,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
+<<<<<<< HEAD
                                     HttpServletResponse response,
                                     FilterChain chain)
+=======
+            HttpServletResponse response,
+            FilterChain chain)
+>>>>>>> origin/dev
             throws ServletException, IOException {
         try {
             if (!shouldSkip(request)) {
@@ -44,28 +53,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String username = claims.getSubject();
 
                     var authorities = extractAuthorities(claims);
+<<<<<<< HEAD
                     var authentication =
                             new UsernamePasswordAuthenticationToken(username, null, authorities);
+=======
+                    var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+>>>>>>> origin/dev
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+<<<<<<< HEAD
         } catch (Exception ignored) {}
+=======
+        } catch (Exception e) {
+            // JWT 토큰 검증 실패 시 로깅
+            System.err.println("JWT Authentication failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+>>>>>>> origin/dev
         chain.doFilter(request, response);
     }
 
     private boolean shouldSkip(HttpServletRequest request) {
+<<<<<<< HEAD
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
         String path = request.getRequestURI();
         for (String prefix : WHITELIST_PREFIXES) {
             if (path.startsWith(prefix)) return true;
+=======
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod()))
+            return true;
+        String path = request.getRequestURI();
+        for (String prefix : WHITELIST_PREFIXES) {
+            if (path.startsWith(prefix))
+                return true;
+>>>>>>> origin/dev
         }
         return false;
     }
 
     private String resolveAccessToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+<<<<<<< HEAD
         if (header != null && header.startsWith("Bearer ")) return header.substring(7);
+=======
+        if (header != null && header.startsWith("Bearer "))
+            return header.substring(7);
+>>>>>>> origin/dev
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -80,7 +115,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private Collection<SimpleGrantedAuthority> extractAuthorities(Claims claims) {
         Object scope = claims.get("scope");
+<<<<<<< HEAD
         if (scope == null) return List.of();
+=======
+        if (scope == null)
+            return List.of();
+>>>>>>> origin/dev
         return Arrays.stream(String.valueOf(scope).split(" "))
                 .filter(s -> !s.isBlank())
                 .map(s -> s.startsWith("ROLE_") ? s : "ROLE_" + s.toUpperCase())

@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleUnreadable(HttpMessageNotReadableException ex) {
         // JSON 파싱 실패 등 요청 본문을 읽을 수 없는 경우 → 400
+        log.error("JSON parsing error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("BAD_REQUEST", "요청 본문(JSON)이 올바르지 않습니다."));
     }
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception ex) {
         // 내부 예외 메시지는 외부로 노출하지 않음
-        log.error("Unhandled exception", ex);
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("INTERNAL_ERROR", "서버 오류가 발생했습니다."));
     }

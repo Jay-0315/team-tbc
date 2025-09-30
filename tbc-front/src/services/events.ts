@@ -26,19 +26,19 @@ export function useToggleFavorite(eventId: number) {
   })
 }
 
-// Join
-type JoinRequest = { qty: number }
-type JoinResponse = { ok: true }
+// Join (switch to groups join endpoint, self-only)
+export type JoinRequest = { qty?: number }
+export type JoinResponse = { ok: true }
 
-async function joinEventRequest(eventId: number, body: JoinRequest): Promise<JoinResponse> {
-  const { data } = await apiClient.post<JoinResponse>(`/events/${eventId}/join`, body)
-  return data
+async function joinEventRequest(eventId: number): Promise<JoinResponse> {
+  await apiClient.post(`/groups/${eventId}/join`)
+  return { ok: true }
 }
 
 export function useJoinEvent(eventId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (body: JoinRequest) => joinEventRequest(eventId, body),
+    mutationFn: () => joinEventRequest(eventId),
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: eventKeys.root }),
@@ -48,23 +48,59 @@ export function useJoinEvent(eventId: number) {
   })
 }
 
-// Events
+// Events - /api/groups 엔드포인트 사용 (events 테이블)
 export async function fetchEvents(params: EventListParams = {}): Promise<Page<EventCardDTO>> {
-  const { data } = await apiClient.get<Page<EventCardDTO>>('/events', {
+  console.log('fetchEvents called with params:', params)
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
     params: {
       page: params.page ?? 0,
       size: params.size ?? 12,
+      // 검색 및 필터링 파라미터 추가
       ...(params.q && { q: params.q }),
+      ...(params.search && { search: params.search }),
       ...(params.category && { category: params.category }),
       ...(params.status && { status: params.status }),
       ...(params.sort && { sort: params.sort }),
+    }
+  })
+  console.log('fetchEvents response:', data)
+  return data
+}
+
+// 찜한 모임 조회
+export async function fetchFavoriteEvents(page: number = 0, size: number = 12): Promise<Page<EventCardDTO>> {
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/events/favorites', {
+    params: { page, size }
+  })
+  return data
+}
+
+// 인기 모임 조회 (리뷰 많은 순)
+export async function fetchPopularEvents(page: number = 0, size: number = 4): Promise<Page<EventCardDTO>> {
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
+    params: { 
+      page, 
+      size,
+      sort: 'REVIEWS_DESC' // 리뷰 많은 순으로 정렬
+    }
+  })
+  return data
+}
+
+// 최근 개설된 모임 조회 (작성시간순)
+export async function fetchRecentEvents(page: number = 0, size: number = 4): Promise<Page<EventCardDTO>> {
+  const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
+    params: { 
+      page, 
+      size,
+      sort: 'CREATED_DESC' // 작성시간순으로 정렬
     }
   })
   return data
 }
 
 // Reviews
-type CreateReviewRequest = {
+export type CreateReviewRequest = {
   rating: number;
   comment: string;
 }
@@ -80,5 +116,3 @@ export async function createReview(eventId: number, body: CreateReviewRequest): 
   const { data } = await apiClient.post<ReviewDTO>(`/events/${eventId}/reviews`, body)
   return data
 }
-
-
