@@ -60,6 +60,12 @@ public class EventCardDTO {
     @Schema(description = "호스트 사용자 ID", example = "42")
     public Long hostId;
 
+    @Schema(description = "위도", example = "37.5663")
+    public Double latitude;
+    
+    @Schema(description = "경도", example = "126.9779")
+    public Double longitude;
+
     public static EventCardDTO fromGroupEntity(GroupEntity e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
         dto.id = e.getId();
@@ -78,6 +84,8 @@ public class EventCardDTO {
         dto.feeType = e.getFeeType();
         dto.feeAmount = e.getFeeAmount();
         dto.hostId = e.getHostId();
+        dto.latitude = e.getLatitude();
+        dto.longitude = e.getLongitude();
         return dto;
     }
 }

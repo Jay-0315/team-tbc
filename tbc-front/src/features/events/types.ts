@@ -5,6 +5,7 @@ export interface EventCardDTO {
   id: number
   title: string
   coverUrl: string
+  imageUrl?: string
   category: string
   status: EventStatus
   remainingSeats: number
@@ -14,10 +15,16 @@ export interface EventCardDTO {
   eventTime?: string // HH:MM 형식
   capacity: number
   joined: number
+  currentParticipants?: number
+  maxParticipants?: number
   favorited?: boolean
   mode?: string
   feeType?: string
   feeAmount?: number
+  description?: string
+  endDate?: string
+  hostNickname?: string
+  hostProfileImage?: string
 }
 
 export interface EventHost {
@@ -31,6 +38,8 @@ export interface EventDetailDTO extends EventCardDTO {
   description?: string
   hostName: string
   tags: string[]
+  latitude?: number
+  longitude?: number
 }
 
 export interface PageResponse<T> {
@@ -43,6 +52,7 @@ export interface PageResponse<T> {
 
 export interface EventListParams {
   q?: string
+  search?: string
   category?: string
   status?: EventStatus
   sort?: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC'

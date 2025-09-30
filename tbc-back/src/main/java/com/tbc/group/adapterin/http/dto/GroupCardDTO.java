@@ -42,14 +42,22 @@ public class GroupCardDTO {
 
     @Schema(description = "호스트 ID", example = "1")
     public Long hostId;
+    
     @Schema(description = "장소", example = "서울시 강남구")
     public String location;
+    
+    @Schema(description = "위도", example = "37.5663")
+    public Double latitude;
+    
+    @Schema(description = "경도", example = "126.9779")
+    public Double longitude;
 
     @Schema(description = "이벤트 날짜", example = "2025-09-10")
     public LocalDate eventDate;
 
     @Schema(description = "이벤트 시간", example = "14:30")
     public LocalTime eventTime;
+    
     @Schema(description = "생성일시", example = "2025-09-22T10:00:00")
     public LocalDateTime createdAt;
 
@@ -67,8 +75,11 @@ public class GroupCardDTO {
         dto.tags = group.tags();
         dto.hostId = group.hostId();
         dto.location = group.location();
+        dto.latitude = group.latitude();
+        dto.longitude = group.longitude();
         dto.eventDate = group.eventDate();
-        dto.eventTime = group.eventTime();        dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용
+        dto.eventTime = group.eventTime();
+        dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용
         return dto;
     }
 }

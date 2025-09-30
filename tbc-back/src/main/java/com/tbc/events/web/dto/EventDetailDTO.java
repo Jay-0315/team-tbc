@@ -52,6 +52,8 @@ public class EventDetailDTO extends EventCardDTO {
         dto.feeInfo = e.getFeeInfo();
         dto.hostId = e.getHostId();
         dto.contentHtml = e.getContentHtml();
+        dto.latitude = e.getLatitude();
+        dto.longitude = e.getLongitude();
         return dto;
     }
 }

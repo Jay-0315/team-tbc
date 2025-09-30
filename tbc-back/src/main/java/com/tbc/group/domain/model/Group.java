@@ -20,6 +20,8 @@ public record Group(
         String contentHtml,
         Long hostId,
         String location,
+        Double latitude,  // 위도
+        Double longitude, // 경도
         LocalDate eventDate,
         LocalTime eventTime,
         int capacity, // Added this field
@@ -41,6 +43,8 @@ public record Group(
             String contentHtml,
             Long hostId,
             String location,
+            Double latitude,  // 위도
+            Double longitude, // 경도
             LocalDate eventDate,
             LocalTime eventTime,
             int capacity, // Added this field
@@ -53,7 +57,8 @@ public record Group(
                 minParticipants, maxParticipants, mode,
                 feeType, feeAmount, feeInfo,
                 tags, contentHtml, hostId,
-                location, eventDate, eventTime,
+                location, latitude, longitude,
+                eventDate, eventTime,
                 capacity, joined, coverUrl, startAt // Added these fields
         );
     }

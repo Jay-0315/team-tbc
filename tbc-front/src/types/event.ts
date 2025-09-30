@@ -14,9 +14,10 @@ export interface Page<T> {
 // 이벤트 목록 조회 파라미터
 export interface EventListParams {
   q?: string
+  search?: string
   category?: string
   status?: EventStatus
-  sort?: 'START_ASC' | 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'NEW_DESC'
+  sort?: 'START_ASC' | 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'NEW_DESC' | 'CREATED_DESC'
   page?: number
   size?: number
 }

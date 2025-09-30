@@ -1,20 +1,21 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from "react"
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
-import { FloatingChatButton } from "@/components/FloatingChatButton"
-import { Heart, Plus, Users, Calendar, Sparkles, AlertCircle } from 'lucide-react'
+import { Calendar, AlertCircle } from 'lucide-react'
 import EventFilters from '../components/event/EventFilters'
 import { EventCardSkeletonGrid } from '../components/skeletons/EventCardSkeleton'
-import { useEvents } from '@/features/events/api/useEvents'
 import { useInfiniteEvents } from '@/features/events/api/useInfiniteEvents'
-import type { EventCardDTO } from '@/features/events/types'
 import type { EventStatus } from '@/features/events/types'
 import EventBanner from '@/components/EventBanner'
 import { Badge } from '@/components/ui/badge'
 
-export default function HomePage() {
-  const { isAuthenticated, refreshAuth } = useAuth()
+interface HomePageProps {
+  onCreateSocialing?: () => void
+}
+
+export default function HomePage({ onCreateSocialing }: HomePageProps) {
+  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -24,7 +25,7 @@ export default function HomePage() {
 
   // URL 파라미터에서 필터 값 추출
   const category = searchParams.get('category') || ''
-  const status = (searchParams.get('status') as EventStatus) || 'RECRUITING'
+  const status = (searchParams.get('status') as EventStatus) || undefined
   const sort = searchParams.get('sort') || 'NEW_DESC'
 
   // 이벤트 데이터 가져오기
@@ -32,20 +33,20 @@ export default function HomePage() {
     data: eventsData, 
     isLoading, 
     isError, 
-    error,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage
+    error
   } = useInfiniteEvents({
     category: category || undefined,
     status: status || undefined,
     sort: sort as any,
-    search: searchQuery || undefined,
+    q: searchQuery || undefined,
   })
 
   // 모든 이벤트를 하나의 배열로 합치기
   const allEvents = useMemo(() => {
-    return eventsData?.pages.flatMap(page => page.content) || []
+    const events = eventsData?.pages.flatMap(page => page.content) || []
+    console.log('HomePage - Total events loaded:', events.length)
+    console.log('HomePage - Events:', events)
+    return events
   }, [eventsData])
 
   // OAuth 성공/실패 후 처리
@@ -54,7 +55,7 @@ export default function HomePage() {
     const oauthMessage = searchParams.get('message')
 
     if (oauthParam === 'success') {
-      refreshAuth()
+      // OAuth 성공 시 URL 파라미터 정리
       setSearchParams(prev => {
         const newParams = new URLSearchParams(prev)
         newParams.delete('oauth')
@@ -70,7 +71,7 @@ export default function HomePage() {
         return newParams
       }, { replace: true })
     }
-  }, [searchParams, setSearchParams, refreshAuth])
+  }, [searchParams, setSearchParams])
 
   // URL 파라미터 업데이트 함수
   const updateSearchParams = useCallback((updates: Record<string, string | null>) => {
@@ -104,7 +105,7 @@ export default function HomePage() {
         {/* 이벤트 배너 */}
         <div className="mx-6 mb-8">
           <EventBanner />
-        </div>
+          </div>
 
         {/* 검색창과 태그 버튼 */}
         <div className="px-6 mb-8">
@@ -120,11 +121,11 @@ export default function HomePage() {
                   { key: 'CULTURE', name: '문화' },
                 ]}
                 selectedCategory={category}
-                onChangeCategory={(c) => updateSearchParams({ category: c })}
-                status={status}
-                onChangeStatus={(s) => updateSearchParams({ status: s })}
-                sort={sort}
-                onChangeSort={(s) => updateSearchParams({ sort: s })}
+                onChangeCategory={(c) => updateSearchParams({ category: c || null })}
+                status={status || null}
+                onChangeStatus={(s) => updateSearchParams({ status: s || null })}
+                sort={sort || null}
+                onChangeSort={(s) => updateSearchParams({ sort: s || null })}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 onSearch={handleSearch}
@@ -202,10 +203,10 @@ export default function HomePage() {
                       <div className="flex justify-between items-center mb-3">
                         {/* 마감날짜 (좌측하단) */}
                         <div className="text-xs text-gray-500">
-                          마감: {new Date(event.endDate).toLocaleDateString('ko-KR', {
+                          마감: {event.endDate ? new Date(event.endDate).toLocaleDateString('ko-KR', {
                             month: 'short',
                             day: 'numeric'
-                          })}
+                          }) : '미정'}
                         </div>
                         
                         {/* 작성자 (우측하단) */}
@@ -313,10 +314,10 @@ export default function HomePage() {
                       <div className="flex justify-between items-center mb-3">
                         {/* 마감날짜 (좌측하단) */}
                         <div className="text-xs text-gray-500">
-                          마감: {new Date(event.endDate).toLocaleDateString('ko-KR', {
+                          마감: {event.endDate ? new Date(event.endDate).toLocaleDateString('ko-KR', {
                             month: 'short',
                             day: 'numeric'
-                          })}
+                          }) : '미정'}
                         </div>
                         
                         {/* 작성자 (우측하단) */}
@@ -382,17 +383,18 @@ export default function HomePage() {
                   <h3 className="mb-2 text-xl font-semibold text-gray-800">표시할 소셜링이 없습니다</h3>
                   <p className="mb-8 text-gray-600">새로운 소셜링을 만들어보세요!</p>
                   {isAuthenticated && (
-                    <Link to="/groups/create">
-                      <button className="px-8 py-4 font-semibold text-black bg-gradient-to-r from-[#FFA700] to-[#FFFFFF] rounded-2xl transition-all duration-300 transform hover:from-[#FFA700]/80 hover:to-[#FFFFFF]/80 hover:scale-105">
-                      소셜링 만들기
-                    </button>
-                    </Link>
+                    <button 
+                      onClick={onCreateSocialing}
+                      className="px-8 py-4 font-semibold text-black bg-gradient-to-r from-[#FFA700] to-[#FFFFFF] rounded-2xl transition-all duration-300 transform hover:from-[#FFA700]/80 hover:to-[#FFFFFF]/80 hover:scale-105"
+                    >
+                        소셜링 만들기
+                      </button>
                   )}
                 </div>
               ) : (
                 allEvents.slice(0, displayCount).map((event) => (
-                  <div 
-                    key={event.id} 
+                  <div
+                    key={event.id}
                     className="group"
                   >
                     <div className="overflow-hidden relative bg-white rounded-xl border border-gray-100 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
@@ -452,10 +454,10 @@ export default function HomePage() {
                         <div className="flex justify-between items-center mb-3">
                           {/* 마감날짜 (좌측하단) */}
                           <div className="text-xs text-gray-500">
-                            마감: {new Date(event.endDate).toLocaleDateString('ko-KR', {
+                            마감: {event.endDate ? new Date(event.endDate).toLocaleDateString('ko-KR', {
                               month: 'short',
                               day: 'numeric'
-                            })}
+                            }) : '미정'}
                           </div>
                           
                           {/* 작성자 (우측하단) */}
@@ -470,8 +472,8 @@ export default function HomePage() {
                             />
                             <span>{event.hostNickname}</span>
                           </div>
-                        </div>
-                        
+                      </div>
+                      
                         {/* 참가하기 버튼 */}
                         <button
                           onClick={() => {
@@ -492,7 +494,7 @@ export default function HomePage() {
                 ))
               )}
             </div>
-
+            
             {/* 더보기 버튼 */}
             {displayCount < allEvents.length && (
               <div className="mt-12 text-center">

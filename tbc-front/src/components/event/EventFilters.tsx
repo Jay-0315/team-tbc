@@ -6,11 +6,11 @@ interface EventFiltersProps {
   selectedCategory?: string
   onChangeCategory: (category?: string) => void
 
-  status: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED' | undefined
-  onChangeStatus: (status: 'UPCOMING' | 'OPEN' | 'WAITLIST' | 'CLOSED' | undefined) => void
+  status: string | null
+  onChangeStatus: (status: string | null) => void
 
-  sort: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC'
-  onChangeSort: (sort: 'DEADLINE_ASC' | 'REVIEWS_DESC' | 'START_ASC' | 'NEW_DESC' | 'CREATED_DESC') => void
+  sort: string | null
+  onChangeSort: (sort: string | null) => void
 
   searchQuery?: string
   onSearchChange: (query: string) => void
