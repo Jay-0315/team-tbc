@@ -73,6 +73,7 @@ logging:
   level:
     org.springframework.web.socket: DEBUG
     org.springframework.web.socket.server: DEBUG
+    com.tbc.payments: DEBUG
     org.hibernate.SQL: warn
 
 jwt:
