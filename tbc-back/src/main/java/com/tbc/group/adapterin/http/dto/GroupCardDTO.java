@@ -51,6 +51,9 @@ public class GroupCardDTO {
     
     @Schema(description = "경도", example = "126.9779")
     public Double longitude;
+    
+    @Schema(description = "이미지 경로", example = "/uploads/abc-123.jpg")
+    public String imagePath;
 
     @Schema(description = "이벤트 날짜", example = "2025-09-10")
     public LocalDate eventDate;
@@ -77,6 +80,7 @@ public class GroupCardDTO {
         dto.location = group.location();
         dto.latitude = group.latitude();
         dto.longitude = group.longitude();
+        dto.imagePath = group.imagePath();
         dto.eventDate = group.eventDate();
         dto.eventTime = group.eventTime();
         dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용

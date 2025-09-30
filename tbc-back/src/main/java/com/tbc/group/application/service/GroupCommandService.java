@@ -55,6 +55,7 @@ public class GroupCommandService {
                     req.location(),
                     req.latitude(),  // 위도
                     req.longitude(), // 경도
+                    req.imagePath(), // 이미지 경로
                     eventDate,
                     eventTime,
                     req.maxParticipants(), // capacity = maxParticipants
