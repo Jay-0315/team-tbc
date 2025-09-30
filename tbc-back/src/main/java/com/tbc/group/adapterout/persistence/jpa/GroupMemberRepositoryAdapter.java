@@ -6,6 +6,9 @@ import com.tbc.group.application.port.out.GroupMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Repository
 @RequiredArgsConstructor
 public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
@@ -43,5 +46,19 @@ public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
     @Override
     public boolean existsActiveMember(Long groupId, Long userId) {
         return repo.existsByGroupIdAndUserIdAndStatus(groupId, userId, "ACTIVE");
+    }
+
+    @Override
+    public List<MemberView> findMembers(Long groupId) {
+        return repo.findByGroupId(groupId).stream()
+                .map(e -> new MemberView(e.getUserId(), e.getRole(), e.getStatus(), e.getJoinedAt()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MemberView> findMembersByStatus(Long groupId, String status) {
+        return repo.findByGroupIdAndStatus(groupId, status).stream()
+                .map(e -> new MemberView(e.getUserId(), e.getRole(), e.getStatus(), e.getJoinedAt()))
+                .collect(Collectors.toList());
     }
 }

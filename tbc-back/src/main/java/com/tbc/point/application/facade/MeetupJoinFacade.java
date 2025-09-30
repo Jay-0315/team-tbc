@@ -54,7 +54,11 @@ public class MeetupJoinFacade {
     // ⬇️ 참가자 목록 조회
     @Transactional(readOnly = true)
     public List<ParticipantResponse> listMembers(Long meetupId, boolean excludeCancelled) { // String → Long
-        // group 포트에 조회용 메서드가 없어 임시 스텁 반환
-        return java.util.Collections.emptyList();
+        List<GroupMemberRepository.MemberView> members = excludeCancelled
+                ? groupMemberRepository.findMembersByStatus(meetupId, "ACTIVE")
+                : groupMemberRepository.findMembers(meetupId);
+        return members.stream()
+                .map(m -> new ParticipantResponse(m.userId(), m.role(), m.status(), m.joinedAt()))
+                .toList();
     }
 }
