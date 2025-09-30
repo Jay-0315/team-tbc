@@ -13,13 +13,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-<<<<<<< HEAD
-=======
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
->>>>>>> origin/dev
 @Service @RequiredArgsConstructor
 public class GroupCommandService {
     private final GroupRepository groupRepo;
@@ -28,12 +25,9 @@ public class GroupCommandService {
 
     @Transactional
     public Long create(GroupCreateRequest req, Long hostId) {
-<<<<<<< HEAD
-=======
         System.out.println("GroupCommandService.create() called with request: " + req);
         System.out.println("Host ID: " + hostId);
         
->>>>>>> origin/dev
         // 검증
         if (req.minParticipants() == null || req.maxParticipants() == null ||
                 req.minParticipants() < 1 || req.maxParticipants() < req.minParticipants())
@@ -41,24 +35,6 @@ public class GroupCommandService {
         if ("PAID".equals(req.feeType()) && (req.feeAmount() == null || req.feeAmount() < 0))
             throw new IllegalArgumentException("fee required");
 
-<<<<<<< HEAD
-        var group = Group.create(
-                req.title(), req.category(), req.topic(),
-                req.minParticipants(), req.maxParticipants(),
-                Mode.valueOf(req.mode()),
-                FeeType.valueOf(req.feeType()),
-                req.feeAmount(), req.feeInfo(),
-                req.tags(), req.contentHtml(),
-                hostId
-        );
-
-        Long groupId = groupRepo.save(group);
-        memberRepo.addHost(groupId, hostId);
-
-        // 커밋 후 채팅 생성
-        events.publishEvent(new GroupCreatedEvent(groupId, hostId));
-        return groupId;
-=======
         // eventDate와 eventTime을 조합해서 startAt 생성
         LocalDate eventDate = req.eventDate() != null ? LocalDate.parse(req.eventDate()) : null;
         LocalTime eventTime = req.eventTime() != null ? LocalTime.parse(req.eventTime()) : null;
@@ -105,6 +81,5 @@ public class GroupCommandService {
             e.printStackTrace();
             throw e;
         }
->>>>>>> origin/dev
     }
 }

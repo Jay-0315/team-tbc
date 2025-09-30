@@ -13,10 +13,6 @@ public record GroupCreateRequest(
         Integer feeAmount,        // PAID일 때 필수
         String feeInfo,
         List<String> tags,
-<<<<<<< HEAD
-        String contentHtml
-) {}
-=======
         String contentHtml,
         String location,
         Double latitude,          // 위도
@@ -25,4 +21,3 @@ public record GroupCreateRequest(
         String eventDate,
         String eventTime
 ) {}
->>>>>>> origin/dev

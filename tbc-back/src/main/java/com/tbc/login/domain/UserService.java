@@ -128,8 +128,6 @@ public class UserService {
     public boolean isNicknameAvailable(String nickname) {
         return !userRepository.existsByNickname(nickname);
     }
-<<<<<<< HEAD
-=======
 
     @Transactional
     public void updateNickname(Long userId, String newNickname) {
@@ -149,5 +147,4 @@ public class UserService {
         user.setNickname(trimmed);
         userRepository.save(user);
     }
->>>>>>> origin/dev
 }

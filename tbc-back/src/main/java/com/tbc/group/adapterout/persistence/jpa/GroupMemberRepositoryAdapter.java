@@ -6,12 +6,9 @@ import com.tbc.group.application.port.out.GroupMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-<<<<<<< HEAD
-=======
 import java.util.List;
 import java.util.stream.Collectors;
 
->>>>>>> origin/dev
 @Repository
 @RequiredArgsConstructor
 public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
@@ -31,12 +28,8 @@ public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
 
     @Override
     public void addMember(Long groupId, Long userId) {
-<<<<<<< HEAD
-        if (repo.existsByGroupIdAndUserId(groupId, userId)) return;
-=======
         // 이미 ACTIVE면 무시(멱등)
         if (repo.existsByGroupIdAndUserIdAndStatus(groupId, userId, "ACTIVE")) return;
->>>>>>> origin/dev
         repo.save(GroupMemberEntity.builder()
                 .groupId(groupId)
                 .userId(userId)
@@ -46,16 +39,6 @@ public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean isMember(Long groupId, Long userId) {
-        return repo.existsByGroupIdAndUserId(groupId, userId);
-    }
-
-    @Override
-    public int countActiveMembers(Long groupId) {
-        return repo.countByGroupIdAndStatus(groupId, "ACTIVE");
-    }
-=======
     public int countActiveMembers(Long groupId) {
         return repo.countByGroupIdAndStatus(groupId, "ACTIVE");
     }
@@ -78,5 +61,4 @@ public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
                 .map(e -> new MemberView(e.getUserId(), e.getRole(), e.getStatus(), e.getJoinedAt()))
                 .collect(Collectors.toList());
     }
->>>>>>> origin/dev
 }

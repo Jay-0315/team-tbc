@@ -32,7 +32,4 @@ public class ReviewDTO {
 
 
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/dev

@@ -3,13 +3,9 @@ package com.tbc.group.adapterin.http.dto;
 import com.tbc.group.domain.model.Group;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-<<<<<<< HEAD
-import java.time.LocalDateTime;
-=======
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
->>>>>>> origin/dev
 import java.util.List;
 
 @Schema(name = "GroupCardDTO", description = "그룹 카드 요약 정보")
@@ -46,12 +42,6 @@ public class GroupCardDTO {
 
     @Schema(description = "호스트 ID", example = "1")
     public Long hostId;
-<<<<<<< HEAD
-
-    @Schema(description = "생성일시", example = "2025-09-22T10:00:00")
-    public LocalDateTime createdAt;
-
-=======
     
     @Schema(description = "장소", example = "서울시 강남구")
     public String location;
@@ -92,7 +82,6 @@ public class GroupCardDTO {
     @Schema(description = "찜 여부", example = "false")
     public Boolean favorited;
 
->>>>>>> origin/dev
     public static GroupCardDTO from(Group group) {
         GroupCardDTO dto = new GroupCardDTO();
         dto.id = group.id();
@@ -106,9 +95,6 @@ public class GroupCardDTO {
         dto.feeAmount = group.feeAmount();
         dto.tags = group.tags();
         dto.hostId = group.hostId();
-<<<<<<< HEAD
-        dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용
-=======
         dto.location = group.location();
         dto.latitude = group.latitude();
         dto.longitude = group.longitude();
@@ -120,7 +106,6 @@ public class GroupCardDTO {
         dto.capacity = group.capacity();
         dto.coverUrl = group.coverUrl();
         dto.favorited = null; // 초기값 null, 이후 enrichPageWithHostInfo에서 설정
->>>>>>> origin/dev
         return dto;
     }
 }
