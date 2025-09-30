@@ -13,6 +13,9 @@ import EventDetailPage from '@/pages/EventDetailPage'
 import EventsPage from '@/pages/EventsPage'
 import { FloatingChatButton } from '@/components/FloatingChatButton'
 import { MyPage } from '@/pages/MyPage'
+import ChargePage from '@/pages/payments/ChargePage'
+import ResultPage from '@/pages/payments/ResultPage'
+import { Pencil } from 'lucide-react'
 
 export default function App() {
   const { user, logoutAsync, isLoading } = useAuth()
@@ -59,6 +62,8 @@ export default function App() {
             element={<CreateEventWizard onCreated={handleGroupCreated} />} 
           />
           <Route path="/groups/:id/chat" element={<GroupChatPage />} />
+          <Route path="/payments/charge" element={<ChargePage />} />
+          <Route path="/payments/result" element={<ResultPage />} />
           <Route path="/mypage" element={<MyPage />} />
         </Routes>
       </main>
