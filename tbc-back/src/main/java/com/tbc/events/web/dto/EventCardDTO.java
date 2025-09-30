@@ -69,6 +69,12 @@ public class EventCardDTO {
     @Schema(description = "이미지 경로", example = "/uploads/abc-123.jpg")
     public String imagePath;
 
+    @Schema(description = "호스트 닉네임", example = "홍길동")
+    public String hostNickname;
+
+    @Schema(description = "호스트 프로필 이미지 URL", example = "https://example.com/profile.jpg")
+    public String hostProfileImage;
+
     public static EventCardDTO fromGroupEntity(GroupEntity e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
         dto.id = e.getId();

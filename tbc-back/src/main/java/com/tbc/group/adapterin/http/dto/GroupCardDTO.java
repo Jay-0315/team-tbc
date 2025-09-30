@@ -64,6 +64,21 @@ public class GroupCardDTO {
     @Schema(description = "생성일시", example = "2025-09-22T10:00:00")
     public LocalDateTime createdAt;
 
+    @Schema(description = "현재 참가자 수", example = "5")
+    public Integer joined;
+
+    @Schema(description = "정원", example = "12")
+    public Integer capacity;
+
+    @Schema(description = "커버 이미지 URL", example = "https://example.com/cover.jpg")
+    public String coverUrl;
+
+    @Schema(description = "호스트 닉네임", example = "홍길동")
+    public String hostNickname;
+
+    @Schema(description = "호스트 프로필 이미지 URL", example = "https://example.com/profile.jpg")
+    public String hostProfileImage;
+
     public static GroupCardDTO from(Group group) {
         GroupCardDTO dto = new GroupCardDTO();
         dto.id = group.id();
@@ -84,6 +99,9 @@ public class GroupCardDTO {
         dto.eventDate = group.eventDate();
         dto.eventTime = group.eventTime();
         dto.createdAt = LocalDateTime.now(); // 임시로 현재 시간 사용
+        dto.joined = group.joined();
+        dto.capacity = group.capacity();
+        dto.coverUrl = group.coverUrl();
         return dto;
     }
 }

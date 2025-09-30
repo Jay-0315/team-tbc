@@ -103,6 +103,9 @@ export function useAuth() {
         const userData = await authApi.getCurrentUser()
         queryClient.setQueryData(authKeys.user(), userData)
         console.log('User data cached:', userData)
+        
+        // 프로필 쿼리도 무효화하여 자동 갱신
+        queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
       } catch (error) {
         console.error('Failed to fetch user data after login:', error)
         // 401 에러인 경우 토큰이 유효하지 않을 수 있으므로 토큰 제거
@@ -114,6 +117,7 @@ export function useAuth() {
         } else {
           // 다른 에러인 경우 재시도
           queryClient.invalidateQueries({ queryKey: authKeys.user() })
+          queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
         }
       }
     },

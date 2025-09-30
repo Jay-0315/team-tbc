@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
 import { useEffect, useState } from 'react'
-import { User } from 'lucide-react'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
 
 import type { User as TbcUser } from '@/types/auth'
@@ -14,10 +13,17 @@ interface HeaderProps {
 
 export default function Header({ user, onLogout }: HeaderProps) {
   const { isAuthenticated } = useAuth()
-  const { data: profile } = useProfile(isAuthenticated)
+  const { data: profile, refetch: refetchProfile } = useProfile()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
+
+  // 인증 상태가 변경되면 프로필 다시 가져오기
+  useEffect(() => {
+    if (isAuthenticated) {
+      refetchProfile()
+    }
+  }, [isAuthenticated, refetchProfile])
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -51,7 +57,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur supports-[backdrop-filter] transition-colors duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white transition-colors duration-300">
       <div className="container flex justify-between items-center px-4 h-16">
         <div className="flex items-center">
           <Link 
@@ -75,22 +81,22 @@ export default function Header({ user, onLogout }: HeaderProps) {
                 onClick={handleUserIconClick}
                 className="flex overflow-hidden justify-center items-center w-10 h-10 bg-white rounded-full border-2 border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 aria-haspopup="menu"
-                aria-expanded={isDropdownOpen}
+                aria-expanded={isDropdownOpen ? 'true' : 'false'}
                 aria-label="사용자 메뉴"
               >
                 {profile?.profileImageUrl ? (
                   <img
                     src={profile.profileImageUrl}
-                    alt={profile.displayName || user?.nickname || '프로필'}
+                    alt={profile.nickname || profile.displayName || '프로필'}
                     className="object-cover w-full h-full"
                     onError={(e) => {
-                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${profile?.displayName || user?.nickname || 'User'}&background=orange&color=white&size=40`
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.nickname || profile?.displayName || 'User')}&background=orange&color=white&size=40`
                     }}
                   />
                 ) : (
                   <img
-                    src={`https://ui-avatars.com/api/?name=${profile?.displayName || user?.nickname || 'User'}&background=orange&color=white&size=40`}
-                    alt={profile?.displayName || user?.nickname || '프로필'}
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.nickname || profile?.displayName || 'User')}&background=orange&color=white&size=40`}
+                    alt={profile?.nickname || profile?.displayName || '프로필'}
                     className="object-cover w-full h-full"
                   />
                 )}
@@ -104,7 +110,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                 >
                   <div className="py-1">
                     <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
-                      {profile?.displayName || user?.realName || user?.nickname}님
+                      {profile?.nickname || profile?.displayName || user?.realName || user?.nickname}님
                     </div>
                     <button
                       onClick={() => {
