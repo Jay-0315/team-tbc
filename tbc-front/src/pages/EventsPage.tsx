@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus } from 'lucide-react'
-// @ts-ignore
 import { useQueryClient } from '@tanstack/react-query'
 import EventFilters from '../components/event/EventFilters'
 import EventCard from '../components/event/EventCard'
@@ -171,7 +170,7 @@ export default function EventsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 transition-colors duration-300">
+    <main className="min-h-screen text-gray-900 bg-white transition-colors duration-300">
         {/* 넷플릭스 스타일 히어로 섹션 */}
         <div className="relative bg-gradient-to-b from-gray-50 to-white transition-colors duration-300">
           <div className="px-4 py-12 mx-auto max-w-7xl">
@@ -310,14 +309,14 @@ export default function EventsPage() {
           <div className="relative w-full max-w-6xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
             <button
               onClick={() => setShowCreateWizard(false)}
-              className="absolute top-4 right-4 z-20 p-2 text-gray-500 rounded-full transition-colors hover:text-gray-700 bg-white/80 backdrop-blur-sm"
+              className="absolute top-4 right-4 z-20 p-2 text-gray-500 rounded-full backdrop-blur-sm transition-colors hover:text-gray-700 bg-white/80"
               aria-label="모달 닫기"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="flex-1 overflow-y-auto" style={{ maxHeight: 'calc(95vh - 2rem)' }}>
+            <div className="overflow-y-auto flex-1" style={{ maxHeight: 'calc(95vh - 2rem)' }}>
               <CreateEventWizard onCreated={handleGroupCreated} />
             </div>
           </div>
