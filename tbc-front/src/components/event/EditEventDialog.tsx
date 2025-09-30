@@ -26,6 +26,7 @@ import { useUpdateEvent } from '@/features/events/api/useEventEdit'
 import { toast } from 'sonner'
 import { Edit, Loader2 } from 'lucide-react'
 import type { EventDetailDTO } from '@/features/events/types'
+import LocationSearch from '@/components/LocationSearch'
 
 const editEventSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요').max(200, '제목은 200자 이하로 입력해주세요'),
@@ -34,6 +35,8 @@ const editEventSchema = z.object({
   eventDate: z.string().min(1, '날짜를 선택해주세요'),
   eventTime: z.string().min(1, '시간을 선택해주세요'),
   location: z.string().min(1, '장소를 입력해주세요').max(200, '장소는 200자 이하로 입력해주세요'),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   description: z.string().max(2000, '설명은 2000자 이하로 입력해주세요').optional(),
   feeType: z.string().optional(),
   feeAmount: z.number().min(0).optional(),
@@ -67,6 +70,8 @@ export function EditEventDialog({ event, children }: EditEventDialogProps) {
       eventDate: event.eventDate || '',
       eventTime: event.eventTime || '',
       location: event.location,
+      latitude: event.latitude,
+      longitude: event.longitude,
       description: event.description || '',
       feeType: event.feeType || 'FREE',
       feeAmount: event.feeAmount || 0,
@@ -212,20 +217,17 @@ export function EditEventDialog({ event, children }: EditEventDialogProps) {
           </div>
 
           {/* 장소 */}
-          <div className="space-y-2">
-            <Label htmlFor="location">장소 *</Label>
-            <Input
-              id="location"
-              {...register('location')}
-              placeholder="모임 장소를 입력하세요"
-              aria-invalid={!!errors.location}
-            />
-            {errors.location && (
-              <p className="text-sm text-red-600" role="alert">
-                {errors.location.message}
-              </p>
-            )}
-          </div>
+          <LocationSearch
+            initialLocation={event.location}
+            initialLat={event.latitude}
+            initialLng={event.longitude}
+            onLocationChange={(location, lat, lng) => {
+              setValue('location', location)
+              setValue('latitude', lat)
+              setValue('longitude', lng)
+            }}
+            error={errors.location?.message}
+          />
 
           {/* 설명 */}
           <div className="space-y-2">

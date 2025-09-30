@@ -15,6 +15,12 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const { isAuthenticated } = useAuth()
   const [isFavorited, setIsFavorited] = useState(event.favorited || false)
   const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
+  
+  // 디버깅: 호스트 정보 확인
+  console.log('EventCard - event.id:', event.id)
+  console.log('EventCard - event:', event)
+  console.log('EventCard - hostNickname:', event.hostNickname)
+  console.log('EventCard - hostProfileImage:', event.hostProfileImage)
 
   // 날짜와 시간 포맷팅
   const formatDate = (dateStr?: string) => {
@@ -64,26 +70,26 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
       onClick={handleCardClick}
     >
       {/* 썸네일 */}
-      <div className="relative h-48 overflow-hidden bg-gray-100">
-        {event.coverUrl ? (
-          <img
-            src={event.coverUrl}
-            alt={event.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none'
-              const parent = e.currentTarget.parentElement
-              if (parent) {
-                parent.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-100"><span class="text-gray-400">No Image</span></div>'
-              }
-            }}
-          />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gray-100">
-            <span className="text-gray-400">No Image</span>
-          </div>
-        )}
+    <div className="relative h-48 overflow-hidden bg-gray-100">
+      {event.imagePath ? (
+        <img
+          src={`http://localhost:8080/img/${event.imagePath.split('/').pop()}`}
+          alt={event.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+            const parent = e.currentTarget.parentElement
+            if (parent) {
+              parent.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-100"><span class="text-gray-400">No Image</span></div>'
+            }
+          }}
+        />
+      ) : (
+        <div className="flex items-center justify-center w-full h-full bg-gray-100">
+          <span className="text-gray-400">No Image</span>
+        </div>
+      )}
 
         {/* 좌측 상단: 태그 */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">

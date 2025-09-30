@@ -5,10 +5,17 @@ import com.tbc.events.application.service.ReviewService;
 import com.tbc.events.domain.model.EventStatus;
 import com.tbc.events.web.dto.*;
 import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
+import com.tbc.group.adapterout.persistence.jpa.repository.GroupMemberJpaRepository;
+import com.tbc.login.adapter.out.persistence.UserJpaRepository;
+import com.tbc.login.domain.User;
+import com.tbc.profile.adapterin.persistence.jpa.entity.ProfileEntity;
+import com.tbc.profile.adapterin.persistence.jpa.repository.ProfileJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class EventFacade {
@@ -18,6 +25,15 @@ public class EventFacade {
     
     @Autowired
     private ReviewService reviewService;
+    
+        @Autowired
+        private UserJpaRepository userRepository;
+        
+        @Autowired
+        private ProfileJpaRepository profileRepository;
+        
+        @Autowired
+        private GroupMemberJpaRepository groupMemberJpaRepository;
     
     /**
      * 이벤트 목록 조회 - 파사드 패턴으로 외부 인터페이스 제공
@@ -39,7 +55,40 @@ public class EventFacade {
      */
     public EventDetailDTO getEventDetail(Long id) {
         GroupEntity event = eventService.getByIdOrThrow(id);
-        return EventDetailDTO.fromGroupEntity(event, null, null, "TEAM-TBC");
+        
+        // 실제 참여자 수 계산
+        int actualJoinedCount = groupMemberJpaRepository.countByGroupIdAndStatus(id, "ACTIVE");
+        
+        // 호스트 정보 조회
+        Long hostId = event.getHostId();
+        String hostName = "TEAM-TBC"; // 기본값
+        String hostNickname = null;
+        String hostProfileImage = null;
+        
+        if (hostId != null) {
+            Optional<User> userOpt = userRepository.findById(hostId);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                hostNickname = user.getNickname();
+                
+                // 프로필 정보 조회
+                Optional<ProfileEntity> profileOpt = profileRepository.findByUserId(hostId);
+                if (profileOpt.isPresent()) {
+                    ProfileEntity profile = profileOpt.get();
+                    hostName = profile.getDisplayName() != null ? profile.getDisplayName() : user.getNickname();
+                    hostProfileImage = profile.getProfileImageUrl();
+                } else {
+                    hostName = user.getNickname();
+                }
+            }
+        }
+        
+        EventDetailDTO dto = EventDetailDTO.fromGroupEntity(event, null, null, hostName, hostNickname, hostProfileImage);
+        // 실제 참여자 수로 업데이트
+        dto.joined = actualJoinedCount;
+        dto.remainingSeats = Math.max(0, event.getCapacity() - actualJoinedCount);
+        
+        return dto;
     }
     
     /**
