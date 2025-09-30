@@ -12,10 +12,11 @@ import EventDetailPage from '@/pages/EventDetailPage'
 // import GroupDetailPage from '@/pages/groups/GroupDetailPage'
 import EventsPage from '@/pages/EventsPage'
 import { FloatingChatButton } from '@/components/FloatingChatButton'
+import FloatingButton from '@/components/FloatingButton'
 import { MyPage } from '@/pages/MyPage'
 import ChargePage from '@/pages/payments/ChargePage'
 import ResultPage from '@/pages/payments/ResultPage'
-import { Pencil } from 'lucide-react'
+import { Pencil, MessageCircle } from 'lucide-react'
 
 export default function App() {
   const { user, logoutAsync, isLoading } = useAuth()
@@ -27,6 +28,10 @@ export default function App() {
     // 그룹 생성 완료 후 바로 채팅 페이지로 이동
     console.log('Group created:', { groupId, roomId })
     navigate(`/groups/${groupId}/chat`)
+  }
+
+  const handleCreatePost = () => {
+    navigate('/posts/new')
   }
 
   if (isLoading) {
@@ -67,7 +72,27 @@ export default function App() {
           <Route path="/mypage" element={<MyPage />} />
         </Routes>
       </main>
-      {user && <FloatingChatButton />}
+      
+      {/* 플로팅 버튼들 */}
+      {user && (
+        <>
+          {/* 글쓰기 버튼 (위쪽) */}
+          <FloatingButton
+            icon={<Pencil className="w-5 h-5" />}
+            label="글쓰기"
+            position="bottom-right"
+            variant="primary"
+            size="md"
+            onClick={handleCreatePost}
+            showLabel={false}
+            pulse={false}
+            className="bottom-24"
+          />
+          
+          {/* 채팅 버튼 (아래쪽) */}
+          <FloatingChatButton />
+        </>
+      )}
     </div>
   )
 }

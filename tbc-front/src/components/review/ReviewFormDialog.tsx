@@ -79,13 +79,13 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
           {children}
         </DialogTrigger>
         <DialogContent 
-          className="sm:max-w-md bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800"
+          className="sm:max-w-md bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 border-2 border-zinc-300 dark:border-zinc-600 shadow-2xl"
         >
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">
+            <DialogTitle className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
               후기 작성
             </DialogTitle>
-            <DialogDescription className="text-sm text-zinc-500 dark:text-zinc-400">
+            <DialogDescription className="text-sm text-zinc-600 dark:text-zinc-300">
               모임에 대한 솔직한 후기를 남겨주세요.
             </DialogDescription>
           </DialogHeader>
@@ -93,7 +93,7 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 평점 선택 */}
             <div className="space-y-3">
-              <label className="text-sm font-medium">평점을 선택해주세요</label>
+              <label className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">평점을 선택해주세요</label>
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -102,19 +102,19 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
                     onClick={() => setRating(star)}
                     className={`p-1 rounded transition-colors ${
                       star <= rating
-                        ? 'text-yellow-400'
-                        : 'text-zinc-400 hover:text-yellow-300'
+                        ? 'text-yellow-500'
+                        : 'text-zinc-400 hover:text-yellow-400'
                     }`}
                     aria-label={`${star}점 선택`}
                   >
                     <Star
-                      className={`h-6 w-6 ${
+                      className={`h-7 w-7 ${
                         star <= rating ? 'fill-current' : ''
                       }`}
                     />
                   </button>
                 ))}
-                <span className="ml-2 text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="ml-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   {rating}점
                 </span>
               </div>
@@ -124,7 +124,7 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
             <div className="space-y-2">
               <label 
                 htmlFor="review-comment" 
-                className="text-sm font-medium"
+                className="text-sm font-semibold text-zinc-900 dark:text-zinc-100"
               >
                 후기 내용
               </label>
@@ -133,13 +133,13 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="모임에 대한 솔직한 후기를 작성해주세요..."
-                className="min-h-[120px] resize-none bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
+                className="min-h-[120px] resize-none bg-white dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 dark:focus:border-blue-400"
                 maxLength={500}
                 required
               />
-              <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
+              <div className="flex justify-between text-xs text-zinc-600 dark:text-zinc-400">
                 <span>최대 500자</span>
-                <span className={comment.length > 450 ? 'text-orange-500' : ''}>
+                <span className={comment.length > 450 ? 'text-orange-500 font-medium' : ''}>
                   {comment.length}/500
                 </span>
               </div>
@@ -152,7 +152,7 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
                 variant="outline"
                 onClick={() => setOpen(false)}
                 disabled={createReview.isPending}
-                className="border-zinc-300 dark:border-zinc-700"
+                className="border-2 border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
                 취소
               </Button>
@@ -160,7 +160,7 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
                 type="submit"
                 disabled={createReview.isPending || !comment.trim()}
                 aria-busy={createReview.isPending}
-                className="bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 font-semibold shadow-lg"
               >
                 {createReview.isPending ? '작성 중...' : '후기 작성'}
               </Button>

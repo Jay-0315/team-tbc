@@ -95,3 +95,46 @@ if (typeof window !== 'undefined') {
 }
 
 export default apiClient
+
+// Google OAuth 로그인 URL 생성
+export function getOAuth2GoogleLoginUrl(): string {
+    // Google OAuth 2.0 인증 URL 생성
+    const clientId = 'your-google-client-id' // 실제 Google Client ID로 교체 필요
+    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/google/callback`)
+    const scope = encodeURIComponent('openid email profile')
+    const state = Math.random().toString(36).substring(7) // CSRF 방지를 위한 랜덤 상태값
+    
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${clientId}&` +
+        `redirect_uri=${redirectUri}&` +
+        `scope=${scope}&` +
+        `response_type=code&` +
+        `state=${state}&` +
+        `access_type=offline&` +
+        `prompt=consent`
+    
+    return googleAuthUrl
+}
+
+// 로그인 함수
+export async function login(username: string, password: string) {
+    try {
+        const response = await apiClient.post('/auth/login', {
+            username,
+            password
+        })
+        
+        if (response.data.success) {
+            setAuthToken(response.data.token)
+            return { success: true, token: response.data.token }
+        } else {
+            return { success: false, message: response.data.message }
+        }
+    } catch (error: any) {
+        console.error('Login error:', error)
+        return { 
+            success: false, 
+            message: error.response?.data?.message || '로그인 중 오류가 발생했습니다.' 
+        }
+    }
+}
