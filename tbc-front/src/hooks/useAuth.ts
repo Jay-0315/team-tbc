@@ -56,7 +56,6 @@ export function useAuth() {
       const storedToken = localStorage.getItem('accessToken')
       if (storedToken) {
         // setAuthToken 호출 제거. 이제 apiClient 인터셉터가 localStorage에서 직접 토큰을 읽음.
-        console.log('Token restored from localStorage:', storedToken.substring(0, 20) + '...')
         setHasToken(true) // 토큰이 있으면 상태 업데이트
       }
       setIsInitialized(true)

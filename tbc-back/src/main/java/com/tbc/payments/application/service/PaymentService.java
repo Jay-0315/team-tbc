@@ -94,8 +94,7 @@ public class PaymentService implements PaymentUseCase {
 
         // 멱등: 이미 PAID면 현재 잔액 리턴
         if (payment.getState() == PaymentState.PAID) {
-            Wallet w = walletRepository.findByUserId(payment.getUserId())
-                    .orElseThrow(() -> new IllegalStateException("WALLET_NOT_FOUND"));
+            Wallet w = walletUseCase.getOrCreate(payment.getUserId());
             return new ConfirmResponse(payment.getOrderId(), payment.getState().name(),
                     payment.getAmount(), w.getBalance());
         }
@@ -120,9 +119,11 @@ public class PaymentService implements PaymentUseCase {
         paymentRepository.savePayment(payment);
         log.debug("PAYMENT PAID orderId={}, paymentKey={}", payment.getOrderId(), payment.getPaymentKey());
 
-        // 4) 지갑 잠금 후 CREDIT + 원장 기록 (멱등)
-        Wallet wallet = walletRepository.findByUserIdForUpdate(payment.getUserId())
-                .orElseThrow(() -> new IllegalStateException("WALLET_NOT_FOUND"));
+        // 4) 지갑 생성 또는 조회 후 CREDIT + 원장 기록 (멱등)
+        Wallet wallet = walletUseCase.getOrCreate(payment.getUserId());
+        // 락을 위해 다시 조회
+        wallet = walletRepository.findByUserIdForUpdate(payment.getUserId())
+                .orElse(wallet);
 
         String idemKey = "TOPUP:" + payment.getOrderId();
 
@@ -140,6 +141,7 @@ public class PaymentService implements PaymentUseCase {
             ledgerRepository.saveLedger(ledger);
 
             wallet.setBalance(wallet.getBalance() + payment.getAmount());
+            walletRepository.saveWallet(wallet);
             // updated_at도 Auditing이 자동 갱신됨 (수동 set 필요X)
 
         } catch (DataIntegrityViolationException dup) {
