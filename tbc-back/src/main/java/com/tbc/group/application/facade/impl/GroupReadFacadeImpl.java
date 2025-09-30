@@ -1,22 +1,12 @@
 package com.tbc.group.application.facade.impl;
 
-<<<<<<< HEAD
-=======
 import com.tbc.events.domain.model.Favorite;
 import com.tbc.events.domain.repository.FavoriteRepo;
->>>>>>> origin/dev
 import com.tbc.group.adapterin.http.dto.GroupCardDTO;
 import com.tbc.group.application.facade.GroupReadFacade;
 import com.tbc.group.application.port.out.ChatRoomOutPort;
 import com.tbc.group.application.port.out.GroupRepository;
 import com.tbc.group.domain.model.Group;
-<<<<<<< HEAD
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
-
-=======
 import com.tbc.profile.adapterin.persistence.jpa.entity.ProfileEntity;
 import com.tbc.profile.adapterin.persistence.jpa.repository.ProfileJpaRepository;
 import com.tbc.login.adapter.out.persistence.UserJpaRepository;
@@ -31,19 +21,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
->>>>>>> origin/dev
 @Component
 @RequiredArgsConstructor
 public class GroupReadFacadeImpl implements GroupReadFacade {
 
     private final ChatRoomOutPort chatRoomOutPort;
     private final GroupRepository groupRepository;
-<<<<<<< HEAD
-=======
     private final ProfileJpaRepository profileRepository;
     private final UserJpaRepository userRepository;
     private final FavoriteRepo favoriteRepo;
->>>>>>> origin/dev
 
     @Override
     public Long getChatRoomId(Long groupId) {
@@ -53,9 +39,6 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
     @Override
     public Page<GroupCardDTO> findAll(Pageable pageable) {
         Page<Group> groups = groupRepository.findAll(pageable);
-<<<<<<< HEAD
-        return groups.map(GroupCardDTO::from);
-=======
         return enrichPageWithHostInfo(groups, pageable, null);
     }
 
@@ -69,16 +52,12 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
     public Page<GroupCardDTO> findAll(Pageable pageable, String searchQuery, String category, Long userId) {
         Page<Group> groups = groupRepository.findAll(pageable, searchQuery, category);
         return enrichPageWithHostInfo(groups, pageable, userId);
->>>>>>> origin/dev
     }
 
     @Override
     public GroupCardDTO findOne(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("group not found: " + groupId));
-<<<<<<< HEAD
-        return GroupCardDTO.from(group);
-=======
         return enrichWithHostInfo(GroupCardDTO.from(group));
     }
 
@@ -184,6 +163,5 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
         }
 
         return dto;
->>>>>>> origin/dev
     }
 }

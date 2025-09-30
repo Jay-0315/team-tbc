@@ -1,34 +1,24 @@
 package com.tbc.group.adapterin.http;
 
-<<<<<<< HEAD
-=======
 import com.tbc.common.util.JwtUtils;
 import com.tbc.common.util.UserUtils;
->>>>>>> origin/dev
 import com.tbc.group.adapterin.http.dto.GroupCreateRequest;
 import com.tbc.group.adapterin.http.dto.GroupCreateResponse;
 import com.tbc.group.adapterin.http.dto.GroupCardDTO;
 import com.tbc.group.application.facade.GroupFacade;
 import com.tbc.group.application.facade.GroupReadFacade;
-<<<<<<< HEAD
-=======
 import com.tbc.group.application.port.out.GroupMemberRepository;
 import com.tbc.login.domain.User;
 import com.tbc.login.domain.UserService;
 import jakarta.servlet.http.HttpServletRequest;
->>>>>>> origin/dev
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-<<<<<<< HEAD
-import org.springframework.web.bind.annotation.*;
-=======
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
->>>>>>> origin/dev
 
 @RestController
 @RequestMapping("/api/groups")
@@ -37,30 +27,14 @@ public class GroupController {
 
     private final GroupFacade groupFacade;          // 생성/참가 등 쓰기 파사드
     private final GroupReadFacade groupReadFacade;  // 읽기 파사드(채팅방 ID 조회)
-<<<<<<< HEAD
-=======
     private final UserUtils userUtils;              // 사용자 유틸리티
     private final UserService userService;          // 사용자 서비스
     private final GroupMemberRepository memberRepository;
     private final JwtUtils jwtUtils;
->>>>>>> origin/dev
 
     @PostMapping
     public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
                                       @RequestHeader("X-User-Id") Long hostId) {
-<<<<<<< HEAD
-        Long id = groupFacade.createGroup(req, hostId);
-        return new GroupCreateResponse(id);
-    }
-
-    @GetMapping
-    public Page<GroupCardDTO> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return groupReadFacade.findAll(pageable);
-=======
         System.out.println("Received group creation request: " + req);
         System.out.println("Host ID: " + hostId);
         Long id = groupFacade.createGroup(req, hostId);
@@ -133,7 +107,6 @@ public class GroupController {
         
         Pageable pageable = PageRequest.of(page, size);
         return groupReadFacade.findByUserId(user.getId(), pageable);
->>>>>>> origin/dev
     }
 
     @GetMapping("/{groupId}")
@@ -150,8 +123,6 @@ public class GroupController {
         Long roomId = groupReadFacade.getChatRoomId(groupId);
         return new ChatRoomRes(roomId);
     }
-<<<<<<< HEAD
-=======
 
     private Long getUserIdOptional(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -162,5 +133,4 @@ public class GroupController {
                 .map(User::getId)
                 .orElse(null);
     }
->>>>>>> origin/dev
 }
