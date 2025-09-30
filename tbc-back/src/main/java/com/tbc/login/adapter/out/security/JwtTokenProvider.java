@@ -5,14 +5,21 @@ import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+<<<<<<< HEAD
 import javax.crypto.SecretKey;
+=======
+>>>>>>> origin/dev
 import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 
 public class JwtTokenProvider {
 
+<<<<<<< HEAD
     private final SecretKey key;
+=======
+    private final Key key;
+>>>>>>> origin/dev
     private final Duration accessTtl;
     private final Duration refreshTtl;
 
@@ -39,12 +46,21 @@ public class JwtTokenProvider {
         Date exp = new Date(now + ttl.toMillis());
 
         return Jwts.builder()
+<<<<<<< HEAD
                 .id(UUID.randomUUID().toString())
                 .subject(subject)
                 .issuedAt(iat)
                 .expiration(exp)
                 .claim("type", type)
                 .signWith(key)
+=======
+                .setId(UUID.randomUUID().toString())
+                .setSubject(subject)
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .claim("type", type)
+                .signWith(key, SignatureAlgorithm.HS256)
+>>>>>>> origin/dev
                 .compact();
     }
 
@@ -63,11 +79,19 @@ public class JwtTokenProvider {
     }
 
     public Claims parseClaims(String token) {
+<<<<<<< HEAD
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+=======
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+>>>>>>> origin/dev
     }
 
     public Claims parseClaimsAllowExpired(String token) {

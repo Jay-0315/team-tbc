@@ -11,6 +11,5 @@ public class TbcApplication {
     public static void main(String[] args) {
         SpringApplication.run(TbcApplication.class, args);
     }
+
 }
-
-

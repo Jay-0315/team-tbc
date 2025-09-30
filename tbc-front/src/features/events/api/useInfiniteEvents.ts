@@ -17,7 +17,9 @@ export function useInfiniteEvents(params: EventListParams = {}) {
       return lastPage.number + 1 >= lastPage.totalPages ? undefined : lastPage.number + 1
     },
     initialPageParam: 0,
-    staleTime: 5 * 60 * 1000, // 5분
-    gcTime: 10 * 60 * 1000, // 10분
+    staleTime: 1 * 60 * 1000, // 1분 - 짧게 설정하여 최신 데이터 유지
+    gcTime: 5 * 60 * 1000, // 5분
+    refetchOnMount: true, // 마운트시 항상 갱신
+    refetchOnWindowFocus: false,
   })
 }

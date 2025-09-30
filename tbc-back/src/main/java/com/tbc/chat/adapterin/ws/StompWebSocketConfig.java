@@ -1,5 +1,9 @@
 package com.tbc.chat.adapterin.ws;
 
+<<<<<<< HEAD
+=======
+import lombok.RequiredArgsConstructor;
+>>>>>>> origin/dev
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -8,8 +12,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+<<<<<<< HEAD
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+=======
+@RequiredArgsConstructor
+public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final JwtRoomHandshakeInterceptor jwtRoomHandshakeInterceptor;
+
+>>>>>>> origin/dev
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // ✅ 구독 prefix: 프론트는 /topic/rooms/{roomId} 를 subscribe
@@ -21,9 +33,22 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+<<<<<<< HEAD
         // ✅ SockJS 엔드포인트
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
+=======
+        // ✅ SockJS 엔드포인트 - 기본 연결용
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(jwtRoomHandshakeInterceptor) // JWT 검증 인터셉터 추가
+                .withSockJS();
+                
+        // ✅ 채팅방별 엔드포인트 - 채팅방 ID를 URL에 포함
+        registry.addEndpoint("/chat/{roomId}")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(jwtRoomHandshakeInterceptor) // JWT 검증 인터셉터 추가
+>>>>>>> origin/dev
                 .withSockJS();
     }
 }

@@ -4,6 +4,9 @@ export const eventKeys = {
     [...eventKeys.root, 'list', params] as const,
   detail: (id: number) => [...eventKeys.root, 'detail', id] as const,
   reviews: (eventId: number) => [...eventKeys.root, 'reviews', eventId] as const,
+  favorites: () => [...eventKeys.root, 'favorites'] as const, // 찜 목록 키
+  popular: () => [...eventKeys.root, 'popular'] as const, // 인기 모임 키
+  recent: () => [...eventKeys.root, 'recent'] as const, // 최근 개설된 모임 키
 }
 
 
