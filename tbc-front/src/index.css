@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @import "react-day-picker/dist/style.css";
 
+/* 폰트 추가 */
+@font-face {
+  font-family: 'BMHanna';
+  src: url('/fonts/BMHANNAAir_ttf.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* 기본 스타일 */
 * {
   box-sizing: border-box;
@@ -17,7 +26,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: Pretendard, Arial, sans-serif;
+  font-family: 'BMHanna', Pretendard, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff !important; /* 흰색 배경 */

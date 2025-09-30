@@ -359,7 +359,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
       )}>
         {/* 헤더 */}
         <div className="mb-12 text-center">
-          <div className="inline-flex justify-center items-center mb-6 w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl shadow-lg">
+          <div className="inline-flex justify-center items-center mb-6 w-16 h-16 bg-gradient-to-r from-orange-400 to-amber-400 rounded-2xl shadow-lg">
             <Users className="w-8 h-8 text-white" />
           </div>
           <h1 className="mb-4 text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
@@ -380,7 +380,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   className={cn(
                     "w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 shadow-lg",
                     stepNumber <= step
-                      ? "bg-gradient-to-r from-red-500 to-pink-500 text-white scale-110"
+                      ? "bg-gradient-to-r from-orange-400 to-amber-400 text-white scale-110"
                       : "bg-white dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-2 border-gray-200 dark:border-gray-600"
                   )}
                 >
@@ -391,7 +391,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     className={cn(
                       "w-20 h-1 mx-4 transition-all duration-500 rounded-full",
                       stepNumber < step
-                        ? "bg-gradient-to-r from-red-500 to-pink-500"
+                        ? "bg-gradient-to-r from-orange-400 to-amber-400"
                         : "bg-gray-200 dark:bg-gray-700"
                     )}
                   />
@@ -415,14 +415,14 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
           </div>
           
           <Progress value={progressValue} className="overflow-hidden h-3 bg-gray-200 rounded-full dark:bg-gray-700">
-            <div className="h-full bg-gradient-to-r from-red-500 to-pink-500 transition-all duration-500 ease-out" 
+            <div className="h-full bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-500 ease-out" 
                  style={{ width: `${progressValue}%` }} />
           </Progress>
         </div>
 
         {/* 에러 메시지 */}
         {errors.submit && (
-          <div className="flex gap-3 items-center p-6 mb-8 text-red-700 bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl border border-red-200 shadow-lg dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-800 dark:text-red-300">
+          <div className="flex gap-3 items-center p-6 mb-8 text-orange-700 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-red-200 shadow-lg dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-800 dark:text-red-300">
             <div className="flex flex-shrink-0 justify-center items-center w-8 h-8 bg-red-100 rounded-full dark:bg-red-900/30">
               <AlertCircle className="w-5 h-5" />
             </div>
@@ -438,7 +438,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
           <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
             <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
               <CardTitle className="flex gap-3 items-center text-2xl">
-                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
+                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl">
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 기본 정보
@@ -459,10 +459,10 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   onChange={(e) => updateForm("title", e.target.value)}
                   placeholder="예: 서울 맛집 투어 모임"
                   className={cn(
-                    "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-red-500/20",
+                    "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                     errors.title 
-                      ? "border-red-500 focus:border-red-500" 
-                      : "border-gray-200 dark:border-gray-600 focus:border-red-500"
+                      ? "border-orange-400 focus:border-orange-400" 
+                      : "border-gray-200 dark:border-gray-600 focus:border-orange-400"
                   )}
                   aria-label="소셜링 제목"
                   maxLength={50}
@@ -490,10 +490,10 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 </Label>
                 <Select value={form.category} onValueChange={(value) => updateForm("category", value)}>
                   <SelectTrigger className={cn(
-                    "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-red-500/20",
+                    "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                     errors.category 
-                      ? "border-red-500 focus:border-red-500" 
-                      : "border-gray-200 dark:border-gray-600 focus:border-red-500"
+                      ? "border-orange-400 focus:border-orange-400" 
+                      : "border-gray-200 dark:border-gray-600 focus:border-orange-400"
                   )}>
                     <SelectValue placeholder="카테고리를 선택해주세요" />
                   </SelectTrigger>
@@ -523,7 +523,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   value={form.topic}
                   onChange={(e) => updateForm("topic", e.target.value)}
                   placeholder="예: 새로운 맛집을 찾아 떠나는 여행"
-                  className={cn(errors.topic && "border-red-500")}
+                  className={cn(errors.topic && "border-orange-400")}
                   aria-label="소셜링 주제"
                 />
                 {errors.topic && (
@@ -547,7 +547,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     max="30"
                     value={form.minParticipants}
                     onChange={(e) => updateForm("minParticipants", parseInt(e.target.value) || 1)}
-                    className={cn(errors.minParticipants && "border-red-500")}
+                    className={cn(errors.minParticipants && "border-orange-400")}
                     aria-label="최소 참가 인원"
                   />
                   {errors.minParticipants && (
@@ -569,7 +569,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     max="30"
                     value={form.maxParticipants}
                     onChange={(e) => updateForm("maxParticipants", parseInt(e.target.value) || 1)}
-                    className={cn(errors.maxParticipants && "border-red-500")}
+                    className={cn(errors.maxParticipants && "border-orange-400")}
                     aria-label="최대 참가 인원"
                   />
                   {errors.maxParticipants && (
@@ -585,7 +585,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 <Button 
                   onClick={next} 
                   size="lg" 
-                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
                 >
                   다음 단계
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -602,7 +602,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
           <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
             <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
               <CardTitle className="flex gap-3 items-center text-2xl">
-                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
+                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl">
                   <CalendarIcon className="w-5 h-5 text-white" />
                 </div>
                 상세 정보
@@ -627,7 +627,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.mode === "OFFLINE"
-                          ? "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300"
+                          ? "border-orange-400 bg-red-50 dark:bg-red-900/20 text-orange-700 dark:text-red-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -643,7 +643,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.mode === "ONLINE"
-                          ? "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300"
+                          ? "border-orange-400 bg-red-50 dark:bg-red-900/20 text-orange-700 dark:text-red-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -672,7 +672,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.feeType === "FREE"
-                          ? "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300"
+                          ? "border-orange-400 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -690,7 +690,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.feeType === "PAID"
-                          ? "border-orange-500 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
+                          ? "border-orange-400 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -719,8 +719,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                         className={cn(
                           "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                           errors.feeAmount 
-                            ? "border-red-500 focus:border-red-500" 
-                            : "border-orange-200 dark:border-orange-700 focus:border-orange-500"
+                            ? "border-orange-400 focus:border-orange-400" 
+                            : "border-orange-200 dark:border-orange-700 focus:border-orange-400"
                         )}
                         aria-label="참가비 금액"
                       />
@@ -744,8 +744,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                         className={cn(
                           "border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                           errors.feeInfo 
-                            ? "border-red-500 focus:border-red-500" 
-                            : "border-orange-200 dark:border-orange-700 focus:border-orange-500"
+                            ? "border-orange-400 focus:border-orange-400" 
+                            : "border-orange-200 dark:border-orange-700 focus:border-orange-400"
                         )}
                         aria-label="참가비 안내 사항"
                         rows={3}
@@ -770,11 +770,11 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-red-500/20",
+                          "w-full justify-start text-left font-normal h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                           !form.eventDate && "text-gray-500 dark:text-gray-400",
                           errors.eventDate 
-                            ? "border-red-500 focus:border-red-500" 
-                            : "border-gray-200 dark:border-gray-600 focus:border-red-500"
+                            ? "border-orange-400 focus:border-orange-400" 
+                            : "border-gray-200 dark:border-gray-600 focus:border-orange-400"
                         )}
                       >
                         <CalendarIcon className="mr-2 w-4 h-4" />
@@ -826,8 +826,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                           ),
                           day_range_end: "day-range-end",
                           day_selected:
-                            "bg-red-500 text-white hover:bg-red-600 hover:text-white focus:bg-red-500 focus:text-white",
-                          day_today: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300",
+                            "bg-orange-400 text-white hover:bg-orange-500 hover:text-white focus:bg-orange-400 focus:text-white",
+                          day_today: "bg-red-100 text-orange-700 dark:bg-red-900/20 dark:text-red-300",
                           day_outside:
                             "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
                           day_disabled: "text-muted-foreground opacity-50",
@@ -850,10 +850,10 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   <Label className="text-sm font-medium">이벤트 시간 *</Label>
                   <Select value={form.eventTime} onValueChange={(value) => updateForm("eventTime", value)}>
                     <SelectTrigger className={cn(
-                      "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-red-500/20",
+                      "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                       errors.eventTime 
-                        ? "border-red-500 focus:border-red-500" 
-                        : "border-gray-200 dark:border-gray-600 focus:border-red-500"
+                        ? "border-orange-400 focus:border-orange-400" 
+                        : "border-gray-200 dark:border-gray-600 focus:border-orange-400"
                     )}>
                       <SelectValue placeholder="시간을 선택해주세요" />
                     </SelectTrigger>
@@ -1017,7 +1017,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 <Button 
                   onClick={next} 
                   size="lg" 
-                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
                 >
                   다음 단계
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1034,7 +1034,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
           <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
             <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
               <CardTitle className="flex gap-3 items-center text-2xl">
-                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
+                <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl">
                   <Tag className="w-5 h-5 text-white" />
                 </div>
                 내용 작성
@@ -1089,7 +1089,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   onClick={onSubmit}
                   disabled={loading}
                   size="lg"
-                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {loading ? (
                     <>
