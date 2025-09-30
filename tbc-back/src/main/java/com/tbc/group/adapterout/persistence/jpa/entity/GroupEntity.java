@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="varigroups")
+@Table(name="events")
 @Entity
 public class GroupEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
@@ -28,6 +28,10 @@ public class GroupEntity {
     @Lob String tagsCsv;          // 간단하게 CSV 저장(필요 시 별도 테이블로 확장)
     @Lob String contentHtml;
     @Column(nullable=false) Long hostId;
+    @Column(name = "start_at") LocalDateTime startAt; // 모임 시작 시각(선택)
+    @Builder.Default
+    @Column(name = "settlement_status", nullable = false, length = 16) String settlementStatus = "PENDING"; // PENDING/SETTLED/REFUNDED
+    @Column(name = "settled_at") LocalDateTime settledAt;
     @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
     @UpdateTimestamp   @Column(nullable=false) LocalDateTime updatedAt;
 }

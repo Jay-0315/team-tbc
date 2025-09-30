@@ -24,6 +24,22 @@ public class GroupMemberRepositoryAdapter implements GroupMemberRepository {
     }
 
     @Override
+    public void addMember(Long groupId, Long userId) {
+        if (repo.existsByGroupIdAndUserId(groupId, userId)) return;
+        repo.save(GroupMemberEntity.builder()
+                .groupId(groupId)
+                .userId(userId)
+                .role("MEMBER")
+                .status("ACTIVE")
+                .build());
+    }
+
+    @Override
+    public boolean isMember(Long groupId, Long userId) {
+        return repo.existsByGroupIdAndUserId(groupId, userId);
+    }
+
+    @Override
     public int countActiveMembers(Long groupId) {
         return repo.countByGroupIdAndStatus(groupId, "ACTIVE");
     }

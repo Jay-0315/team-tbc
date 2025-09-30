@@ -6,11 +6,13 @@ import com.tbc.group.application.port.out.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Repository
 @RequiredArgsConstructor
@@ -61,5 +63,19 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId()
         ));
+    }
+
+    @Override
+    public java.util.List<Long> findDuePaidGroupIds(LocalDateTime now, int limit) {
+        return repo.findDuePaidGroupIds(now, PageRequest.of(0, limit));
+    }
+
+    @Override
+    public void markSettlement(Long groupId, String status) {
+        // 간단 구현: 엔티티 로드 후 상태/시각 업데이트
+        var e = repo.findById(groupId).orElseThrow();
+        e.setSettlementStatus(status);
+        e.setSettledAt(LocalDateTime.now());
+        repo.save(e);
     }
 }

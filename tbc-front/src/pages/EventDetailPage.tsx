@@ -27,7 +27,7 @@ export default function EventDetailPage() {
   }
 
   return (
-    <main role="main" aria-labelledby="page-title" className="px-4 py-6 mx-auto max-w-5xl">
+    <main role="main" aria-labelledby="page-title" className="max-w-5xl px-4 py-6 mx-auto">
       <h1 id="page-title" className="sr-only">
         이벤트 상세 페이지
       </h1>
@@ -41,7 +41,7 @@ export default function EventDetailPage() {
       )}
 
       {isError && (
-        <div role="alert" className="flex justify-between items-center text-sm text-red-600">
+        <div role="alert" className="flex items-center justify-between text-sm text-red-600">
           상세 정보를 불러오지 못했습니다.
           <button
             type="button"
@@ -62,7 +62,7 @@ export default function EventDetailPage() {
         <>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <section className="space-y-4 lg:col-span-2">
-            <div className="overflow-hidden bg-white rounded-xl border border-zinc-200">
+            <div className="overflow-hidden bg-white border rounded-xl border-zinc-200">
               <img
                 src={data.coverUrl}
                 alt={`${data.title} 커버 이미지`}
@@ -92,14 +92,14 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            <article className="p-4 bg-white rounded-xl border border-zinc-200" aria-label="이벤트 소개">
+            <article className="p-4 bg-white border rounded-xl border-zinc-200" aria-label="이벤트 소개">
               <h3 className="mb-2 text-lg font-semibold">소개</h3>
               <ExpandableText text={data.description} />
             </article>
 
             {/* 리뷰 섹션 */}
-            <section className="p-4 bg-white rounded-xl border border-zinc-200" aria-label="이벤트 후기">
-              <div className="flex justify-between items-center mb-4">
+            <section className="p-4 bg-white border rounded-xl border-zinc-200" aria-label="이벤트 후기">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">후기</h3>
                 {numericId && (
                   <ReviewFormDialog eventId={numericId}>
@@ -123,24 +123,24 @@ export default function EventDetailPage() {
           <aside className="space-y-3 lg:col-span-1" aria-label="행동 영역">
             <button
               type="button"
-              className="w-full h-11 font-semibold text-white bg-black rounded-lg hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black"
+              className="w-full font-semibold text-white bg-black rounded-lg h-11 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black"
               aria-label="참가하기"
               onClick={() => setOpenJoin(true)}
             >
               참가하기
             </button>
 
-            <div className="flex gap-2 items-center">
-              <div className="inline-flex flex-1 justify-center items-center h-11 rounded-lg border border-zinc-300 hover:bg-zinc-50">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center justify-center flex-1 border rounded-lg h-11 border-zinc-300 hover:bg-zinc-50">
                 {numericId ? <FavoriteButton eventId={numericId} initialFavorited={false} size={20} /> : null}
               </div>
               <button
                 type="button"
-                className="w-11 h-11 rounded-lg border border-zinc-300 hover:bg-zinc-50"
+                className="border rounded-lg w-11 h-11 border-zinc-300 hover:bg-zinc-50"
                 onClick={handleCopy}
                 aria-label="링크 복사"
               >
-                <Copy className="mx-auto w-4 h-4" aria-hidden="true" />
+                <Copy className="w-4 h-4 mx-auto" aria-hidden="true" />
               </button>
             </div>
 

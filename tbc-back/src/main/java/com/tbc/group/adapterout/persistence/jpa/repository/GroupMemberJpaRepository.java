@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupMemberJpaRepository extends JpaRepository<GroupMemberEntity, Long> {
     int countByGroupIdAndStatus(Long groupId, String status);
+
+    boolean existsByGroupIdAndUserId(Long groupId, Long userId);
 }
