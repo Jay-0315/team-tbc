@@ -50,15 +50,20 @@ export function useJoinEvent(eventId: number) {
 
 // Events - /api/groups 엔드포인트 사용 (events 테이블)
 export async function fetchEvents(params: EventListParams = {}): Promise<Page<EventCardDTO>> {
+  console.log('fetchEvents called with params:', params)
   const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
     params: {
       page: params.page ?? 0,
       size: params.size ?? 12,
       // 검색 및 필터링 파라미터 추가
       ...(params.q && { q: params.q }),
+      ...(params.search && { search: params.search }),
       ...(params.category && { category: params.category }),
+      ...(params.status && { status: params.status }),
+      ...(params.sort && { sort: params.sort }),
     }
   })
+  console.log('fetchEvents response:', data)
   return data
 }
 

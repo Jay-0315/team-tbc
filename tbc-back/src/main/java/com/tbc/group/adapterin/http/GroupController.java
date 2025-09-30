@@ -60,9 +60,18 @@ public class GroupController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String q,  // 검색어
-            @RequestParam(required = false) String category  // 카테고리 필터
+            @RequestParam(required = false) String category,  // 카테고리 필터
+            @RequestParam(required = false, defaultValue = "NEW_DESC") String sort  // 정렬
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        // 정렬 옵션에 따라 Pageable 생성
+        Pageable pageable;
+        if ("NEW_DESC".equals(sort) || "CREATED_DESC".equals(sort)) {
+            pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "createdAt"
+            ));
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
         return groupReadFacade.findAll(pageable, q, category);
     }
 

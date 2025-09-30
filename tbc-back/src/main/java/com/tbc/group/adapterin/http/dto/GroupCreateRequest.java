@@ -15,6 +15,8 @@ public record GroupCreateRequest(
         List<String> tags,
         String contentHtml,
         String location,
+        Double latitude,          // 위도
+        Double longitude,         // 경도
         String eventDate,
         String eventTime
 ) {}

@@ -55,7 +55,8 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
     }
@@ -70,7 +71,8 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
     }
@@ -85,7 +87,8 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
     }
@@ -100,7 +103,8 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getEventDate(), e.getEventTime(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
     }

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Star, Edit, Trash2 } from 'lucide-react'
+import { Copy, Star, Edit, Trash2, MapPin } from 'lucide-react'
 import { useEventDetail } from '../features/events/api/useEventDetail'
 import FavoriteButton from '../components/event/FavoriteButton'
 import JoinDialog from '../components/event/JoinDialog'
@@ -12,6 +12,7 @@ import { Button } from '../components/ui/button'
 import { useMemo, useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import apiClient from '../lib/api'
+import Map from '../components/Map'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
@@ -30,6 +31,11 @@ export default function EventDetailPage() {
     ?? (data as unknown as { host?: { id?: number } })?.host?.id
   const contentHtml = (data as unknown as { content_html?: string })?.content_html
     ?? (data as unknown as { contentHtml?: string })?.contentHtml
+  
+  // 위도/경도 가져오기 (타입에 정의됨)
+  const latitude = data?.latitude ?? null
+  const longitude = data?.longitude ?? null
+  const location = data?.location || ''
 
   // 호스트 여부 확인
   const isHost = user && hostId && user.id === hostId
@@ -168,6 +174,33 @@ export default function EventDetailPage() {
                   </div>
                 ) : null
               })()}
+
+              {/* 장소 및 지도 */}
+              {location && (
+                <div className="p-4 space-y-4 rounded-3xl border border-gray-200 shadow-xl backdrop-blur-sm bg-white/80">
+                  <div className="flex gap-2 items-center">
+                    <MapPin className="w-5 h-5 text-purple-500" />
+                    <h3 className="text-lg font-semibold">모임 장소</h3>
+                  </div>
+                  <p className="text-gray-700">{location}</p>
+                  {latitude !== null && longitude !== null && latitude !== undefined && longitude !== undefined ? (
+                    <div className="mt-4">
+                      <Map
+                        lat={latitude}
+                        lng={longitude}
+                        locationName={location}
+                        zoom={15}
+                        height="300px"
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-4 p-4 text-sm text-center text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+                      <MapPin className="inline-block mr-2 w-4 h-4" />
+                      지도 정보가 없습니다
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* 후기 섹션 */}
               {isAuthenticated ? (

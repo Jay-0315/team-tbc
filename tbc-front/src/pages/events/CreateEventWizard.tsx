@@ -16,12 +16,14 @@ import { CalendarIcon, MapPin, Users, Tag, X, Plus, AlertCircle } from "lucide-r
 import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import { cn } from "@/lib/utils"
+import LocationSearch from "@/components/LocationSearch"
 
 type Mode = "ONLINE" | "OFFLINE"
 type FeeType = "FREE" | "PAID"
 
 type Props = {
   onCreated: (groupId: number, roomId: number) => void
+  isModal?: boolean
 }
 
 type Form = {
@@ -39,6 +41,8 @@ type Form = {
   eventDate: Date | undefined
   eventTime: string
   location: string
+  lat: number | null
+  lng: number | null
   capacity: number
   joined: number
   coverUrl: string
@@ -87,7 +91,7 @@ const TIME_OPTIONS = [
   { value: "22:30", label: "오후 10:30" }
 ]
 
-export default function CreateEventWizard({ onCreated }: Props) {
+export default function CreateEventWizard({ onCreated, isModal = false }: Props) {
   const { user } = useAuth()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [loading, setLoading] = useState(false)
@@ -110,6 +114,8 @@ export default function CreateEventWizard({ onCreated }: Props) {
     eventDate: undefined,
     eventTime: "19:00",
     location: "",
+    lat: null,
+    lng: null,
     capacity: 10,
     joined: 0,
     coverUrl: "https://via.placeholder.com/400x200/4F46E5/FFFFFF?text=Event+Cover",
@@ -167,7 +173,9 @@ export default function CreateEventWizard({ onCreated }: Props) {
       }
 
       if (!form.location.trim()) {
-        newErrors.location = "장소를 입력해주세요"
+        newErrors.location = "장소를 검색하고 선택해주세요"
+      } else if (form.lat === null || form.lng === null) {
+        newErrors.location = "장소를 검색하여 지도에서 위치를 확인해주세요"
       }
 
       if (form.feeType === "PAID") {
@@ -238,7 +246,9 @@ export default function CreateEventWizard({ onCreated }: Props) {
         contentHtml: form.contentHtml,
         eventDate: form.eventDate.toISOString().split('T')[0],
         eventTime: form.eventTime,
-        location: form.location
+        location: form.location,
+        latitude: form.lat,
+        longitude: form.lng
       }
 
       console.log("Creating event with payload:", payload)
@@ -276,17 +286,25 @@ export default function CreateEventWizard({ onCreated }: Props) {
   const progressValue = (step / 3) * 100
 
   return (
-    <div className="w-full bg-gradient-to-br via-white from-slate-50 to-slate-100">
-      {/* 배경 패턴 */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-pink-500/5"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25px 25px, rgba(239, 68, 68, 0.1) 2px, transparent 0)`,
-          backgroundSize: '50px 50px'
-        }}></div>
-      </div>
+    <div className={cn(
+      "w-full",
+      !isModal && "bg-gradient-to-br via-white from-slate-50 to-slate-100"
+    )}>
+      {/* 배경 패턴 - 페이지 모드에서만 표시 */}
+      {!isModal && (
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-pink-500/5"></div>
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25px 25px, rgba(239, 68, 68, 0.1) 2px, transparent 0)`,
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+      )}
       
-      <div className="relative px-4 py-8 w-full min-h-full">
+      <div className={cn(
+        "relative w-full min-h-full",
+        isModal ? "px-6 py-6" : "px-4 py-8"
+      )}>
         {/* 헤더 */}
         <div className="mb-12 text-center">
           <div className="inline-flex justify-center items-center mb-6 w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl shadow-lg">
@@ -804,27 +822,20 @@ export default function CreateEventWizard({ onCreated }: Props) {
                 </div>
               </div>
 
-              {/* 장소 */}
-              <div className="space-y-2">
-                <Label htmlFor="location" className="flex gap-2 items-center text-sm font-medium">
-                  <MapPin className="w-4 h-4" />
-                  장소 *
-                </Label>
-                <Input
-                  id="location"
-                  value={form.location}
-                  onChange={(e) => updateForm("location", e.target.value)}
-                  placeholder={form.mode === "ONLINE" ? "예: Zoom, Google Meet 링크" : "예: 강남역 2번 출구"}
-                  className={cn(errors.location && "border-red-500")}
-                  aria-label="모임 장소"
-                />
-                {errors.location && (
-                  <p className="flex gap-1 items-center text-sm text-red-600">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.location}
-                  </p>
-                )}
-              </div>
+              {/* 장소 검색 */}
+              <LocationSearch
+                initialLocation={form.location}
+                initialLat={form.lat || undefined}
+                initialLng={form.lng || undefined}
+                onLocationChange={(location, lat, lng) => {
+                  setForm(prev => ({ ...prev, location, lat, lng }))
+                  // 장소 에러 제거
+                  if (errors.location) {
+                    setErrors(prev => ({ ...prev, location: "" }))
+                  }
+                }}
+                error={errors.location}
+              />
 
               {/* 태그 */}
               <div className="space-y-2">
