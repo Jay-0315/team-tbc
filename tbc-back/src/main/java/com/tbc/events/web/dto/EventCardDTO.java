@@ -65,6 +65,9 @@ public class EventCardDTO {
     
     @Schema(description = "경도", example = "126.9779")
     public Double longitude;
+    
+    @Schema(description = "이미지 경로", example = "/uploads/abc-123.jpg")
+    public String imagePath;
 
     public static EventCardDTO fromGroupEntity(GroupEntity e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
@@ -86,6 +89,7 @@ public class EventCardDTO {
         dto.hostId = e.getHostId();
         dto.latitude = e.getLatitude();
         dto.longitude = e.getLongitude();
+        dto.imagePath = e.getImagePath();
         return dto;
     }
 }

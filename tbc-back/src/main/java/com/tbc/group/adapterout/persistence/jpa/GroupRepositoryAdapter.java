@@ -37,6 +37,9 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .contentHtml(g.contentHtml())
                 .hostId(g.hostId())
                 .location(g.location())
+                .latitude(g.latitude())
+                .longitude(g.longitude())
+                .imagePath(g.imagePath())
                 .eventDate(g.eventDate())
                 .eventTime(g.eventTime())
                 .startAt(g.eventDate() != null && g.eventTime() != null ? 
@@ -55,7 +58,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(), e.getImagePath(),
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
@@ -71,7 +74,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(), e.getImagePath(),
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
@@ -87,7 +90,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(), e.getImagePath(),
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
@@ -103,7 +106,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
                 e.getContentHtml(), e.getHostId(),
-                e.getLocation(), e.getLatitude(), e.getLongitude(),
+                e.getLocation(), e.getLatitude(), e.getLongitude(), e.getImagePath(),
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));

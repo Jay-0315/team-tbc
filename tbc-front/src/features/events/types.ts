@@ -6,6 +6,7 @@ export interface EventCardDTO {
   title: string
   coverUrl: string
   imageUrl?: string
+  imagePath?: string  // 업로드된 이미지 경로
   category: string
   status: EventStatus
   remainingSeats: number

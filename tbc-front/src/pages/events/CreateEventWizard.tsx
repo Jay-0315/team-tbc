@@ -43,6 +43,7 @@ type Form = {
   location: string
   lat: number | null
   lng: number | null
+  imagePath: string | null
   capacity: number
   joined: number
   coverUrl: string
@@ -98,6 +99,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
   const [datePickerOpen, setDatePickerOpen] = useState(false)
   const [tagInput, setTagInput] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const [form, setForm] = useState<Form>({
     title: "",
@@ -116,6 +118,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
     location: "",
     lat: null,
     lng: null,
+    imagePath: null,
     capacity: 10,
     joined: 0,
     coverUrl: "https://via.placeholder.com/400x200/4F46E5/FFFFFF?text=Event+Cover",
@@ -213,6 +216,54 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
     updateForm("tags", form.tags.filter(t => t !== tag))
   }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 파일 크기 체크 (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, image: "파일 크기는 5MB를 초과할 수 없습니다." }))
+      return
+    }
+
+    // 파일 확장자 체크
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    if (!extension || !allowedExtensions.includes(extension)) {
+      setErrors(prev => ({ ...prev, image: "jpg, jpeg, png, gif, webp 파일만 업로드 가능합니다." }))
+      return
+    }
+
+    setUploadingImage(true)
+    setErrors(prev => ({ ...prev, image: "" }))
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const { data } = await apiClient.post('/images/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+
+      if (data.imagePath) {
+        updateForm('imagePath', data.imagePath)
+        console.log('Image uploaded successfully:', data.imagePath)
+      } else {
+        throw new Error(data.message || '이미지 업로드 실패')
+      }
+    } catch (error: any) {
+      console.error('Image upload error:', error)
+      setErrors(prev => ({ 
+        ...prev, 
+        image: error.response?.data?.message || error.message || '이미지 업로드 중 오류가 발생했습니다.'
+      }))
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   const onSubmit = async () => {
     if (loading || !validateStep(3)) return
     setLoading(true)
@@ -248,7 +299,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         eventTime: form.eventTime,
         location: form.location,
         latitude: form.lat,
-        longitude: form.lng
+        longitude: form.lng,
+        imagePath: form.imagePath
       }
 
       console.log("Creating event with payload:", payload)
@@ -836,6 +888,72 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 }}
                 error={errors.location}
               />
+
+              {/* 이미지 업로드 */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="image-upload" className="flex gap-2 items-center text-base font-semibold text-gray-900 dark:text-white">
+                    <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    대표 이미지 (선택사항)
+                  </Label>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex gap-3 items-center">
+                      <Input
+                        id="image-upload"
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                        className="h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-purple-500/20 border-gray-200 dark:border-gray-600 focus:border-purple-500"
+                        aria-label="이미지 파일 선택"
+                      />
+                      {uploadingImage && (
+                        <div className="flex gap-2 items-center text-sm text-purple-600 dark:text-purple-400">
+                          <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          업로드 중...
+                        </div>
+                      )}
+                    </div>
+                    
+                    {errors.image && (
+                      <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                        <AlertCircle className="w-4 h-4 text-red-500" />
+                        <p className="text-sm text-red-600 dark:text-red-400">{errors.image}</p>
+                      </div>
+                    )}
+                    
+                    {form.imagePath && (
+                      <div className="p-3 bg-green-50 rounded-lg border border-green-200 dark:bg-green-900/20 dark:border-green-800">
+                        <div className="flex gap-2 items-center">
+                          <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-green-700 dark:text-green-300">이미지 업로드 완료</p>
+                            <p className="text-xs text-green-600 dark:text-green-400">{form.imagePath}</p>
+                          </div>
+                          {form.imagePath.startsWith('/uploads/') && (
+                            <img 
+                              src={`http://localhost:8080${form.imagePath}`} 
+                              alt="업로드된 이미지 미리보기" 
+                              className="object-cover w-16 h-16 rounded-lg border border-green-300"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      JPG, JPEG, PNG, GIF, WEBP 형식 지원 (최대 5MB)
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* 태그 */}
               <div className="space-y-2">

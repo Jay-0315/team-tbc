@@ -400,9 +400,9 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
                     <div className="overflow-hidden relative bg-white rounded-xl border border-gray-100 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       {/* 썸네일 */}
                       <div className="overflow-hidden relative h-48 bg-white">
-                        {event.imageUrl ? (
+                        {(event.imagePath || event.imageUrl) ? (
                           <img
-                            src={event.imageUrl}
+                            src={event.imagePath ? `http://localhost:8080${event.imagePath}` : event.imageUrl}
                             alt={event.title}
                             className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                             style={{ 

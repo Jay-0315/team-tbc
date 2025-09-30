@@ -36,6 +36,7 @@ public class GroupEntity {
     @Column(length=200) String location;
     @Column Double latitude;   // 위도
     @Column Double longitude;  // 경도
+    @Column(name="image_path", length=500) String imagePath;  // 업로드 이미지 경로
     @Column(name="event_date") LocalDate eventDate;
     @Column(name="event_time") LocalTime eventTime;
     @Column(name="start_at") LocalDateTime startAt;  // 시작 시간 (eventDate + eventTime 조합)

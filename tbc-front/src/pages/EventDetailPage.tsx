@@ -40,6 +40,7 @@ export default function EventDetailPage() {
   const latitude = data?.latitude ?? null
   const longitude = data?.longitude ?? null
   const location = data?.location || ''
+  const imagePath = data?.imagePath ?? null
 
   // 호스트 여부 확인
   const isHost = user && hostId && user.id === hostId
@@ -151,11 +152,28 @@ export default function EventDetailPage() {
         <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <section className="space-y-4 lg:col-span-2">
-              <div className="overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-md">
-                {/* 커버 대체: 카테고리 배지/영역 */}
-                <div className="w-full aspect-[16/9] bg-white flex items-center justify-center border-b border-gray-100">
-                  <span className="text-xl font-bold text-gray-800">{data.category}</span>
-                </div>
+              <div className="overflow-hidden rounded-3xl border border-gray-200 shadow-xl backdrop-blur-sm bg-white/80">
+                {/* 커버 이미지 또는 카테고리 그라디언트 */}
+                {imagePath ? (
+                  <div className="overflow-hidden relative w-full aspect-[16/9]">
+                    <img
+                      src={`http://localhost:8080${imagePath}`}
+                      alt={data.title}
+                      className="object-cover w-full h-full"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                        const parent = e.currentTarget.parentElement
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full aspect-[16/9] bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center"><span class="text-2xl font-bold text-white">' + data.category + '</span></div>'
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full aspect-[16/9] bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-white">{data.category}</span>
+                  </div>
+                )}
                 <div className="p-4">
                   <div className="mb-2">
                     <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] text-white bg-black">

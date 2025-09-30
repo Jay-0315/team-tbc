@@ -22,6 +22,7 @@ public record Group(
         String location,
         Double latitude,  // 위도
         Double longitude, // 경도
+        String imagePath, // 이미지 경로
         LocalDate eventDate,
         LocalTime eventTime,
         int capacity, // Added this field
@@ -45,6 +46,7 @@ public record Group(
             String location,
             Double latitude,  // 위도
             Double longitude, // 경도
+            String imagePath, // 이미지 경로
             LocalDate eventDate,
             LocalTime eventTime,
             int capacity, // Added this field
@@ -57,7 +59,7 @@ public record Group(
                 minParticipants, maxParticipants, mode,
                 feeType, feeAmount, feeInfo,
                 tags, contentHtml, hostId,
-                location, latitude, longitude,
+                location, latitude, longitude, imagePath,
                 eventDate, eventTime,
                 capacity, joined, coverUrl, startAt // Added these fields
         );
