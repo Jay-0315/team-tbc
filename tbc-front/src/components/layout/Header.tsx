@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
+import { useProfile } from '@/hooks/useProfile'
 import { useEffect, useState } from 'react'
 import { User } from 'lucide-react'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
@@ -13,8 +14,10 @@ interface HeaderProps {
 
 export default function Header({ user, onLogout }: HeaderProps) {
   const { isAuthenticated } = useAuth()
+  const { data: profile } = useProfile(isAuthenticated)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -47,63 +50,106 @@ export default function Header({ user, onLogout }: HeaderProps) {
     }
   }
 
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur supports-[backdrop-filter] transition-colors duration-300">
       <div className="container flex justify-between items-center px-4 h-16">
         <div className="flex items-center">
           <Link 
             to="/" 
-            className="flex items-center space-x-2 text-xl font-bold text-gray-900 transition-colors duration-300 hover:opacity-80"
+            className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80"
           >
-            <span>HolaPoP</span>
+            {/* HolaPop 로고 */}
+            <img 
+              src="/holapop-logo.png" 
+              alt="HolaPop" 
+              className="w-auto h-30"
+            />
           </Link>
         </div>
         
         <div className="flex items-center space-x-4">
-          {/* 사용자 아이콘 */}
-          <div className="relative dropdown-container">
-            <button
-              onClick={handleUserIconClick}
-              className="flex justify-center items-center w-10 h-10 bg-gray-100 rounded-full transition-colors duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              aria-haspopup="menu"
-              aria-expanded={isDropdownOpen}
-              aria-label={isAuthenticated ? "사용자 메뉴" : "로그인"}
-            >
-              <User className="w-5 h-5 text-gray-600" />
-            </button>
-
-            {/* 로그인된 상태에서만 드롭다운 메뉴 표시 */}
-            {isAuthenticated && isDropdownOpen && (
-              <div
-                className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
-                role="menu"
+          {isAuthenticated ? (
+            /* 로그인된 상태: 프로필 아이콘 */
+            <div className="relative dropdown-container">
+              <button
+                onClick={handleUserIconClick}
+                className="flex overflow-hidden justify-center items-center w-10 h-10 bg-white rounded-full border-2 border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                aria-haspopup="menu"
+                aria-expanded={isDropdownOpen}
+                aria-label="사용자 메뉴"
               >
-                <div className="py-1">
-                  <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
-                    {user?.nickname}님
-                  </div>
-                  <button
-                    onClick={() => {
-                      setIsDropdownOpen(false)
-                      window.location.href = '/mypage'
+                {profile?.profileImageUrl ? (
+                  <img
+                    src={profile.profileImageUrl}
+                    alt={profile.displayName || user?.nickname || '프로필'}
+                    className="object-cover w-full h-full"
+                    onError={(e) => {
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${profile?.displayName || user?.nickname || 'User'}&background=orange&color=white&size=40`
                     }}
-                    className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
-                    role="menuitem"
-                  >
-                    마이페이지
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
-                    role="menuitem"
-                  >
-                    로그아웃
-                  </button>
+                  />
+                ) : (
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${profile?.displayName || user?.nickname || 'User'}&background=orange&color=white&size=40`}
+                    alt={profile?.displayName || user?.nickname || '프로필'}
+                    className="object-cover w-full h-full"
+                  />
+                )}
+              </button>
+
+              {/* 드롭다운 메뉴 */}
+              {isDropdownOpen && (
+                <div
+                  className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
+                  role="menu"
+                >
+                  <div className="py-1">
+                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                      {profile?.displayName || user?.realName || user?.nickname}님
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsDropdownOpen(false)
+                        window.location.href = '/mypage'
+                      }}
+                      className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                      role="menuitem"
+                    >
+                      마이페이지
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                      role="menuitem"
+                    >
+                      로그아웃
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            /* 로그인되지 않은 상태: 로그인/회원가입 버튼 */
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  setAuthModalMode('login')
+                  setIsAuthModalOpen(true)
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              >
+                로그인
+              </button>
+              <button
+                onClick={() => {
+                  setAuthModalMode('register')
+                  setIsAuthModalOpen(true)
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-800 bg-[#F5E6B3] border border-transparent rounded-lg hover:bg-[#E8D89C] focus:outline-none focus:ring-2 focus:ring-[#E8D89C] focus:ring-offset-2 transition-colors duration-200"
+              >
+                회원가입
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -111,7 +157,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
       <UnifiedAuthModal 
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        initialMode="login"
+        initialMode={authModalMode}
       />
     </header>
   )
