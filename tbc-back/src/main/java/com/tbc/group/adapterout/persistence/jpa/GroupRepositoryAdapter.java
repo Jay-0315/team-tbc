@@ -6,19 +6,11 @@ import com.tbc.group.application.port.out.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-<<<<<<< HEAD
-import org.springframework.data.domain.PageRequest;
-=======
->>>>>>> origin/dev
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-<<<<<<< HEAD
-import java.time.LocalDateTime;
-=======
->>>>>>> origin/dev
 
 @Repository
 @RequiredArgsConstructor
@@ -34,21 +26,13 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .topic(g.topic())
                 .minParticipants(g.minParticipants())
                 .maxParticipants(g.maxParticipants())
-<<<<<<< HEAD
-=======
-                .capacity(g.maxParticipants())  // capacity는 maxParticipants와 동일
-                .joined(0)  // 기본값으로 0 설정
-                .coverUrl("")  // 기본값으로 빈 문자열 설정
->>>>>>> origin/dev
+                .capacity(g.maxParticipants())
+                .joined(0)
+                .coverUrl("")
                 .mode(g.mode().name())
                 .feeType(g.feeType().name())
                 .feeAmount(g.feeAmount())
                 .feeInfo(g.feeInfo())
-<<<<<<< HEAD
-                .tagsCsv(String.join(",", g.tags()))
-                .contentHtml(g.contentHtml())
-                .hostId(g.hostId())
-=======
                 .tagsCsv(g.tags() == null ? "" : String.join(",", g.tags()))
                 .contentHtml(g.contentHtml())
                 .hostId(g.hostId())
@@ -58,9 +42,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .imagePath(g.imagePath())
                 .eventDate(g.eventDate())
                 .eventTime(g.eventTime())
-                .startAt(g.eventDate() != null && g.eventTime() != null ? 
-                    g.eventDate().atTime(g.eventTime()) : null)
->>>>>>> origin/dev
+                .startAt(g.eventDate() != null && g.eventTime() != null ? g.eventDate().atTime(g.eventTime()) : null)
                 .build();
         return repo.save(e).getId();
     }
@@ -74,14 +56,10 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-<<<<<<< HEAD
-                e.getContentHtml(), e.getHostId()
-=======
                 e.getContentHtml(), e.getHostId(),
                 e.getLocation(), e.getLatitude(), e.getLongitude(), e.getImagePath(),
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
->>>>>>> origin/dev
         ));
     }
 
@@ -94,31 +72,14 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 com.tbc.group.domain.model.Group.FeeType.valueOf(e.getFeeType()),
                 e.getFeeAmount(), e.getFeeInfo(),
                 e.getTagsCsv() == null ? List.of() : Arrays.asList(e.getTagsCsv().split(",")),
-<<<<<<< HEAD
-                e.getContentHtml(), e.getHostId()
-=======
                 e.getContentHtml(), e.getHostId(),
                 e.getLocation(), e.getLatitude(), e.getLongitude(), e.getImagePath(),
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
->>>>>>> origin/dev
         ));
     }
 
     @Override
-<<<<<<< HEAD
-    public java.util.List<Long> findDuePaidGroupIds(LocalDateTime now, int limit) {
-        return repo.findDuePaidGroupIds(now, PageRequest.of(0, limit));
-    }
-
-    @Override
-    public void markSettlement(Long groupId, String status) {
-        // 간단 구현: 엔티티 로드 후 상태/시각 업데이트
-        var e = repo.findById(groupId).orElseThrow();
-        e.setSettlementStatus(status);
-        e.setSettledAt(LocalDateTime.now());
-        repo.save(e);
-=======
     public Page<com.tbc.group.domain.model.Group> findAll(Pageable pageable, String searchQuery, String category) {
         return repo.findAll(pageable, searchQuery, category).map(e -> new com.tbc.group.domain.model.Group(
                 e.getId(), e.getTitle(), e.getCategory(), e.getTopic(),
@@ -148,6 +109,5 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 e.getEventDate(), e.getEventTime(),
                 e.getCapacity(), e.getJoined(), e.getCoverUrl(), e.getStartAt() // Added these fields
         ));
->>>>>>> origin/dev
     }
 }

@@ -5,13 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-<<<<<<< HEAD
-import java.time.LocalDateTime;
-=======
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
->>>>>>> origin/dev
 
 @Getter
 @Setter
@@ -27,21 +23,6 @@ public class GroupEntity {
     @Column(nullable=false, length=120) String topic;
     @Column(nullable=false) int minParticipants;
     @Column(nullable=false) int maxParticipants;
-<<<<<<< HEAD
-    @Column(nullable=false, length=16) String mode;      // ONLINE/OFFLINE
-    @Column(nullable=false, length=8)  String feeType;   // FREE/PAID
-    Integer feeAmount;
-    @Lob String feeInfo;
-    @Lob String tagsCsv;          // 간단하게 CSV 저장(필요 시 별도 테이블로 확장)
-    @Lob String contentHtml;
-    @Column(nullable=false) Long hostId;
-    @Column(name = "start_at") LocalDateTime startAt; // 모임 시작 시각(선택)
-    @Builder.Default
-    @Column(name = "settlement_status", nullable = false, length = 16) String settlementStatus = "PENDING"; // PENDING/SETTLED/REFUNDED
-    @Column(name = "settled_at") LocalDateTime settledAt;
-    @CreationTimestamp @Column(nullable=false, updatable=false) LocalDateTime createdAt;
-    @UpdateTimestamp   @Column(nullable=false) LocalDateTime updatedAt;
-=======
     @Column(nullable=false) int capacity;                // 최대 인원 (maxParticipants와 동일)
     @Builder.Default @Column(nullable=false) int joined = 0;              // 현재 참가자 수 (기본값: 0)
     @Builder.Default @Column(name="cover_url", length=500, nullable=false) String coverUrl = "";  // 커버 이미지 URL (기본값: 빈 문자열)
@@ -61,5 +42,4 @@ public class GroupEntity {
     @Column(name="start_at") LocalDateTime startAt;  // 시작 시간 (eventDate + eventTime 조합)
     @CreationTimestamp @Column(name="created_at", nullable=false, updatable=false) LocalDateTime createdAt;
     @UpdateTimestamp   @Column(name="updated_at", nullable=false) LocalDateTime updatedAt;
->>>>>>> origin/dev
 }
