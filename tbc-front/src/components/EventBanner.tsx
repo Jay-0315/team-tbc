@@ -91,7 +91,7 @@ export default function EventBanner() {
       </div>
 
       {/* 콘텐츠 - 좌측 상단 */}
-      <div className="absolute top-6 left-6 z-10 max-w-md">
+      <div className="absolute top-6 left-4 z-10 max-w-md">
         <h2 className="mb-3 text-2xl md:text-3xl font-bold text-black" style={{
           WebkitTextStroke: '2px white',
           paintOrder: 'stroke fill'
@@ -107,7 +107,7 @@ export default function EventBanner() {
       </div>
 
       {/* 좌측 하단 선택 버튼들 */}
-      <div className="absolute bottom-6 left-6 z-20">
+      <div className="absolute bottom-6 left-4 z-20">
         <div className="flex space-x-2">
           {eventBanners.map((_, index) => (
             <button

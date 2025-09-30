@@ -8,6 +8,7 @@ public interface GroupReadFacade {
     Long getChatRoomId(Long groupId);
     Page<GroupCardDTO> findAll(Pageable pageable);
     Page<GroupCardDTO> findAll(Pageable pageable, String searchQuery, String category);
+    Page<GroupCardDTO> findAll(Pageable pageable, String searchQuery, String category, Long userId);
     GroupCardDTO findOne(Long groupId);
     Page<GroupCardDTO> findByUserId(Long userId, Pageable pageable);
 }

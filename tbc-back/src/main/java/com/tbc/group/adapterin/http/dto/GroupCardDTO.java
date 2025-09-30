@@ -79,6 +79,9 @@ public class GroupCardDTO {
     @Schema(description = "호스트 프로필 이미지 URL", example = "https://example.com/profile.jpg")
     public String hostProfileImage;
 
+    @Schema(description = "찜 여부", example = "false")
+    public Boolean favorited;
+
     public static GroupCardDTO from(Group group) {
         GroupCardDTO dto = new GroupCardDTO();
         dto.id = group.id();
@@ -102,6 +105,7 @@ public class GroupCardDTO {
         dto.joined = group.joined();
         dto.capacity = group.capacity();
         dto.coverUrl = group.coverUrl();
+        dto.favorited = null; // 초기값 null, 이후 enrichPageWithHostInfo에서 설정
         return dto;
     }
 }

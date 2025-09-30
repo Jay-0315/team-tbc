@@ -22,7 +22,7 @@ public class EventFacade {
     /**
      * 이벤트 목록 조회 - 파사드 패턴으로 외부 인터페이스 제공
      */
-    public Page<EventCardDTO> getEventList(String q, String category, String status, String sort, Pageable pageable) {
+    public Page<EventCardDTO> getEventList(Long userId, String q, String category, String status, String sort, Pageable pageable) {
         EventStatus eventStatus = null;
         if (status != null) {
             try {
@@ -31,7 +31,7 @@ public class EventFacade {
                 // Invalid status, keep as null
             }
         }
-        return eventService.list(null, q, category, eventStatus, sort, pageable);
+        return eventService.list(userId, q, category, eventStatus, sort, pageable);
     }
     
     /**
@@ -63,6 +63,13 @@ public class EventFacade {
         return reviewService.create(userId, eventId, reviewCreateReq);
     }
     
+    /**
+     * 찜한 이벤트 목록 조회
+     */
+    public Page<EventCardDTO> getFavoriteEvents(Long userId, Pageable pageable) {
+        return eventService.findFavoriteEvents(userId, pageable);
+    }
+
     /**
      * 이벤트 즐겨찾기 토글
      */

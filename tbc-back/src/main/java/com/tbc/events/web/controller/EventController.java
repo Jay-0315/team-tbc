@@ -46,13 +46,14 @@ public class EventController {
                         @ApiResponse(responseCode = "400", description = "요청 오류", content = @Content(schema = @Schema(implementation = com.tbc.common.exception.GlobalExceptionHandler.ErrorResponse.class)))
         })
         public PageResponse<EventCardDTO> list(
-                        @RequestHeader(value = "X-User-Id", required = false) Long userId,
                         @RequestParam(required = false) String q,
                         @RequestParam(required = false) String category,
                         @RequestParam(required = false) String status,
                         @RequestParam(required = false, defaultValue = "CREATED_DESC") String sort,
-                        Pageable pageable) {
-                Page<EventCardDTO> page = eventFacade.getEventList(q, category, status, sort, pageable);
+                        Pageable pageable,
+                        Authentication authentication) {
+                Long userId = getUserId(authentication);
+                Page<EventCardDTO> page = eventFacade.getEventList(userId, q, category, status, sort, pageable);
                 return PageResponse.from(page);
         }
 
@@ -160,14 +161,76 @@ public class EventController {
                 return ResponseEntity.noContent().build();
         }
 
+    @GetMapping("/favorites")
+    @Operation(summary = "찜한 이벤트 목록 조회", description = "사용자가 찜한 이벤트 목록을 조회합니다.", tags = { "Favorites" })
+    @ApiResponses({
+                    @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = PageResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
+    public PageResponse<EventCardDTO> getFavoriteEvents(
+                    @RequestParam(defaultValue = "0") int page,
+                    @RequestParam(defaultValue = "12") int size,
+                    Authentication authentication) {
+            try {
+                    System.out.println("=== GET /api/events/favorites - page: " + page + ", size: " + size);
+                    System.out.println("=== Authentication: " + (authentication != null ? authentication.getName() : "null"));
+                    
+                    Long userId = getUserId(authentication);
+                    System.out.println("=== Extracted userId: " + userId);
+                    
+                    if (userId == null) {
+                            throw new org.springframework.security.access.AccessDeniedException("로그인이 필요합니다.");
+                    }
+                    
+                    Pageable pageable = PageRequest.of(page, size);
+                    Page<EventCardDTO> favoriteEvents = eventFacade.getFavoriteEvents(userId, pageable);
+                    System.out.println("=== Favorite events returned: " + favoriteEvents.getTotalElements() + " total, " + favoriteEvents.getContent().size() + " in page");
+                    
+                    PageResponse<EventCardDTO> response = PageResponse.from(favoriteEvents);
+                    System.out.println("=== Returning PageResponse");
+                    return response;
+                    
+            } catch (Exception e) {
+                    System.err.println("=== ERROR in getFavoriteEvents controller: " + e.getClass().getName() + " - " + e.getMessage());
+                    e.printStackTrace();
+                    throw e;
+            }
+    }
+
+    @PostMapping("/{id}/favorite")
+    @Operation(summary = "이벤트 찜하기/취소", description = "이벤트를 찜하거나 찜을 취소합니다.", tags = { "Favorites" })
+    @ApiResponses({
+                    @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = FavoriteResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 필요"),
+                    @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음")
+    })
+    public FavoriteResponse toggleFavorite(
+                    @PathVariable Long id,
+                    Authentication authentication) {
+            Long userId = getUserId(authentication);
+            if (userId == null) {
+                    throw new org.springframework.security.access.AccessDeniedException("로그인이 필요합니다.");
+            }
+            return eventFacade.toggleFavorite(id, userId);
+    }
+
         private Long getUserId(Authentication authentication) {
-                if (authentication == null || !authentication.isAuthenticated()) {
-                        return null;
+                try {
+                        if (authentication == null || !authentication.isAuthenticated()) {
+                                System.out.println("=== getUserId: authentication is null or not authenticated");
+                                return null;
+                        }
+                        String email = authentication.getName();
+                        System.out.println("=== getUserId: email from authentication: " + email);
+                        
+                        User user = userService.findByEmailOptional(email)
+                                        .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException(
+                                                        "사용자를 찾을 수 없습니다."));
+                        System.out.println("=== getUserId: found user with id: " + user.getId());
+                        return user.getId();
+                } catch (Exception e) {
+                        System.err.println("=== ERROR in getUserId: " + e.getMessage());
+                        throw e;
                 }
-                String email = authentication.getName();
-                User user = userService.findByEmailOptional(email)
-                                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException(
-                                                "사용자를 찾을 수 없습니다."));
-                return user.getId();
         }
 }

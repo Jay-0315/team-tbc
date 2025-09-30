@@ -22,9 +22,12 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                         com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
     }
 
     @Bean
@@ -50,6 +53,9 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/api/", configuration);
         source.registerCorsConfiguration("/api/*", configuration);
         source.registerCorsConfiguration("/api/**", configuration);
+        // OAuth2 경로도 CORS 허용
+        source.registerCorsConfiguration("/oauth2/**", configuration);
+        source.registerCorsConfiguration("/login/oauth2/**", configuration);
         return source;
     }
 
@@ -58,9 +64,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/oauth2/authorization/google")
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureUrl("http://localhost:5173?error=oauth2_failed")
+                )
                 .authorizeHttpRequests(auth -> auth
                         // OPTIONS 요청 허용 - ** 패턴 대신 구체적인 패턴 사용
                         .requestMatchers(HttpMethod.OPTIONS, "/api").permitAll()
@@ -91,6 +102,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
+                        
+                        // OAuth2 로그인 관련 경로 허용
+                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/login/oauth2/**").permitAll()
 
                         // 수정: /api/auth/me는 인증이 필요하도록 명시적으로 설정
                         .requestMatchers("/api/auth/me").authenticated()

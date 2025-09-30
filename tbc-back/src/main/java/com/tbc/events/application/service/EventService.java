@@ -10,11 +10,16 @@ import com.tbc.profile.adapterin.persistence.jpa.repository.ProfileJpaRepository
 import com.tbc.login.adapter.out.persistence.UserJpaRepository;
 import com.tbc.login.domain.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,29 +46,83 @@ public class EventService {
         
         Sort s = mapSort(sort);
         Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), s);
-        return groupRepository.findAll(p, normalizedQuery, normalizedCategory)
-                .map(e -> enrichWithHostInfo(EventCardDTO.fromGroupEntity(e, null)));
+        Page<GroupEntity> page = groupRepository.findAll(p, normalizedQuery, normalizedCategory);
+        
+        return enrichPageWithHostInfo(page, pageable, userId);
     }
     
-    private EventCardDTO enrichWithHostInfo(EventCardDTO dto) {
-        if (dto.hostId == null) {
-            return dto;
+    /**
+     * N+1 문제 해결: 한번에 모든 호스트 정보와 찜 정보를 조회하여 매핑
+     */
+    private Page<EventCardDTO> enrichPageWithHostInfo(Page<GroupEntity> page, Pageable pageable, Long userId) {
+        List<EventCardDTO> dtos = page.getContent().stream()
+                .map(e -> EventCardDTO.fromGroupEntity(e, null))
+                .collect(Collectors.toList());
+
+        if (dtos.isEmpty()) {
+            return new PageImpl<>(dtos, pageable, page.getTotalElements());
         }
-        
-        // 프로필 정보 조회
-        profileRepository.findByUserId(dto.hostId).ifPresent(profile -> {
-            dto.hostNickname = profile.getDisplayName();
-            dto.hostProfileImage = profile.getProfileImageUrl();
-        });
-        
-        // 프로필이 없으면 User 정보에서 닉네임 가져오기
-        if (dto.hostNickname == null) {
-            userRepository.findById(dto.hostId).ifPresent(user -> {
-                dto.hostNickname = user.getNickname() != null ? user.getNickname() : user.getRealName();
+
+        // 모든 eventId 수집 (찜 정보 조회용)
+        List<Long> eventIds = dtos.stream()
+                .map(dto -> dto.id)
+                .filter(id -> id != null)
+                .collect(Collectors.toList());
+
+        // 사용자의 찜 정보 bulk 조회
+        java.util.Set<Long> favoritedEventIds = new java.util.HashSet<>();
+        if (userId != null && !eventIds.isEmpty()) {
+            favoritedEventIds = favoriteRepo.findByUserId(userId).stream()
+                    .map(fav -> fav.getEventId())
+                    .collect(Collectors.toSet());
+        }
+
+        // 모든 hostId 수집
+        List<Long> hostIds = dtos.stream()
+                .map(dto -> dto.hostId)
+                .filter(id -> id != null)
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (!hostIds.isEmpty()) {
+            // 프로필 정보 bulk 조회
+            Map<Long, ProfileEntity> profileMap = profileRepository.findByUserIdIn(hostIds).stream()
+                    .collect(Collectors.toMap(ProfileEntity::getUserId, p -> p));
+
+            // 프로필이 없는 사용자의 User 정보 bulk 조회
+            List<Long> missingProfileIds = hostIds.stream()
+                    .filter(id -> !profileMap.containsKey(id))
+                    .collect(Collectors.toList());
+
+            Map<Long, User> userMap = missingProfileIds.isEmpty() ? Map.of() :
+                    userRepository.findByIdIn(missingProfileIds).stream()
+                            .collect(Collectors.toMap(User::getId, u -> u));
+
+            // DTO에 호스트 정보 매핑
+            final java.util.Set<Long> finalFavoritedEventIds = favoritedEventIds;
+            dtos.forEach(dto -> {
+                // 찜 정보 설정
+                if (userId != null && dto.id != null) {
+                    dto.favorited = finalFavoritedEventIds.contains(dto.id);
+                }
+                
+                // 호스트 정보 설정
+                if (dto.hostId != null) {
+                    ProfileEntity profile = profileMap.get(dto.hostId);
+                    if (profile != null) {
+                        dto.hostNickname = profile.getDisplayName();
+                        dto.hostProfileImage = profile.getProfileImageUrl();
+                    } else {
+                        User user = userMap.get(dto.hostId);
+                        if (user != null) {
+                            dto.hostNickname = user.getNickname() != null ? user.getNickname() : user.getRealName();
+                        }
+                    }
+                }
             });
         }
-        
-        return dto;
+
+        return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 
     private Sort mapSort(String sort) {
@@ -76,6 +135,73 @@ public class EventService {
     public GroupEntity getByIdOrThrow(Long id) {
         return groupRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이벤트입니다."));
+    }
+
+    /**
+     * 찜한 이벤트 목록 조회
+     */
+    public Page<EventCardDTO> findFavoriteEvents(Long userId, Pageable pageable) {
+        try {
+            System.out.println("=== findFavoriteEvents START - userId: " + userId);
+            
+            if (userId == null) {
+                throw new org.springframework.security.access.AccessDeniedException("인증이 필요합니다.");
+            }
+            
+            // 사용자가 찜한 이벤트 ID 목록 조회
+            List<com.tbc.events.domain.model.Favorite> favorites = favoriteRepo.findByUserId(userId);
+            System.out.println("=== Favorites found: " + favorites.size());
+            
+            if (favorites.isEmpty()) {
+                System.out.println("=== No favorites found, returning empty page");
+                return new PageImpl<>(List.of(), pageable, 0);
+            }
+            
+            List<Long> favoriteEventIds = favorites.stream()
+                    .map(fav -> fav.getEventId())
+                    .collect(Collectors.toList());
+            System.out.println("=== Favorite event IDs: " + favoriteEventIds);
+            
+            // 찜한 이벤트 ID로 이벤트 조회
+            List<GroupEntity> favoriteEvents = groupRepository.findAllById(favoriteEventIds);
+            System.out.println("=== Events found from DB: " + favoriteEvents.size());
+            
+            // 존재하지 않는 이벤트 제거 (삭제된 이벤트 등)
+            favoriteEvents = favoriteEvents.stream()
+                    .filter(entity -> entity != null && entity.getId() != null)
+                    .collect(Collectors.toList());
+            System.out.println("=== Events after filtering: " + favoriteEvents.size());
+            
+            if (favoriteEvents.isEmpty()) {
+                System.out.println("=== No valid events found, returning empty page");
+                return new PageImpl<>(List.of(), pageable, 0);
+            }
+            
+            // 페이징 처리
+            int start = (int) pageable.getOffset();
+            int total = favoriteEvents.size();
+            System.out.println("=== Paging - start: " + start + ", total: " + total + ", pageSize: " + pageable.getPageSize());
+            
+            // start가 total보다 크면 빈 페이지 반환
+            if (start >= total) {
+                System.out.println("=== Start >= total, returning empty page with total count");
+                return new PageImpl<>(List.of(), pageable, total);
+            }
+            
+            int end = Math.min((start + pageable.getPageSize()), total);
+            List<GroupEntity> pagedEvents = favoriteEvents.subList(start, end);
+            System.out.println("=== Paged events count: " + pagedEvents.size());
+            
+            Page<GroupEntity> page = new PageImpl<>(pagedEvents, pageable, total);
+            Page<EventCardDTO> result = enrichPageWithHostInfo(page, pageable, userId);
+            System.out.println("=== findFavoriteEvents END - returning " + result.getContent().size() + " items");
+            return result;
+            
+        } catch (Exception e) {
+            System.err.println("=== ERROR in findFavoriteEvents: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional

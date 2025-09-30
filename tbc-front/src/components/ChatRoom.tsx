@@ -206,67 +206,100 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false }: ChatRoo
   }
 
   return (
-    <div className={embedded ? "flex flex-col h-full bg-white" : "flex flex-col h-screen bg-white"} style={embedded ? {height: '100%'} : undefined}>
+    <div className={embedded ? "flex flex-col h-full bg-gradient-to-b from-orange-50/20 to-white" : "flex flex-col h-screen bg-white"} style={embedded ? {height: '100%'} : undefined}>
       {/* Header */}
-      <div className="flex justify-between items-center px-4 py-3 bg-white border-b border-zinc-200">
-        <div className="flex gap-4 items-center">
-          <button
-            onClick={() => navigate('/')}
-            className="transition-colors text-zinc-600 hover:text-black"
-          >
-            ← 홈으로 가기
-          </button>
-          <h1 className="text-lg font-semibold text-zinc-900">
-            {resolvedRoomName}
-          </h1>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className={`text-xs ${getConnectionStatusColor()}`}>
-            {getConnectionStatusText()}
+      <div className="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-orange-500 to-orange-600 border-b border-orange-600">
+        <div className="flex gap-3 items-center flex-1 min-w-0">
+          {!embedded && (
+            <button
+              onClick={() => navigate('/')}
+              className="transition-colors text-white/90 hover:text-white flex-shrink-0"
+            >
+              ← 홈으로 가기
+            </button>
+          )}
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-base font-bold text-white truncate">
+              {resolvedRoomName}
+            </h1>
+            <div className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
+              connectionState === 'CONNECTED' ? 'bg-green-500/30 text-green-100' :
+              connectionState === 'CONNECTING' ? 'bg-yellow-500/30 text-yellow-100' :
+              connectionState === 'ERROR' ? 'bg-red-500/30 text-red-100' :
+              'bg-white/20 text-white/70'
+            }`}>
+              {getConnectionStatusText()}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className={embedded ? "overflow-y-auto flex-1 p-4 space-y-4 bg-zinc-50" : "overflow-y-auto flex-1 p-4 space-y-4 bg-zinc-50"}>
+      <div className="overflow-y-auto flex-1 p-4 space-y-3">
         {messages.length === 0 ? (
-          <div className="py-8 text-center text-zinc-500">
-            아직 메시지가 없습니다. 첫 번째 메시지를 보내보세요!
+          <div className="py-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full">
+              <span className="text-2xl">💬</span>
+            </div>
+            <p className="text-sm text-gray-500">아직 메시지가 없습니다.<br/>첫 번째 메시지를 보내보세요!</p>
           </div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.userId === userId ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <div className={`max-w-xs lg:max-w-md`}>
-                {/* 닉네임 + 시간 */}
-                <div className={`mb-1 text-xs text-zinc-500 ${message.userId === userId ? 'text-right' : 'text-left'}`}>
-                  <span className="font-medium text-zinc-700">{message.userNickname}</span>
-                  <span className="mx-1">•</span>
-                  <time aria-label="보낸 시간">{new Date(message.timestamp).toLocaleString()}</time>
+          messages.map((message) => {
+            const isMyMessage = message.userId === userId
+            const isSystemMessage = message.type === 'SYSTEM'
+            
+            if (isSystemMessage) {
+              return (
+                <div key={message.id} className="flex justify-center my-4">
+                  <div className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                    {message.content}
+                  </div>
                 </div>
-                {/* 말풍선 */}
-                <div
-                  className={`px-4 py-2 rounded-lg ${
-                  message.userId === userId
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-zinc-900 border border-zinc-200'
-                }`}
+              )
+            }
+            
+            return (
+              <div
+                key={message.id}
+                className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
               >
-                <div className="text-sm">{message.content}</div>
+                <div className={`max-w-xs lg:max-w-md flex flex-col ${isMyMessage ? 'items-end' : 'items-start'}`}>
+                  {/* 상대방 메시지만 닉네임 표시 */}
+                  {!isMyMessage && (
+                    <div className="mb-1 px-1 text-xs text-left">
+                      <span className="font-semibold text-gray-700">{message.userNickname}</span>
+                    </div>
+                  )}
+                  {/* 말풍선 + 시간 */}
+                  <div className={`flex items-end gap-2 ${
+                    isMyMessage ? 'flex-row-reverse' : 'flex-row'
+                  }`}>
+                    <div
+                      className={`px-4 py-2.5 rounded-2xl shadow-sm ${
+                        isMyMessage
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-br-sm'
+                          : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm'
+                      }`}
+                    >
+                      <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.content}</div>
+                    </div>
+                    <time className="text-xs text-gray-500 flex-shrink-0 pb-0.5" aria-label="보낸 시간">
+                      {new Date(message.timestamp).toLocaleTimeString('ko-KR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </time>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            )
+          })
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
-      <div className="p-4 bg-white border-t border-zinc-200">
+      <div className="p-4 bg-white border-t border-gray-200">
         <div className="flex gap-2">
           <input
             type="text"
@@ -279,18 +312,19 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false }: ChatRoo
                 : '연결을 기다리는 중...'
             }
             disabled={connectionState !== 'CONNECTED'}
-            className="flex-1 px-3 py-2 bg-white rounded-md border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-900 placeholder-zinc-400 disabled:bg-zinc-100 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2.5 bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-gray-900 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+            aria-label="메시지 입력"
           />
           <Button
             onClick={handleSendMessage}
             disabled={!newMessage.trim() || connectionState !== 'CONNECTED'}
-            className="px-6 text-white bg-blue-600 hover:bg-blue-700"
+            className="px-6 py-2.5 text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             전송
           </Button>
         </div>
-        <div className="mt-1 text-xs text-zinc-500">
-          Enter로 전송, Shift+Enter로 줄바꿈
+        <div className="mt-2 text-xs text-gray-500 px-1">
+          💡 Enter로 전송, Shift+Enter로 줄바꿈
         </div>
       </div>
     </div>
