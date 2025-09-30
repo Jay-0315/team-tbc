@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 import HomePage from '@/pages/HomePage'
 // import PostsPage from '@/pages/PostsPage'
 import NewPostPage from '@/pages/NewPostPage'
@@ -21,6 +22,10 @@ import { MyPage } from '@/pages/MyPage'
 import ChargePage from '@/pages/payments/ChargePage'
 import ResultPage from '@/pages/payments/ResultPage'
 import CreateSocialingModal from '@/components/event/CreateSocialingModal'
+import TermsPage from '@/pages/TermsPage'
+import PrivacyPage from '@/pages/PrivacyPage'
+import NoticePage from '@/pages/NoticePage'
+import FAQPage from '@/pages/FAQPage'
 import { Pencil } from 'lucide-react'
 
 export default function App() {
@@ -101,8 +106,15 @@ export default function App() {
           <Route path="/payments/charge" element={<ChargePage />} />
           <Route path="/payments/result" element={<ResultPage />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/notice" element={<NoticePage />} />
+          <Route path="/faq" element={<FAQPage />} />
         </Routes>
       </main>
+      
+      {/* Footer */}
+      <Footer />
       
       {/* 플로팅 버튼들 */}
       {user && (
