@@ -7,9 +7,10 @@ import { EditProfileDialog } from '@/components/profile/EditProfileDialog'
 import { GroupHistoryCard } from '@/components/profile/GroupHistoryCard'
 import { useProfile } from '@/hooks/useProfile'
 import { useGroupHistory } from '@/hooks/useGroupHistory'
+import { useWalletBalance } from '@/features/payments/api/useBalance'
 
 export function MyPage() {
-  const { user, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
   const [showEditDialog, setShowEditDialog] = useState(false)
   
@@ -20,6 +21,7 @@ export function MyPage() {
     createdGroups, 
     isLoading: historyLoading 
   } = useGroupHistory()
+  const { data: wallet, isLoading: walletLoading } = useWalletBalance()
 
   if (!isAuthenticated) {
     return (
@@ -49,6 +51,17 @@ export function MyPage() {
           <p className="text-gray-600 dark:text-gray-400">
             프로필을 관리하고 모임 내역을 확인하세요.
           </p>
+          <div className="inline-flex items-center gap-3 px-3 py-2 mt-4 border rounded bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/30">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/40">
+              <span className="text-sm">🍿</span>
+            </div>
+            <span className="text-sm font-medium text-amber-900 dark:text-amber-100">내 팝콘</span>
+            {walletLoading ? (
+              <span className="text-sm text-amber-600 dark:text-amber-400">로딩...</span>
+            ) : (
+              <span className="font-semibold text-amber-900 dark:text-amber-100">{Math.floor((wallet?.balance ?? 0) / 100).toLocaleString()}개</span>
+            )}
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -63,8 +76,8 @@ export function MyPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <ProfileCard 
-                profile={profile} 
+              <ProfileCard
+                profile={profile || undefined}
                 onEdit={() => setShowEditDialog(true)}
               />
             )}
@@ -137,7 +150,7 @@ export function MyPage() {
 
         {showEditDialog && (
           <EditProfileDialog
-            profile={profile}
+            profile={profile || undefined}
             onClose={() => setShowEditDialog(false)}
             onSuccess={() => {
               setShowEditDialog(false)

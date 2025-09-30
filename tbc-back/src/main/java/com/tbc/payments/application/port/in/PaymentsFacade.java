@@ -7,4 +7,5 @@ public interface PaymentsFacade {
     ConfirmResponse confirm(ConfirmRequest req);
     RefundResponse refund(RefundRequest req);
     CancelPaymentResponse cancelInit(String orderId);
+    WalletBalanceResponse getWalletBalance(Long userId);
 }
