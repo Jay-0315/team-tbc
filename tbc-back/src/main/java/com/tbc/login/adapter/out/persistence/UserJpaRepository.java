@@ -40,6 +40,11 @@ public class UserJpaRepository implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<User> findByGoogleId(String googleId) {
+        return repo.findByGoogleId(googleId);
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return repo.existsByEmail(email);
     }

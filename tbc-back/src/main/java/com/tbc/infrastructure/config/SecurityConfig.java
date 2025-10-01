@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -22,9 +25,24 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final com.tbc.login.adapter.out.security.OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                         com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+                         com.tbc.login.adapter.out.security.OAuth2LoginFailureHandler oAuth2LoginFailureHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
+    }
+
+    /**
+     * OAuth2 Authorization Request Repository
+     * 세션 기반으로 OAuth2 인증 요청 정보를 저장
+     */
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 
     @Bean
@@ -62,9 +80,8 @@ public class SecurityConfig {
                 "Access-Control-Request-Headers"
         ));
 
-        // JWT Bearer 방식(Authorization 헤더 사용)으로 통일할 경우 credentials는 false 권장.
-        // 만약 쿠키 기반 인증을 사용한다면 true로 바꾸고 allowedOrigin을 정확히 명시하세요.
-        configuration.setAllowCredentials(false);
+        // OAuth2 세션 쿠키 전달을 위해 true 설정
+        configuration.setAllowCredentials(true);
 
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie", "Content-Type"));
         configuration.setMaxAge(3600L);
@@ -77,25 +94,51 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // JWT stateless API면 비활성화 (운영 안전: 쿠키 사용시 재검토)
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation().newSession()
+                )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                // OAuth2 로그인 설정
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                        .authorizationEndpoint(auth -> auth
+                                .baseUri("/oauth2/authorization")
+                                .authorizationRequestRepository(authorizationRequestRepository())
+                        )
+                        .redirectionEndpoint(redirect -> redirect
+                                .baseUri("/login/oauth2/code/*")
+                        )
+                )
                 .authorizeHttpRequests(auth -> auth
                         // Preflight 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // WebSocket SockJS info 핸들러와 핸드셰이크 엔드포인트를 허용
-                        // (SockJS의 /ws/info 는 초기 XHR이므로 permit 해둠; 실제 메시지 송수신은 CONNECT 시 토큰 검증)
+                        // WebSocket 허용
                         .requestMatchers("/ws/**").permitAll()
 
+                        // 정적 리소스 허용
+                        .requestMatchers("/img/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        
+                        // OAuth2 로그인 관련 경로 허용
+                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/login/oauth2/**").permitAll()
+                        
                         // 인증 없이 허용해야 하는 경로들
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/signup").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/me").authenticated() // 명시적으로 인증 필요
                         .requestMatchers("/api/users/check-email").permitAll()
                         .requestMatchers("/api/users/check-nickname").permitAll()
                         .requestMatchers("/api/groups/**").permitAll()
                         .requestMatchers("/api/events/**").permitAll()
+                        .requestMatchers("/api/images/upload").permitAll() // 이미지 업로드 허용
                         // 모니터링 허용
                         .requestMatchers("/actuator/**").permitAll()
 

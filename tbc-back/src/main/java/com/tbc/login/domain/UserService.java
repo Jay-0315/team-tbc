@@ -147,4 +147,36 @@ public class UserService {
         user.setNickname(trimmed);
         userRepository.save(user);
     }
+
+    /**
+     * 기존 계정에 구글 계정 연동
+     */
+    @Transactional
+    public User linkGoogleAccount(Long userId, String googleId) {
+        if (userId == null || googleId == null || googleId.trim().isEmpty()) {
+            throw new IllegalArgumentException("유효하지 않은 요청입니다.");
+        }
+
+        // 이미 다른 계정에 연동된 구글 ID인지 확인
+        userRepository.findByGoogleId(googleId)
+                .ifPresent(u -> {
+                    throw new IllegalArgumentException("이미 다른 계정에 연동된 구글 계정입니다.");
+                });
+
+        // 현재 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 구글 계정 연동
+        user.linkGoogleAccount(googleId);
+        return userRepository.save(user);
+    }
+
+    /**
+     * 구글 ID로 사용자 조회 (구글 로그인 시 사용)
+     */
+    @Transactional(readOnly = true)
+    public Optional<User> findByGoogleId(String googleId) {
+        return userRepository.findByGoogleId(googleId);
+    }
 }

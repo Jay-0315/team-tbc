@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { login, getOAuth2GoogleLoginUrl } from '@/lib/api'
+import { login } from '@/lib/api'
 import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 interface LoginModalProps {
@@ -57,8 +57,8 @@ export default function LoginModal({
   }
 
   const handleGoogleLogin = () => {
-    const googleUrl = getOAuth2GoogleLoginUrl()
-    window.location.href = googleUrl
+    // OAuth2Controller의 /google/login 엔드포인트로 직접 리다이렉트
+    window.location.href = 'http://localhost:8080/api/oauth2/google/login'
   }
 
   if (!isOpen) return null

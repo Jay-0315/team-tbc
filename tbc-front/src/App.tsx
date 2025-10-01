@@ -1,6 +1,6 @@
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import Header from '@/components/layout/Header'
@@ -31,8 +31,113 @@ export default function App() {
   const { user, logoutAsync, isLoading } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isChatModalOpen, setIsChatModalOpen] = useState(false)
+
+  // OAuth2 로그인 성공 후 처리
+  useEffect(() => {
+    const handleOAuth2LoginSuccess = async () => {
+      const loginSuccess = searchParams.get('login')
+      const googleLinked = searchParams.get('google_linked')
+      const error = searchParams.get('error')
+      
+      if (googleLinked === 'true') {
+        // Google 계정 연동 성공
+        console.log('Google account linked successfully')
+        
+        // 토큰 확인 (기존 토큰이 갱신되었을 수 있음)
+        const token = localStorage.getItem('accessToken')
+        console.log('Token in localStorage:', token ? 'exists' : 'not found')
+        
+        if (token) {
+          toast.success('Google 계정이 연동되었습니다!', {
+            description: '이제 Google 계정으로도 로그인할 수 있습니다.',
+            duration: 5000,
+          })
+          
+          // URL에서 파라미터 제거
+          setSearchParams({})
+          
+          // JWT 기반 인증: 토큰 갱신 이벤트 발생
+          console.log('Dispatching authLoginSuccess event for token refresh')
+          window.dispatchEvent(new CustomEvent('authLoginSuccess'))
+          
+          // 사용자 데이터 새로고침
+          queryClient.invalidateQueries({ queryKey: ['auth', 'user'] })
+          queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
+        } else {
+          toast.error('토큰을 찾을 수 없습니다. 다시 로그인해주세요.')
+          setSearchParams({})
+        }
+        
+      } else if (loginSuccess === 'success') {
+        // OAuth2 로그인 성공
+        console.log('OAuth2 login success detected')
+        
+        // 토큰 확인
+        const token = localStorage.getItem('accessToken')
+        console.log('Token in localStorage:', token ? 'exists' : 'not found')
+        
+        if (token) {
+          toast.success('구글 로그인이 완료되었습니다!')
+          
+          // URL에서 파라미터 제거
+          setSearchParams({})
+          
+          // JWT 기반 인증: 로그인 성공 이벤트 발생
+          console.log('Dispatching authLoginSuccess event')
+          window.dispatchEvent(new CustomEvent('authLoginSuccess'))
+          
+          // 사용자 데이터 새로고침
+          queryClient.invalidateQueries({ queryKey: ['auth', 'user'] })
+          queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
+        } else {
+          toast.error('토큰을 찾을 수 없습니다. 다시 로그인해주세요.')
+          setSearchParams({})
+        }
+        
+      } else if (error === 'signup_required') {
+        // 계정이 없음 - 회원가입 필요
+        const email = searchParams.get('email')
+        toast.error('등록되지 않은 계정입니다.', {
+          description: email 
+            ? `${email}로 먼저 회원가입을 진행해주세요.`
+            : '먼저 회원가입을 진행해주세요.',
+          duration: 5000,
+        })
+        setSearchParams({})
+      } else if (error === 'google_link_failed') {
+        // Google 계정 연동 실패
+        toast.error('Google 계정 연동에 실패했습니다.', {
+          description: '이미 다른 계정에 연동된 Google 계정일 수 있습니다.',
+          duration: 5000,
+        })
+        setSearchParams({})
+      } else if (error === 'oauth2_email_not_found') {
+        // Google에서 이메일 정보를 가져오지 못함
+        toast.error('Google 계정 정보를 가져올 수 없습니다.', {
+          description: 'Google 계정에서 이메일 권한을 허용해주세요.',
+          duration: 5000,
+        })
+        setSearchParams({})
+      } else if (error === 'oauth2_id_not_found') {
+        // Google ID를 가져오지 못함
+        toast.error('Google 인증에 실패했습니다. 다시 시도해주세요.')
+        setSearchParams({})
+      } else if (error === 'oauth2_failed') {
+        // 기타 OAuth2 로그인 실패
+        toast.error('구글 로그인에 실패했습니다. 다시 시도해주세요.')
+        setSearchParams({})
+      } else if (error === 'token_storage_failed') {
+        // 토큰 저장 실패
+        toast.error('로그인 토큰 저장에 실패했습니다. 다시 시도해주세요.')
+        setSearchParams({})
+      }
+    }
+    
+    handleOAuth2LoginSuccess()
+  }, [searchParams, setSearchParams, queryClient])
 
   // 앱 시작 시 토큰 복원은 useAuth 훅에서 처리됨
   

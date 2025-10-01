@@ -66,7 +66,6 @@ export async function fetchMyWallet(): Promise<WalletBalanceResponse> {
 
 // Events - /api/groups 엔드포인트 사용 (events 테이블)
 export async function fetchEvents(params: EventListParams = {}): Promise<Page<EventCardDTO>> {
-  console.log('fetchEvents called with params:', params)
   const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
     params: {
       page: params.page ?? 0,
@@ -79,7 +78,6 @@ export async function fetchEvents(params: EventListParams = {}): Promise<Page<Ev
       ...(params.sort && { sort: params.sort }),
     }
   })
-  console.log('fetchEvents response:', data)
   return data
 }
 

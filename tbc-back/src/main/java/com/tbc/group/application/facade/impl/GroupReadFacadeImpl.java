@@ -11,6 +11,7 @@ import com.tbc.profile.adapterin.persistence.jpa.entity.ProfileEntity;
 import com.tbc.profile.adapterin.persistence.jpa.repository.ProfileJpaRepository;
 import com.tbc.login.adapter.out.persistence.UserJpaRepository;
 import com.tbc.login.domain.User;
+import com.tbc.group.adapterout.persistence.jpa.repository.GroupMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,6 +31,7 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
     private final ProfileJpaRepository profileRepository;
     private final UserJpaRepository userRepository;
     private final FavoriteRepo favoriteRepo;
+    private final GroupMemberJpaRepository groupMemberJpaRepository;
 
     @Override
     public Long getChatRoomId(Long groupId) {
@@ -122,6 +124,13 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
                     dto.favorited = finalFavoritedEventIds.contains(dto.id);
                 }
                 
+                // 실제 참여자 수 계산
+                if (dto.id != null) {
+                    int actualJoinedCount = groupMemberJpaRepository.countByGroupIdAndStatus(dto.id, "ACTIVE");
+                    dto.joined = actualJoinedCount;
+                    System.out.println("GroupReadFacadeImpl - Group ID: " + dto.id + ", actualJoinedCount: " + actualJoinedCount);
+                }
+                
                 // 호스트 정보 설정
                 if (dto.hostId != null) {
                     ProfileEntity profile = profileMap.get(dto.hostId);
@@ -145,6 +154,13 @@ public class GroupReadFacadeImpl implements GroupReadFacade {
      * 단일 조회용: 기존 방식 유지
      */
     private GroupCardDTO enrichWithHostInfo(GroupCardDTO dto) {
+        // 실제 참여자 수 계산
+        if (dto.id != null) {
+            int actualJoinedCount = groupMemberJpaRepository.countByGroupIdAndStatus(dto.id, "ACTIVE");
+            dto.joined = actualJoinedCount;
+            System.out.println("GroupReadFacadeImpl.enrichWithHostInfo - Group ID: " + dto.id + ", actualJoinedCount: " + actualJoinedCount);
+        }
+
         if (dto.hostId == null) {
             return dto;
         }
