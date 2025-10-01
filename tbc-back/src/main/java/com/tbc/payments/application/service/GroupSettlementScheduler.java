@@ -41,14 +41,49 @@ public class GroupSettlementScheduler {
                 .toList();
         for (GroupEntity g : due) {
             try {
-                settleGroup(g);
+                settleOrCleanupHolds(g);
             } catch (Exception e) {
                 log.error("Settlement failed for group {}: {}", g.getId(), e.getMessage());
             }
         }
     }
 
-    private void settleGroup(GroupEntity g) {
+    private void settleOrCleanupHolds(GroupEntity g) {
+        // If already finalized, just cleanup residual holds deterministically
+        if ("SETTLED".equalsIgnoreCase(g.getSettlementStatus())) {
+            // Ensure all holds are CAPTURED then RELEASED (no ledger changes here)
+            holdRepo.captureByGroupId(g.getId());
+            holdRepo.releaseByGroupId(g.getId());
+            return;
+        }
+        if ("REFUNDED".equalsIgnoreCase(g.getSettlementStatus())) {
+            // Ensure any remaining HELD are refunded (idempotent) then RELEASED
+            List<WalletHold> holds = holdRepo.findActiveByGroupId(g.getId());
+            for (WalletHold h : holds) {
+                Wallet wallet = walletRepo.findByUserIdForUpdate(h.userId())
+                        .orElseGet(() -> walletRepo.saveWallet(Wallet.builder().userId(h.userId()).balance(0L).build()));
+
+                String idemKey = "MEETUP_REFUND:CREDIT:" + g.getId() + ":" + h.userId();
+                if (ledgerRepo.findByIdempotencyKey(idemKey).isEmpty()) {
+                    WalletLedger credit = WalletLedger.builder()
+                            .walletId(wallet.getId())
+                            .type(LedgerType.CREDIT)
+                            .amount(h.amount())
+                            .reason("MEETUP_REFUND")
+                            .refType("MEETUP")
+                            .refId(String.valueOf(g.getId()))
+                            .idempotencyKey(idemKey)
+                            .build();
+                    ledgerRepo.saveLedger(credit);
+
+                    wallet.setBalance(wallet.getBalance() + h.amount());
+                    walletRepo.saveWallet(wallet);
+                }
+            }
+            holdRepo.releaseByGroupId(g.getId());
+            return;
+        }
+
         int joined = memberRepo.countByGroupIdAndStatus(g.getId(), "ACTIVE");
         int min = g.getMinParticipants();
         int amountPopcorn = g.getFeeAmount() == null ? 0 : g.getFeeAmount();
@@ -57,7 +92,7 @@ public class GroupSettlementScheduler {
         if (amountWon <= 0) return;
 
         if (joined >= min) {
-            // Capture: 참가자 hold는 CAPTURE로 상태만 변경(잔액은 이미 DEBIT됨). 호스트로 CREDIT.
+            // Capture: 참가자 hold CAPTURE 후 RELEASE 처리. 호스트로 CREDIT.
             holdRepo.captureByGroupId(g.getId());
 
             Wallet host = walletRepo.findByUserIdForUpdate(g.getHostId())
@@ -79,6 +114,8 @@ public class GroupSettlementScheduler {
                 host.setBalance(host.getBalance() + total);
                 walletRepo.saveWallet(host);
             }
+            // RELEASE any remaining holds post-capture for cleanliness
+            holdRepo.releaseByGroupId(g.getId());
             // persist settlement status
             g.setSettlementStatus("SETTLED");
             g.setSettledAt(LocalDateTime.now());
