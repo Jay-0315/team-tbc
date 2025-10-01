@@ -7,9 +7,12 @@ server:
   servlet:
     session:
       cookie:
-        secure: false
-        same-site: none
+        # OAuth2 인증을 위한 세션 쿠키 설정
+        secure: false           # localhost에서는 false (운영에서는 true)
+        same-site: lax          # OAuth2는 Lax 권장 (None은 Secure=true 필수)
         http-only: true
+        path: /                 # 모든 경로에서 쿠키 사용 가능
+      timeout: 1800             # 30분 (OAuth2 플로우 완료까지 충분한 시간)
   tomcat:
     threads:
       max: 200
@@ -65,7 +68,7 @@ spring:
             authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
             token-uri: https://www.googleapis.com/oauth2/v4/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            user-name-attribute: id
+            user-name-attribute: sub
 
 
 
@@ -101,9 +104,8 @@ app:
   seed: false
   seed.always: false
   seed.reviews: false
-  # OS 무관 업로드 디렉토리 (프로젝트 루트 기준). 필요 시 절대경로로 재설정 가능
   upload:
-    dir: img
+    dir: ./img
 
 management:
   endpoints:

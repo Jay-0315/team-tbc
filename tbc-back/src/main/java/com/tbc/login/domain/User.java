@@ -25,6 +25,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String nickname;
 
+    @Column(unique = true)
+    private String googleId;  // 구글 계정 연동 ID
+
     private User(String email, String realName, String password, String nickname) {
         this.email = email;
         this.realName = realName;
@@ -38,5 +41,13 @@ public class User {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void linkGoogleAccount(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public boolean isGoogleLinked() {
+        return this.googleId != null && !this.googleId.isEmpty();
     }
 }
