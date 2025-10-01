@@ -37,11 +37,44 @@ async function joinEventRequest(eventId: number): Promise<JoinResponse> {
     await apiClient.post(`/groups/${eventId}/join`)
     return { ok: true }
   } catch (err: unknown) {
-    if (axios.isAxiosError(err) && err.response?.status === 402) {
-      // 백엔드: 잔액 부족 시 402 반환 → 프런트 표준 에러 메시지로 변환
-      throw new Error('INSUFFICIENT_BALANCE')
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status
+      const message = err.response?.data?.message || err.message
+      
+      // 402: 잔액 부족
+      if (status === 402) {
+        throw new Error('INSUFFICIENT_BALANCE')
+      }
+      
+      // 409: 중복 참가 등
+      if (status === 409) {
+        if (message?.includes('ALREADY_JOINED')) {
+          throw new Error('이미 참가한 소셜링입니다.')
+        }
+        if (message?.includes('GROUP_FULL')) {
+          throw new Error('정원이 마감되었습니다.')
+        }
+        if (message?.includes('GROUP_ALREADY_STARTED')) {
+          throw new Error('이미 시작된 소셜링입니다.')
+        }
+        if (message?.includes('GROUP_NOT_OPEN')) {
+          throw new Error('참가할 수 없는 상태입니다.')
+        }
+        throw new Error('참가할 수 없습니다.')
+      }
+      
+      // 404: 그룹을 찾을 수 없음
+      if (status === 404) {
+        throw new Error('소셜링을 찾을 수 없습니다.')
+      }
+      
+      // 401: 인증 필요
+      if (status === 401) {
+        throw new Error('로그인이 필요합니다.')
+      }
     }
-    throw err instanceof Error ? err : new Error('JOIN_FAILED')
+    
+    throw err instanceof Error ? err : new Error('신청 중 오류가 발생했습니다.')
   }
 }
 
