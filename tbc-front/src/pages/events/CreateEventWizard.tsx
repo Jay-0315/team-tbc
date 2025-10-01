@@ -304,6 +304,12 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
       const [hours, minutes] = form.eventTime.split(':')
       eventDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
 
+      // 날짜를 로컬 시간대 기준으로 YYYY-MM-DD 형식으로 변환 (UTC 변환으로 인한 날짜 차이 방지)
+      const year = form.eventDate.getFullYear()
+      const month = String(form.eventDate.getMonth() + 1).padStart(2, '0')
+      const day = String(form.eventDate.getDate()).padStart(2, '0')
+      const eventDateString = `${year}-${month}-${day}`
+
       const payload = {
         title: form.title,
         category: form.category,
@@ -316,7 +322,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         feeInfo: form.feeInfo,
         tags: form.tags,
         contentHtml: form.contentHtml,
-        eventDate: form.eventDate.toISOString().split('T')[0],
+        eventDate: eventDateString,
         eventTime: form.eventTime,
         location: form.mode === "OFFLINE" ? form.location : form.onlineLink || "",
         latitude: form.mode === "OFFLINE" ? form.lat : null,
