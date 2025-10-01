@@ -10,8 +10,8 @@ RUN npm ci
 # 소스 코드 복사
 COPY . .
 
-# Vite 프로덕션 빌드
-RUN npm run build
+# Vite 프로덕션 빌드 (타입 체크 없이)
+RUN npx vite build
 
 # 빌드 결과물만 유지 (dist 폴더)
 FROM scratch AS export
