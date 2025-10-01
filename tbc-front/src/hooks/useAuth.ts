@@ -52,11 +52,10 @@ export function useAuth() {
   // Initialize auth token on mount
   useEffect(() => {
     const initializeAuth = async () => {
-      // 수정: accessToken 키로 변경하여 api.ts의 인터셉터와 일치시킴
+      // JWT 기반 인증: localStorage에서 토큰 확인
       const storedToken = localStorage.getItem('accessToken')
       if (storedToken) {
-        // setAuthToken 호출 제거. 이제 apiClient 인터셉터가 localStorage에서 직접 토큰을 읽음.
-        setHasToken(true) // 토큰이 있으면 상태 업데이트
+        setHasToken(true)
       }
       setIsInitialized(true)
     }
@@ -64,17 +63,36 @@ export function useAuth() {
     initializeAuth()
   }, [])
 
-  // 401 에러로 인한 토큰 제거 이벤트 리스너
+  // JWT 기반 인증: 로그인 상태 변경 이벤트 리스너
   useEffect(() => {
-    const handleTokenRemoved = () => {
-      console.log('🔔 토큰 제거 이벤트 수신')
+    const handleLoginSuccess = () => {
+      console.log('useAuth: authLoginSuccess event received')
+      const token = localStorage.getItem('accessToken')
+      console.log('useAuth: Token exists:', !!token)
+      
+      if (token) {
+        setHasToken(true)
+        console.log('useAuth: hasToken set to true')
+        
+        // 사용자 데이터 새로고침
+        queryClient.invalidateQueries({ queryKey: authKeys.user() })
+        queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
+        console.log('useAuth: User queries invalidated')
+      }
+    }
+
+    const handleLogout = () => {
+      console.log('useAuth: authLogout event received')
       setHasToken(false)
+      localStorage.removeItem('accessToken')
       queryClient.setQueryData(authKeys.user(), null)
     }
 
-    window.addEventListener('authTokenRemoved', handleTokenRemoved)
+    window.addEventListener('authLoginSuccess', handleLoginSuccess)
+    window.addEventListener('authLogout', handleLogout)
     return () => {
-      window.removeEventListener('authTokenRemoved', handleTokenRemoved)
+      window.removeEventListener('authLoginSuccess', handleLoginSuccess)
+      window.removeEventListener('authLogout', handleLogout)
     }
   }, [queryClient])
 
