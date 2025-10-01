@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useJoinEvent } from '../../services/events'
+import { toast } from 'sonner'
 
 interface JoinDialogProps {
   eventId: number
@@ -49,12 +50,22 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
   const submit = async () => {
     if (!canSubmit) return
     try {
-      await mutateAsync({ qty: 1 })
-      showToast('신청 완료')
+      await mutateAsync()
+      toast.success('🎉 모임 참가가 완료되었습니다!', {
+        description: '채팅방에서 다른 참가자들과 소통해보세요.',
+        duration: 3000,
+      })
       onOpenChange(false)
+      // 페이지 리프레시
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : '신청 중 오류가 발생했습니다.'
-      showToast(message, true)
+      toast.error('참가 신청 실패', {
+        description: message,
+        duration: 3000,
+      })
     }
   }
 
@@ -118,27 +129,5 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
   )
 }
 
-function showToast(message: string, isError = false) {
-  const id = 'toast-area'
-  let area = document.getElementById(id)
-  if (!area) {
-    area = document.createElement('div')
-    area.id = id
-    area.setAttribute('role', 'status')
-    area.setAttribute('aria-live', 'polite')
-    area.style.position = 'fixed'
-    area.style.bottom = '16px'
-    area.style.left = '50%'
-    area.style.transform = 'translateX(-50%)'
-    document.body.appendChild(area)
-  }
-  const el = document.createElement('div')
-  el.textContent = message
-  el.className = `mt-1 px-3 py-2 rounded text-sm ${isError ? 'bg-red-600 text-white' : 'bg-black text-white'}`
-  area.appendChild(el)
-  setTimeout(() => {
-    area?.removeChild(el)
-  }, 1500)
-}
 
 

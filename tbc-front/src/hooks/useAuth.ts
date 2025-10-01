@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
 import type { User, LoginRequest, LoginResponse, SignupRequest, SignupResponse } from '@/types/auth'
+import { toast } from 'sonner'
 
 // Auth API functions
 const authApi = {
@@ -137,6 +138,15 @@ export function useAuth() {
           queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
         }
       }
+      
+      // 로그인 성공 이벤트 발생
+      window.dispatchEvent(new CustomEvent('authLoginSuccess'))
+      
+      // 성공 팝업 및 리프레시
+      toast.success('로그인에 성공했습니다!')
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     },
     onError: (error: any) => {
       console.error('Login failed:', error)
@@ -149,6 +159,12 @@ export function useAuth() {
     onSuccess: () => {
       // After successful signup, user needs to login
       queryClient.invalidateQueries({ queryKey: authKeys.user() })
+      
+      // 성공 팝업 및 리프레시
+      toast.success('회원가입이 완료되었습니다!')
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     },
     onError: (error: any) => {
       console.error('Signup failed:', error)
@@ -163,6 +179,12 @@ export function useAuth() {
       localStorage.removeItem('accessToken')
       setHasToken(false) // 토큰 상태 업데이트
       queryClient.setQueryData(authKeys.user(), null)
+      
+      // 성공 팝업 및 리프레시
+      toast.success('로그아웃되었습니다.')
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     },
     onError: (error: any) => {
       console.error('Logout failed:', error)
@@ -171,6 +193,12 @@ export function useAuth() {
       localStorage.removeItem('accessToken')
       setHasToken(false) // 토큰 상태 업데이트
       queryClient.setQueryData(authKeys.user(), null)
+      
+      // 에러가 발생해도 로컬 상태는 클리어되므로 성공으로 처리
+      toast.success('로그아웃되었습니다.')
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     }
   })
 

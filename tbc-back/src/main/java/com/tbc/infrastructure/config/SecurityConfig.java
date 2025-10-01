@@ -136,6 +136,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/events/**").permitAll()
                         .requestMatchers("/api/images/upload").permitAll() // 이미지 업로드 허용
                         .requestMatchers("/api/nominatim/**").permitAll() // Nominatim 프록시 허용
+                        .requestMatchers("/api/payments/**").permitAll() // 결제 관련 엔드포인트 허용
                         // 모니터링 허용
                         .requestMatchers("/actuator/**").permitAll()
 

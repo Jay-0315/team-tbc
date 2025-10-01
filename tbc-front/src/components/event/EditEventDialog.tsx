@@ -89,6 +89,10 @@ export function EditEventDialog({ event, children }: EditEventDialogProps) {
           toast.success('모임이 성공적으로 수정되었습니다!')
           setOpen(false)
           reset()
+          // 페이지 리프레시
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
         },
         onError: (error) => {
           toast.error(`모임 수정에 실패했습니다: ${error.message}`)
@@ -114,7 +118,7 @@ export function EditEventDialog({ event, children }: EditEventDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>

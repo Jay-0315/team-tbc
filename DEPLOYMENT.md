@@ -1,49 +1,99 @@
 # TBC 프로젝트 배포 가이드
 
-## 🚀 서버 배포 방법
+## 🚀 Ubuntu 서버 배포 가이드
 
-### Windows 서버 배포
+### 1. 서버 준비
 ```bash
-# 1. 자동 배포 (권장)
-deploy.bat
+# 시스템 업데이트
+sudo apt update && sudo apt upgrade -y
 
-# 2. 수동 배포
-git pull origin dev
-build.bat
-docker-compose up -d
+# Docker 설치
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+
+# Docker Compose 설치
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Git 설치
+sudo apt install git -y
 ```
 
-### Linux 서버 배포
+### 2. 프로젝트 클론
 ```bash
-# 1. 자동 배포 (권장)
+# 프로젝트 디렉토리로 이동
+cd /opt
+sudo git clone https://github.com/Jay-0315/team-tbc.git
+sudo chown -R $USER:$USER team-tbc
+cd team-tbc
+```
+
+### 3. 환경 설정
+```bash
+# 환경 변수 파일 생성 (필요시)
+cp .env.example .env
+# .env 파일을 편집하여 필요한 환경 변수 설정
+```
+
+### 4. Docker 이미지 빌드 및 배포
+```bash
+# 실행 권한 부여
+chmod +x deploy.sh
+
+# 자동 배포 실행
 ./deploy.sh
-
-# 2. 수동 배포
-git pull origin dev
-chmod +x build.sh
-./build.sh
-docker-compose up -d
 ```
 
-## 📋 배포 전 체크리스트
-
-### 필수 요구사항
-- [ ] Docker 및 Docker Compose 설치
-- [ ] Git 저장소 클론 완료
-- [ ] 포트 80, 5173 사용 가능
-- [ ] 최소 2GB RAM 권장
-
-### 환경 설정
-- [ ] `.env` 파일 설정 (필요시)
-- [ ] 데이터베이스 연결 정보 확인
-- [ ] 외부 API 키 설정 (필요시)
-
-## 🔧 서비스 관리
-
-### 서비스 상태 확인
+### 5. 서비스 확인
 ```bash
+# 컨테이너 상태 확인
 docker-compose ps
+
+# 로그 확인
+docker-compose logs -f
+
+# 웹 서비스 접속 확인
+curl http://localhost/health
 ```
+
+### 6. 방화벽 설정 (필요시)
+```bash
+# UFW 방화벽 설정
+sudo ufw allow 22    # SSH
+sudo ufw allow 80    # HTTP
+sudo ufw allow 443   # HTTPS (SSL 인증서 설정 시)
+sudo ufw enable
+```
+
+## 🔧 개발 환경 설정
+
+### Windows 환경
+```cmd
+# 배포 스크립트 실행
+deploy.bat
+```
+
+### Linux/macOS 환경
+```bash
+# 배포 스크립트 실행
+./deploy.sh
+```
+
+## 📋 서비스 구성
+
+### 컨테이너 구성
+- **tbc-front**: React 프론트엔드 (포트 5173)
+- **tbc-back**: Spring Boot 백엔드 (포트 8080)
+- **tbc-nginx**: Nginx 리버스 프록시 (포트 80)
+
+### 네트워크
+- **tbc-net**: Docker 네트워크로 컨테이너 간 통신
+
+### 볼륨
+- **./tbc-back/img**: 업로드된 이미지 파일 영구 저장
+
+## 🛠️ 유지보수
 
 ### 로그 확인
 ```bash
@@ -53,7 +103,7 @@ docker-compose logs -f
 # 특정 서비스 로그
 docker-compose logs -f tbc-front
 docker-compose logs -f tbc-back
-docker-compose logs -f nginx
+docker-compose logs -f tbc-nginx
 ```
 
 ### 서비스 재시작
@@ -62,119 +112,63 @@ docker-compose logs -f nginx
 docker-compose restart
 
 # 특정 서비스 재시작
-docker-compose restart tbc-back
+docker-compose restart tbc-front
 ```
 
-### 서비스 중지
+### 이미지 업데이트
 ```bash
-docker-compose down
+# 코드 변경 후 재배포
+git pull origin master
+./deploy.sh
 ```
 
-## 🌐 서비스 접속
-
-- **프론트엔드**: http://localhost
-- **백엔드 API**: http://localhost/api
-- **헬스체크**: http://localhost/health
-
-## 🐛 문제 해결
-
-### 일반적인 문제들
-
-#### 1. 포트 충돌
+### 데이터 백업
 ```bash
-# 포트 사용 중인 프로세스 확인
-netstat -ano | findstr :80
-netstat -ano | findstr :5173
+# 이미지 파일 백업
+tar -czf backup-$(date +%Y%m%d).tar.gz tbc-back/img/
 
-# 프로세스 종료 후 재시작
-docker-compose down
-docker-compose up -d
+# 데이터베이스 백업 (MySQL 사용 시)
+docker-compose exec tbc-back mysqldump -u root -p database_name > backup-$(date +%Y%m%d).sql
 ```
 
-#### 2. 이미지 빌드 실패
+## 🚨 문제 해결
+
+### 포트 충돌
 ```bash
-# Docker 캐시 정리
-docker system prune -a
+# 포트 사용 확인
+sudo netstat -tlnp | grep :80
+sudo netstat -tlnp | grep :8080
 
-# 다시 빌드
-build.bat  # Windows
-./build.sh # Linux
+# 프로세스 종료
+sudo kill -9 <PID>
 ```
 
-#### 3. 컨테이너 시작 실패
+### 컨테이너 재시작 실패
 ```bash
-# 로그 확인
-docker-compose logs
+# 컨테이너 강제 제거
+docker-compose down -v --remove-orphans
+docker system prune -f
 
-# 볼륨 정리 후 재시작
-docker-compose down -v
-docker-compose up -d
+# 재시작
+./deploy.sh
 ```
 
-#### 4. 데이터베이스 연결 실패
-- 데이터베이스 서비스 상태 확인
-- 연결 정보 확인
-- 네트워크 설정 확인
-
-## 📊 모니터링
-
-### 리소스 사용량 확인
+### 디스크 공간 부족
 ```bash
-docker stats
+# Docker 정리
+docker system prune -a -f
+docker volume prune -f
+
+# 로그 파일 정리
+sudo journalctl --vacuum-time=7d
 ```
-
-### 디스크 사용량 확인
-```bash
-docker system df
-```
-
-### 컨테이너 상태 확인
-```bash
-docker-compose ps
-```
-
-## 🔄 업데이트 배포
-
-### 코드 업데이트 후 배포
-```bash
-# 1. 자동 배포 (권장)
-deploy.bat  # Windows
-./deploy.sh # Linux
-
-# 2. 수동 배포
-git pull origin dev
-docker-compose down
-build.bat  # Windows
-./build.sh # Linux
-docker-compose up -d
-```
-
-### 데이터베이스 마이그레이션
-```bash
-# 백엔드 컨테이너에서 실행
-docker exec -it tbc-back java -jar app.jar --spring.profiles.active=prod
-```
-
-## 🛡️ 보안 고려사항
-
-### 프로덕션 환경
-- [ ] CORS 설정 검토
-- [ ] JWT 토큰 만료 시간 설정
-- [ ] 데이터베이스 보안 설정
-- [ ] HTTPS 설정 (권장)
-- [ ] 방화벽 설정
-
-### 환경 변수 관리
-- [ ] 민감한 정보는 환경 변수로 관리
-- [ ] `.env` 파일을 Git에 커밋하지 않음
-- [ ] 프로덕션 환경별 설정 분리
 
 ## 📞 지원
 
-문제가 발생하면 다음을 확인해주세요:
-1. 로그 파일 확인
-2. 서비스 상태 확인
-3. 네트워크 연결 확인
-4. 리소스 사용량 확인
+문제가 발생하면 다음을 확인하세요:
+1. Docker 및 Docker Compose 설치 상태
+2. 포트 80, 8080 사용 가능 여부
+3. 방화벽 설정
+4. 서버 리소스 (메모리, 디스크 공간)
 
-추가 지원이 필요한 경우 개발팀에 문의해주세요.
+추가 지원이 필요한 경우 프로젝트 이슈를 생성해주세요.

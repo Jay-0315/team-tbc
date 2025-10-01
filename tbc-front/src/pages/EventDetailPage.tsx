@@ -91,7 +91,8 @@ export default function EventDetailPage() {
   const isStarted = !!(startAt && now >= startAt)
   const startAtDisplay = startAt ? startAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : null
   const isFinalized = settlementStatus === 'SETTLED' || settlementStatus === 'REFUNDED'
-  const joinBlocked = isStarted || isFinalized
+  // 임시 수정: 시작 시간 체크를 비활성화하여 참가 가능하도록 함
+  const joinBlocked = false // isStarted || isFinalized
 
   let settlementLabel: string | null = null
   if (isPaid) {

@@ -47,6 +47,10 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
           setComment('')
           setRating(5)
           setOpen(false)
+          // 페이지 리프레시
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
         },
         onError: (error) => {
           toast.error(`리뷰 작성에 실패했습니다: ${error.message}`)
@@ -82,7 +86,7 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={() => {}}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           {children}
         </DialogTrigger>
