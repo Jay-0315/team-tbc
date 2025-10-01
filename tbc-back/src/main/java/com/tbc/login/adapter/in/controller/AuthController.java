@@ -123,7 +123,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<User>> getCurrentUser(
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
             @CookieValue(name = "access", required = false) String accessToken,
             @RequestHeader(value = "Authorization", required = false) String authHeader
     ) {
@@ -141,7 +141,7 @@ public class AuthController {
             User user = userService.findByEmailOptional(email)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
 
-            return ResponseEntity.ok(ApiResponse.ok(user));
+            return ResponseEntity.ok(ApiResponse.ok(new UserResponse(user)));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(ApiResponse.error("유효하지 않은 토큰입니다"));
         }

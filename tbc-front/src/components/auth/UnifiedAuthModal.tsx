@@ -16,7 +16,7 @@ interface UnifiedAuthModalProps {
 }
 
 export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: UnifiedAuthModalProps) {
-  const { loginAsync, signupAsync, isLoggingIn, isRegistering } = useAuth()
+  const { loginAsync, signupAsync, isLoggingIn, isSigningUp } = useAuth()
   const [mode, setMode] = useState<'login' | 'register'>(initialMode)
   const [formData, setFormData] = useState({
     email: '',
@@ -91,14 +91,29 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
         return
       }
       
-      if (formData.password.length < 6) {
-        setError('비밀번호는 최소 6자 이상이어야 합니다.')
+      if (formData.password.length < 8) {
+        setError('비밀번호는 최소 8자 이상이어야 합니다.')
         return
       }
       
       try {
         await signupAsync({ email: formData.email, password: formData.password, realName: formData.realName, nickname: formData.nickname })
-        onClose()
+        // 회원가입 성공 후 자동 로그인
+        try {
+          await loginAsync({ email: formData.email, password: formData.password })
+          onClose()
+        } catch {
+          // 자동 로그인 실패 시에도 회원가입은 성공했으므로 모달을 닫고 사용자에게 로그인하도록 안내
+          setError('회원가입은 완료되었습니다. 다시 로그인해주세요.')
+          setMode('login')
+          setFormData({
+            email: formData.email,
+            password: '',
+            confirmPassword: '',
+            realName: '',
+            nickname: ''
+          })
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.')
       }
@@ -198,7 +213,7 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                           onChange={(e) => handleInputChange('realName', e.target.value)}
                           className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-xl"
                           placeholder="실명을 입력하세요"
-                          disabled={isLoggingIn || isRegistering}
+                          disabled={isLoggingIn || isSigningUp}
                         />
                       </div>
                     </div>
@@ -215,7 +230,7 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                           onChange={(e) => handleInputChange('nickname', e.target.value)}
                           className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-xl"
                           placeholder="닉네임을 입력하세요"
-                          disabled={isLoggingIn || isRegistering}
+                          disabled={isLoggingIn || isSigningUp}
                         />
                       </div>
                     </div>
@@ -237,7 +252,7 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-xl"
                     placeholder="이메일을 입력하세요"
-                    disabled={isLoggingIn || isRegistering}
+                    disabled={isLoggingIn || isSigningUp}
                   />
                 </div>
               </div>
@@ -255,14 +270,14 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     className="pl-9 sm:pl-10 pr-9 sm:pr-10 h-10 sm:h-12 text-sm sm:text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-xl"
-                    placeholder="비밀번호를 입력하세요"
-                    disabled={isLoggingIn || isRegistering}
+                    placeholder={mode === 'register' ? "비밀번호를 입력하세요 (최소 8자)" : "비밀번호를 입력하세요"}
+                    disabled={isLoggingIn || isSigningUp}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    disabled={isLoggingIn || isRegistering}
+                    disabled={isLoggingIn || isSigningUp}
                     aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                   >
                     {showPassword ? <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" /> : <Eye className="w-3 h-3 sm:w-4 sm:h-4" />}
@@ -292,13 +307,13 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                         className="pl-9 sm:pl-10 pr-9 sm:pr-10 h-10 sm:h-12 text-sm sm:text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-xl"
                         placeholder="비밀번호를 다시 입력하세요"
-                        disabled={isLoggingIn || isRegistering}
+                        disabled={isLoggingIn || isSigningUp}
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        disabled={isLoggingIn || isRegistering}
+                        disabled={isLoggingIn || isSigningUp}
                         aria-label={showConfirmPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                       >
                         {showConfirmPassword ? <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" /> : <Eye className="w-3 h-3 sm:w-4 sm:h-4" />}
@@ -323,10 +338,10 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
               {/* 제출 버튼 */}
               <Button
                 type="submit"
-                disabled={isLoggingIn || isRegistering}
+                disabled={isLoggingIn || isSigningUp}
                 className="w-full h-10 sm:h-12 text-sm sm:text-base bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {isLoggingIn || isRegistering ? (
+                {isLoggingIn || isSigningUp ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                     {mode === 'login' ? '로그인 중...' : '회원가입 중...'}

@@ -43,6 +43,7 @@ type Form = {
   location: string
   lat: number | null
   lng: number | null
+  onlineLink: string | null
   imagePath: string | null
   capacity: number
   joined: number
@@ -60,6 +61,16 @@ const CATEGORIES = [
   { value: "CULTURE", label: "문화" },
   { value: "ETC", label: "기타" }
 ] as const
+
+// URL 유효성 검사 함수
+const isValidUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 const TIME_OPTIONS = [
   { value: "09:00", label: "오전 9:00" },
@@ -118,6 +129,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
     location: "",
     lat: null,
     lng: null,
+    onlineLink: null,
     imagePath: null,
     capacity: 10,
     joined: 0,
@@ -175,10 +187,19 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         newErrors.eventTime = "이벤트 시간을 선택해주세요"
       }
 
-      if (!form.location.trim()) {
-        newErrors.location = "장소를 검색하고 선택해주세요"
-      } else if (form.lat === null || form.lng === null) {
-        newErrors.location = "장소를 검색하여 지도에서 위치를 확인해주세요"
+      // 오프라인 모임일 때는 장소 필수, 온라인 모임일 때는 링크 필수
+      if (form.mode === "OFFLINE") {
+        if (!form.location.trim()) {
+          newErrors.location = "장소를 검색하고 선택해주세요"
+        } else if (form.lat === null || form.lng === null) {
+          newErrors.location = "장소를 검색하여 지도에서 위치를 확인해주세요"
+        }
+      } else if (form.mode === "ONLINE") {
+        if (!form.onlineLink?.trim()) {
+          newErrors.onlineLink = "화상 회의 링크를 입력해주세요"
+        } else if (!isValidUrl(form.onlineLink)) {
+          newErrors.onlineLink = "올바른 URL 형식을 입력해주세요 (예: https://zoom.us/...)"
+        }
       }
 
       if (form.feeType === "PAID") {
@@ -297,9 +318,9 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         contentHtml: form.contentHtml,
         eventDate: form.eventDate.toISOString().split('T')[0],
         eventTime: form.eventTime,
-        location: form.location,
-        latitude: form.lat,
-        longitude: form.lng,
+        location: form.mode === "OFFLINE" ? form.location : form.onlineLink || "",
+        latitude: form.mode === "OFFLINE" ? form.lat : null,
+        longitude: form.mode === "OFFLINE" ? form.lng : null,
         imagePath: form.imagePath
       }
 
@@ -345,9 +366,9 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
       {/* 배경 패턴 - 페이지 모드에서만 표시 */}
       {!isModal && (
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-pink-500/5"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-400/5 to-amber-400/5"></div>
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 25px 25px, rgba(239, 68, 68, 0.1) 2px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 25px 25px, rgba(251, 146, 60, 0.1) 2px, transparent 0)`,
             backgroundSize: '50px 50px'
           }}></div>
         </div>
@@ -422,7 +443,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
 
         {/* 에러 메시지 */}
         {errors.submit && (
-          <div className="flex gap-3 items-center p-6 mb-8 text-orange-700 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-red-200 shadow-lg dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-800 dark:text-red-300">
+          <div className="flex gap-3 items-center p-6 mb-8 text-red-700 bg-gradient-to-r from-red-50 to-red-50 rounded-2xl border border-red-200 shadow-lg dark:from-red-900/20 dark:to-red-900/20 dark:border-red-800 dark:text-red-300">
             <div className="flex flex-shrink-0 justify-center items-center w-8 h-8 bg-red-100 rounded-full dark:bg-red-900/30">
               <AlertCircle className="w-5 h-5" />
             </div>
@@ -436,7 +457,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         {/* 1단계: 기본 정보 */}
         {step === 1 && (
           <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
-            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
+            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-orange-400/10 to-amber-400/10 dark:from-orange-400/20 dark:to-amber-400/20 dark:border-gray-700">
               <CardTitle className="flex gap-3 items-center text-2xl">
                 <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl">
                   <Users className="w-5 h-5 text-white" />
@@ -514,8 +535,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
               </div>
 
               {/* 주제 */}
-              <div className="space-y-2">
-                <Label htmlFor="topic" className="text-sm font-medium">
+              <div className="space-y-3">
+                <Label htmlFor="topic" className="text-base font-semibold text-gray-900 dark:text-white">
                   주제 *
                 </Label>
                 <Input
@@ -523,21 +544,26 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   value={form.topic}
                   onChange={(e) => updateForm("topic", e.target.value)}
                   placeholder="예: 새로운 맛집을 찾아 떠나는 여행"
-                  className={cn(errors.topic && "border-orange-400")}
+                  className={cn(
+                    "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
+                    errors.topic 
+                      ? "border-orange-400 focus:border-orange-500" 
+                      : "border-gray-200 dark:border-gray-600 focus:border-orange-500"
+                  )}
                   aria-label="소셜링 주제"
                 />
                 {errors.topic && (
-                  <p className="flex gap-1 items-center text-sm text-red-600">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.topic}
-                  </p>
+                  <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                    <AlertCircle className="w-4 h-4 text-red-500" />
+                    <p className="text-sm text-red-600 dark:text-red-400">{errors.topic}</p>
+                  </div>
                 )}
               </div>
 
               {/* 인원 수 */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="minParticipants" className="text-sm font-medium">
+                <div className="space-y-3">
+                  <Label htmlFor="minParticipants" className="text-base font-semibold text-gray-900 dark:text-white">
                     최소 인원 *
                   </Label>
                   <Input
@@ -547,19 +573,24 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     max="30"
                     value={form.minParticipants}
                     onChange={(e) => updateForm("minParticipants", parseInt(e.target.value) || 1)}
-                    className={cn(errors.minParticipants && "border-orange-400")}
+                    className={cn(
+                      "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
+                      errors.minParticipants 
+                        ? "border-orange-400 focus:border-orange-500" 
+                        : "border-gray-200 dark:border-gray-600 focus:border-orange-500"
+                    )}
                     aria-label="최소 참가 인원"
                   />
                   {errors.minParticipants && (
-                    <p className="flex gap-1 items-center text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.minParticipants}
-                    </p>
+                    <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-600 dark:text-red-400">{errors.minParticipants}</p>
+                    </div>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="maxParticipants" className="text-sm font-medium">
+                <div className="space-y-3">
+                  <Label htmlFor="maxParticipants" className="text-base font-semibold text-gray-900 dark:text-white">
                     최대 인원 * (최대 30명)
                   </Label>
                   <Input
@@ -569,14 +600,19 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     max="30"
                     value={form.maxParticipants}
                     onChange={(e) => updateForm("maxParticipants", parseInt(e.target.value) || 1)}
-                    className={cn(errors.maxParticipants && "border-orange-400")}
+                    className={cn(
+                      "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
+                      errors.maxParticipants 
+                        ? "border-orange-400 focus:border-orange-500" 
+                        : "border-gray-200 dark:border-gray-600 focus:border-orange-500"
+                    )}
                     aria-label="최대 참가 인원"
                   />
                   {errors.maxParticipants && (
-                    <p className="flex gap-1 items-center text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.maxParticipants}
-                    </p>
+                    <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-600 dark:text-red-400">{errors.maxParticipants}</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -585,7 +621,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 <Button 
                   onClick={next} 
                   size="lg" 
-                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-orange-500 hover:to-amber-500 hover:shadow-xl hover:scale-105"
                 >
                   다음 단계
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -600,7 +636,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         {/* 2단계: 상세 정보 */}
         {step === 2 && (
           <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
-            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
+            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-orange-400/10 to-amber-400/10 dark:from-orange-400/20 dark:to-amber-400/20 dark:border-gray-700">
               <CardTitle className="flex gap-3 items-center text-2xl">
                 <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl">
                   <CalendarIcon className="w-5 h-5 text-white" />
@@ -627,7 +663,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.mode === "OFFLINE"
-                          ? "border-orange-400 bg-red-50 dark:bg-red-900/20 text-orange-700 dark:text-red-300"
+                          ? "border-orange-400 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -643,7 +679,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.mode === "ONLINE"
-                          ? "border-orange-400 bg-red-50 dark:bg-red-900/20 text-orange-700 dark:text-red-300"
+                          ? "border-orange-400 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -672,7 +708,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                       className={cn(
                         "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
                         form.feeType === "FREE"
-                          ? "border-orange-400 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300"
+                          ? "border-orange-400 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
                           : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                       )}
                     >
@@ -704,7 +740,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 </RadioGroup>
 
                 {form.feeType === "PAID" && (
-                  <div className="p-6 space-y-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-200 dark:from-orange-900/10 dark:to-yellow-900/10 dark:border-orange-800">
+                  <div className="p-6 space-y-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-200 dark:from-orange-900/10 dark:to-amber-900/10 dark:border-orange-800">
                     <div className="space-y-3">
                       <Label htmlFor="feeAmount" className="text-base font-semibold text-gray-900 dark:text-white">
                         필요 팝콘 (개) *
@@ -719,8 +755,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                         className={cn(
                           "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                           errors.feeAmount 
-                            ? "border-orange-400 focus:border-orange-400" 
-                            : "border-orange-200 dark:border-orange-700 focus:border-orange-400"
+                            ? "border-orange-400 focus:border-orange-500" 
+                            : "border-orange-200 dark:border-orange-700 focus:border-orange-500"
                         )}
                         aria-label="참가비 금액"
                       />
@@ -744,8 +780,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                         className={cn(
                           "border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
                           errors.feeInfo 
-                            ? "border-orange-400 focus:border-orange-400" 
-                            : "border-orange-200 dark:border-orange-700 focus:border-orange-400"
+                            ? "border-orange-400 focus:border-orange-500" 
+                            : "border-orange-200 dark:border-orange-700 focus:border-orange-500"
                         )}
                         aria-label="참가비 안내 사항"
                         rows={3}
@@ -763,8 +799,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
 
               {/* 날짜와 시간 */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">이벤트 날짜 *</Label>
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold text-gray-900 dark:text-white">이벤트 날짜 *</Label>
                   <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                     <PopoverTrigger asChild>
                       <Button
@@ -827,7 +863,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                           day_range_end: "day-range-end",
                           day_selected:
                             "bg-orange-400 text-white hover:bg-orange-500 hover:text-white focus:bg-orange-400 focus:text-white",
-                          day_today: "bg-red-100 text-orange-700 dark:bg-red-900/20 dark:text-red-300",
+                          day_today: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300",
                           day_outside:
                             "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
                           day_disabled: "text-muted-foreground opacity-50",
@@ -839,15 +875,15 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     </PopoverContent>
                   </Popover>
                   {errors.eventDate && (
-                    <p className="flex gap-1 items-center text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.eventDate}
-                    </p>
+                    <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-600 dark:text-red-400">{errors.eventDate}</p>
+                    </div>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">이벤트 시간 *</Label>
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold text-gray-900 dark:text-white">이벤트 시간 *</Label>
                   <Select value={form.eventTime} onValueChange={(value) => updateForm("eventTime", value)}>
                     <SelectTrigger className={cn(
                       "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
@@ -866,99 +902,128 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     </SelectContent>
                   </Select>
                   {errors.eventTime && (
-                    <p className="flex gap-1 items-center text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.eventTime}
-                    </p>
+                    <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-600 dark:text-red-400">{errors.eventTime}</p>
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* 장소 검색 */}
-              <LocationSearch
-                initialLocation={form.location}
-                initialLat={form.lat || undefined}
-                initialLng={form.lng || undefined}
-                onLocationChange={(location, lat, lng) => {
-                  setForm(prev => ({ ...prev, location, lat, lng }))
-                  // 장소 에러 제거
-                  if (errors.location) {
-                    setErrors(prev => ({ ...prev, location: "" }))
-                  }
-                }}
-                error={errors.location}
-              />
+              {/* 장소 검색 (오프라인) 또는 화상 링크 (온라인) */}
+              {form.mode === "OFFLINE" ? (
+                <LocationSearch
+                  initialLocation={form.location}
+                  initialLat={form.lat || undefined}
+                  initialLng={form.lng || undefined}
+                  onLocationChange={(location, lat, lng) => {
+                    setForm(prev => ({ ...prev, location, lat, lng }))
+                    // 장소 에러 제거
+                    if (errors.location) {
+                      setErrors(prev => ({ ...prev, location: "" }))
+                    }
+                  }}
+                  error={errors.location}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <Label htmlFor="onlineLink" className="text-base font-semibold text-gray-900 dark:text-white">
+                    화상 회의 링크 *
+                  </Label>
+                  <Input
+                    id="onlineLink"
+                    type="url"
+                    value={form.onlineLink || ""}
+                    onChange={(e) => updateForm("onlineLink", e.target.value)}
+                    placeholder="예: https://zoom.us/j/123456789 또는 https://meet.google.com/abc-defg-hij"
+                    className={cn(
+                      "h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20",
+                      errors.onlineLink 
+                        ? "border-orange-400 focus:border-orange-500" 
+                        : "border-gray-200 dark:border-gray-600 focus:border-orange-500"
+                    )}
+                    aria-label="화상 회의 링크"
+                  />
+                  {errors.onlineLink && (
+                    <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-600 dark:text-red-400">{errors.onlineLink}</p>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Zoom, Google Meet, Microsoft Teams 등의 링크를 입력해주세요
+                  </p>
+                </div>
+              )}
 
               {/* 이미지 업로드 */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="image-upload" className="flex gap-2 items-center text-base font-semibold text-gray-900 dark:text-white">
-                    <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    대표 이미지 (선택사항)
-                  </Label>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex gap-3 items-center">
-                      <Input
-                        id="image-upload"
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                        onChange={handleImageUpload}
-                        disabled={uploadingImage}
-                        className="h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-purple-500/20 border-gray-200 dark:border-gray-600 focus:border-purple-500"
-                        aria-label="이미지 파일 선택"
-                      />
-                      {uploadingImage && (
-                        <div className="flex gap-2 items-center text-sm text-purple-600 dark:text-purple-400">
-                          <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          업로드 중...
-                        </div>
-                      )}
-                    </div>
-                    
-                    {errors.image && (
-                      <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
-                        <AlertCircle className="w-4 h-4 text-red-500" />
-                        <p className="text-sm text-red-600 dark:text-red-400">{errors.image}</p>
+              <div className="space-y-3">
+                <Label htmlFor="image-upload" className="flex gap-2 items-center text-base font-semibold text-gray-900 dark:text-white">
+                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  대표 이미지 (선택사항)
+                                </Label>
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-3 items-center">
+                    <Input
+                      id="image-upload"
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                      className="h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20 border-gray-200 dark:border-gray-600 focus:border-orange-500"
+                      aria-label="이미지 파일 선택"
+                    />
+                    {uploadingImage && (
+                      <div className="flex gap-2 items-center text-sm text-orange-600 dark:text-orange-400">
+                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        업로드 중...
                       </div>
                     )}
-                    
-                    {form.imagePath && (
-                      <div className="p-3 bg-green-50 rounded-lg border border-green-200 dark:bg-green-900/20 dark:border-green-800">
-                        <div className="flex gap-2 items-center">
-                          <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-green-700 dark:text-green-300">이미지 업로드 완료</p>
-                            <p className="text-xs text-green-600 dark:text-green-400">{form.imagePath}</p>
-                          </div>
-                          {form.imagePath.startsWith('/uploads/') && (
-                            <img 
-                              src={`http://localhost:8080${form.imagePath}`} 
-                              alt="업로드된 이미지 미리보기" 
-                              className="object-cover w-16 h-16 rounded-lg border border-green-300"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      JPG, JPEG, PNG, GIF, WEBP 형식 지원 (최대 5MB)
-                    </p>
                   </div>
+                  
+                  {errors.image && (
+                    <div className="flex gap-2 items-center p-3 bg-red-50 rounded-lg dark:bg-red-900/20">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-600 dark:text-red-400">{errors.image}</p>
+                    </div>
+                  )}
+                  
+                  {form.imagePath && (
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200 dark:bg-green-900/20 dark:border-green-800">
+                      <div className="flex gap-2 items-center">
+                        <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-green-700 dark:text-green-300">이미지 업로드 완료</p>
+                          <p className="text-xs text-green-600 dark:text-green-400">{form.imagePath}</p>
+                        </div>
+                        {form.imagePath.startsWith('/uploads/') && (
+                          <img 
+                            src={`http://localhost:8080${form.imagePath}`} 
+                            alt="업로드된 이미지 미리보기" 
+                            className="object-cover w-16 h-16 rounded-lg border border-green-300"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    JPG, JPEG, PNG, GIF, WEBP 형식 지원 (최대 5MB)
+                  </p>
                 </div>
               </div>
 
               {/* 태그 */}
-              <div className="space-y-2">
-                <Label className="flex gap-2 items-center text-sm font-medium">
-                  <Tag className="w-4 h-4" />
+              <div className="space-y-3">
+                <Label className="flex gap-2 items-center text-base font-semibold text-gray-900 dark:text-white">
+                  <Tag className="w-5 h-5" />
                   태그 (선택사항)
                 </Label>
                 <div className="flex gap-2">
@@ -967,7 +1032,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
                     placeholder="태그를 입력하고 Enter를 누르세요"
-                    className="flex-1"
+                    className="flex-1 h-12 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20 border-gray-200 dark:border-gray-600 focus:border-orange-500"
                     aria-label="태그 입력"
                     maxLength={20}
                   />
@@ -977,6 +1042,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     size="sm"
                     onClick={addTag}
                     disabled={!tagInput.trim() || form.tags.length >= 10}
+                    className="h-12 px-4 border-2 border-gray-200 dark:border-gray-600 hover:border-orange-500 hover:bg-orange-50 rounded-xl"
                   >
                     <Plus className="w-4 h-4" />
                   </Button>
@@ -998,7 +1064,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   최대 10개까지 추가 가능합니다
                 </p>
               </div>
@@ -1017,7 +1083,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                 <Button 
                   onClick={next} 
                   size="lg" 
-                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-orange-500 hover:to-amber-500 hover:shadow-xl hover:scale-105"
                 >
                   다음 단계
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1032,7 +1098,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
         {/* 3단계: 내용 작성 */}
         {step === 3 && (
           <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-gray-800/80">
-            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 dark:border-gray-700">
+            <CardHeader className="bg-gradient-to-r border-b border-gray-100 from-orange-400/10 to-amber-400/10 dark:from-orange-400/20 dark:to-amber-400/20 dark:border-gray-700">
               <CardTitle className="flex gap-3 items-center text-2xl">
                 <div className="flex justify-center items-center w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl">
                   <Tag className="w-5 h-5 text-white" />
@@ -1044,8 +1110,8 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8 space-y-8">
-              <div className="space-y-2">
-                <Label htmlFor="content" className="text-sm font-medium">
+              <div className="space-y-3">
+                <Label htmlFor="content" className="text-base font-semibold text-gray-900 dark:text-white">
                   상세 내용 *
                 </Label>
                 <Textarea
@@ -1053,21 +1119,21 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   value={form.contentHtml}
                   onChange={(e) => updateForm("contentHtml", e.target.value)}
                   placeholder="모임에 대한 상세한 내용을 작성해주세요.&#10;&#10;예시:&#10;- 모임 목적과 기대효과&#10;- 준비물이나 주의사항&#10;- 일정 및 진행 방식&#10;- 연락처 및 문의사항"
-                  className="min-h-[200px]"
+                  className="min-h-[200px] text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-orange-500/20 border-gray-200 dark:border-gray-600 focus:border-orange-500"
                   aria-label="소셜링 상세 내용"
                   rows={10}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   참가자들이 모임에 대해 잘 이해할 수 있도록 자세히 작성해주세요
                 </p>
               </div>
 
               {/* 미리보기 */}
               {form.contentHtml && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">미리보기</Label>
-                  <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 min-h-[100px]">
-                    <div className="text-sm text-gray-700 whitespace-pre-wrap dark:text-gray-300">
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold text-gray-900 dark:text-white">미리보기</Label>
+                  <div className="p-6 border-2 rounded-xl bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800 min-h-[100px]">
+                    <div className="text-base text-gray-700 whitespace-pre-wrap dark:text-gray-300">
                       {form.contentHtml}
                     </div>
                   </div>
@@ -1089,7 +1155,7 @@ export default function CreateEventWizard({ onCreated, isModal = false }: Props)
                   onClick={onSubmit}
                   disabled={loading}
                   size="lg"
-                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-red-600 hover:to-pink-600 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="px-8 h-12 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl shadow-lg transition-all duration-200 transform hover:from-orange-500 hover:to-amber-500 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {loading ? (
                     <>
