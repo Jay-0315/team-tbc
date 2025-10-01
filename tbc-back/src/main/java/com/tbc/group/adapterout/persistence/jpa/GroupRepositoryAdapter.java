@@ -27,7 +27,7 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .minParticipants(g.minParticipants())
                 .maxParticipants(g.maxParticipants())
                 .capacity(g.maxParticipants())
-                .joined(0)
+                .joined(1)  // 호스트가 자동으로 참가하므로 1로 시작
                 .coverUrl("")
                 .mode(g.mode().name())
                 .feeType(g.feeType().name())
