@@ -198,8 +198,8 @@ export default function EventDetailPage() {
                 {/* 커버 이미지 또는 카테고리 그라디언트 */}
                 {imagePath ? (
                   <div className="overflow-hidden relative w-full aspect-[16/9]">
-                    <img
-                      src={`http://localhost:8080/img/${imagePath.split('/').pop()}`}
+                        <img
+                          src={`/uploads/${imagePath.split('/').pop()}`}
                       alt={data.title}
                       className="object-cover w-full h-full"
                       onError={(e) => {

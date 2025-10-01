@@ -3,6 +3,7 @@ package com.tbc.group.adapterin.http;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +21,9 @@ import java.util.UUID;
 @Tag(name = "Image Upload", description = "이미지 업로드 API")
 public class ImageUploadController {
 
-    private static final String UPLOAD_DIR = "D:/team-tbc/tbc-back/img";
+    // 운영체제 무관한 업로드 경로: 기본값은 프로젝트 작업 디렉토리 하위의 img 폴더
+    @Value("${app.upload.dir:img}")
+    private String uploadDir;
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
 
@@ -51,15 +54,15 @@ public class ImageUploadController {
             }
 
             // 업로드 디렉토리 생성
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
+            File uploadDirFile = new File(uploadDir);
+            if (!uploadDirFile.exists()) {
+                uploadDirFile.mkdirs();
             }
 
             // UUID 파일명 생성
             String uuid = UUID.randomUUID().toString();
             String newFilename = uuid + "." + extension;
-            Path filePath = Paths.get(UPLOAD_DIR, newFilename);
+            Path filePath = Paths.get(uploadDir, newFilename);
 
             // 파일 저장
             Files.write(filePath, file.getBytes());

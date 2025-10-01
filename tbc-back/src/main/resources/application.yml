@@ -101,6 +101,9 @@ app:
   seed: false
   seed.always: false
   seed.reviews: false
+  # OS 무관 업로드 디렉토리 (프로젝트 루트 기준). 필요 시 절대경로로 재설정 가능
+  upload:
+    dir: img
 
 management:
   endpoints:
