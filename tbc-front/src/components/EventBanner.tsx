@@ -16,7 +16,7 @@ const eventBanners: EventBanner[] = [
     id: 1,
     title: "신규 회원 50% 할인",
     description: "첫 이벤트 참여 시 모든 참가비 50% 할인!",
-    imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1740&auto=format&fit=crop",
+    imageUrl: "/event1.png",
     gradient: "from-purple-600/80 to-pink-600/80",
     ctaText: "지금 참여하기",
     ctaLink: "/events"
@@ -25,7 +25,7 @@ const eventBanners: EventBanner[] = [
     id: 2,
     title: "가을 캠핑 이벤트",
     description: "야외에서 즐기는 캠핑과 바베큐 파티",
-    imageUrl: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?q=80&w=1740&auto=format&fit=crop",
+    imageUrl: "/event2.png",
     gradient: "from-green-600/80 to-blue-600/80",
     ctaText: "캠핑 참여하기",
     ctaLink: "/events?category=camping"
@@ -34,7 +34,7 @@ const eventBanners: EventBanner[] = [
     id: 3,
     title: "스터디 그룹 모집",
     description: "같이 공부할 사람을 찾아보세요!",
-    imageUrl: "https://images.unsplash.com/photo-1480796927426-f609979314bd?q=80&w=1740&auto=format&fit=crop",
+    imageUrl: "/event3.png",
     gradient: "from-blue-600/80 to-purple-600/80",
     ctaText: "스터디 참여하기",
     ctaLink: "/events?category=study"
@@ -43,7 +43,7 @@ const eventBanners: EventBanner[] = [
     id: 4,
     title: "창작 워크샵",
     description: "함께 만들어가는 예술의 세계",
-    imageUrl: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?q=80&w=1740&auto=format&fit=crop",
+    imageUrl: "/eventg4.png",
     gradient: "from-pink-600/80 to-orange-600/80",
     ctaText: "워크샵 참여하기",
     ctaLink: "/events?category=art"
@@ -88,20 +88,16 @@ export default function EventBanner() {
           className="object-cover w-full h-full"
           loading="lazy"
         />
+        {/* 검은색 반투명 오버레이 */}
+        <div className="absolute inset-0 bg-black/40"></div>
       </div>
 
       {/* 콘텐츠 - 좌측 상단 */}
       <div className="absolute top-6 left-4 z-10 max-w-md">
-        <h2 className="mb-3 text-2xl md:text-3xl font-bold text-black" style={{
-          WebkitTextStroke: '2px white',
-          paintOrder: 'stroke fill'
-        }}>
+        <h2 className="mb-3 text-2xl md:text-3xl font-extrabold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
           {currentBanner.title}
         </h2>
-        <p className="mb-6 text-base md:text-lg text-black" style={{
-          WebkitTextStroke: '1.5px white',
-          paintOrder: 'stroke fill'
-        }}>
+        <p className="mb-6 text-base md:text-lg font-semibold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
           {currentBanner.description}
         </p>
       </div>

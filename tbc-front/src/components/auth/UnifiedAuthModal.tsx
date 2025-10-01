@@ -76,6 +76,8 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
       try {
         await loginAsync({ email: formData.email, password: formData.password })
         onClose()
+        // 로그인 성공 시 홈페이지로 이동 및 새로고침
+        window.location.href = '/'
       } catch (err) {
         setError(err instanceof Error ? err.message : '로그인에 실패했습니다.')
       }
@@ -98,6 +100,8 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
       try {
         await signupAsync({ email: formData.email, password: formData.password, realName: formData.realName, nickname: formData.nickname })
         onClose()
+        // 회원가입 성공 시 홈페이지로 이동 및 새로고침
+        window.location.href = '/'
       } catch (err) {
         setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.')
       }

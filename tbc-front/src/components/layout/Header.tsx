@@ -82,7 +82,6 @@ export default function Header({ user, onLogout }: HeaderProps) {
                 onClick={handleUserIconClick}
                 className="flex overflow-hidden justify-center items-center w-10 h-10 bg-white rounded-full border-2 border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 aria-haspopup="menu"
-                aria-expanded={isDropdownOpen}
                 aria-label="사용자 메뉴"
               >
                 {profile?.profileImageUrl ? (
@@ -151,7 +150,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                   setAuthModalMode('register')
                   setIsAuthModalOpen(true)
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-800 bg-[#F5E6B3] border border-transparent rounded-lg hover:bg-[#E8D89C] focus:outline-none focus:ring-2 focus:ring-[#E8D89C] focus:ring-offset-2 transition-colors duration-200"
+                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-orange-400 to-amber-400 border border-transparent rounded-lg hover:from-orange-500 hover:to-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105"
               >
                 회원가입
               </button>

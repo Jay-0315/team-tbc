@@ -327,7 +327,7 @@ export default function EventDetailPage() {
               {!isHost && (
                 <button
                   type="button"
-                  className="w-full h-11 font-semibold text-gray-900 bg-[#F5E6B3] rounded-2xl transition-colors duration-200 hover:bg-[#E8D89C] focus-visible:ring-2 focus-visible:ring-black/20"
+                  className="w-full h-11 font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-2xl transition-all duration-300 transform hover:from-orange-500 hover:to-amber-500 hover:scale-105 focus-visible:ring-2 focus-visible:ring-orange-500"
                   aria-label="참가하기"
                   onClick={() => setOpenJoin(true)}
                 >

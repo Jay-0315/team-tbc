@@ -16,16 +16,29 @@ export function useChatHistory(roomId: number, limit = 50) {
     queryFn: async (): Promise<ChatMessage[]> => {
       // Backend: GET /api/chat/rooms/{roomId}/messages?cursor&limit
       const response = await apiClient.get(`/chat/rooms/${roomId}/messages`, { params: { limit } })
-      const items = response.data?.items as Array<{ id: number; roomId: number; userId: number; type: 'CHAT' | 'SYSTEM'; content: string; sentAt: string }>
+      const items = response.data?.items as Array<{ 
+        id: number
+        roomId: number
+        userId: number
+        userNickname?: string
+        userProfileImage?: string
+        type: 'CHAT' | 'SYSTEM'
+        content: string
+        createdAt: string  // ✅ sentAt → createdAt로 변경
+      }>
       return (items ?? []).map((m) => ({
         id: m.id,
         roomId: m.roomId,
         userId: m.userId,
         type: m.type,
         content: m.content,
-        createdAt: m.sentAt,
+        createdAt: m.createdAt,  // ✅ 올바른 필드명
       }))
     },
     enabled: !!roomId,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    staleTime: 30000,     // 30초간 캐시
+    gcTime: 5 * 60 * 1000  // 5분간 보관
   })
 }

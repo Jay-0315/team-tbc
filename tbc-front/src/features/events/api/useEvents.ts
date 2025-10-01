@@ -22,7 +22,8 @@ export function useEvents(params: EventListParams) {
     placeholderData: (prev) => prev, // keepPreviousData-like behavior
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    staleTime: 1000 * 30,
-    gcTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30초
+    gcTime: 1000 * 60 * 5, // 5분
+    refetchInterval: 1000 * 30, // ✅ 30초마다 자동 갱신 (참가인원 실시간 반영)
   })
 }

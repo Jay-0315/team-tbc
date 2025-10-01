@@ -4,6 +4,17 @@ import { useState } from 'react'
 import type { EventCardDTO } from '../../features/events/types'
 import { useAuth } from '../../hooks/useAuth'
 import { useToggleFavorite } from '../../services/events'
+import { useParticipants } from '../../features/events/api/useParticipants'
+
+// 카테고리 한글 이름 매핑
+const CATEGORY_NAME_MAP: Record<string, string> = {
+  ETC: '기타',
+  GAME: '게임',
+  FOOD: '음식',
+  STUDY: '스터디',
+  SPORTS: '스포츠',
+  CULTURE: '문화',
+}
 
 interface EventCardProps {
   event: EventCardDTO
@@ -16,11 +27,9 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const [isFavorited, setIsFavorited] = useState(event.favorited || false)
   const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
   
-  // 디버깅: 호스트 정보 확인
-  console.log('EventCard - event.id:', event.id)
-  console.log('EventCard - event:', event)
-  console.log('EventCard - hostNickname:', event.hostNickname)
-  console.log('EventCard - hostProfileImage:', event.hostProfileImage)
+  // ✅ 실시간 참가인원 수 조회
+  const { data: participants = [] } = useParticipants(event.id)
+  const currentJoined = participants.length || event.joined || 0
 
   // 날짜와 시간 포맷팅
   const formatDate = (dateStr?: string) => {
@@ -91,22 +100,26 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
         </div>
       )}
 
-        {/* 좌측 상단: 태그 */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
-          <span className="inline-block px-3 py-1 bg-black/80 text-white text-xs font-medium rounded-full">
-            {event.category}
+        {/* 좌측 상단: 카테고리 태그 */}
+        <div className="absolute top-3 left-3">
+          <span className="inline-flex items-center justify-center px-2.5 py-1 bg-black/80 text-white text-xs font-medium rounded-full text-center min-w-[50px]">
+            {CATEGORY_NAME_MAP[event.category] || event.category}
           </span>
-          {event.feeType === 'PAID' && event.feeAmount && (
-            <span className="inline-block px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
-              🍿 {event.feeAmount}P
-            </span>
-          )}
         </div>
 
-        {/* 우측 상단: 참가인원수 */}
+        {/* 좌측 하단: 팝콘 태그 */}
+        {event.feeType === 'PAID' && event.feeAmount && (
+          <div className="absolute bottom-3 left-3">
+            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full text-center min-w-[50px]">
+              🍿 {event.feeAmount}P
+            </span>
+          </div>
+        )}
+
+        {/* 우측 상단: 참가인원수 (실시간) */}
         <div className="absolute top-3 right-3">
-          <div className="bg-black/80 text-white px-3 py-1 rounded-full text-xs font-medium">
-            {event.joined}/{event.capacity}명
+          <div className="inline-flex items-center justify-center bg-black/80 text-white px-2.5 py-1 rounded-full text-xs font-medium text-center min-w-[50px]">
+            {currentJoined}/{event.capacity}명
           </div>
         </div>
 
