@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useUpdateProfile, type Profile } from '@/hooks/useProfile'
 import { useAuth } from '@/hooks/useAuth'
+import { User, Camera, Loader2, Sparkles } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
 import apiClient from '@/lib/api'
 
 interface Props {
@@ -81,86 +87,244 @@ export function EditProfileDialog({ profile, onClose, onSuccess }: Props) {
   const isSubmitDisabled = isPending || displayName.trim().length === 0 || nickStatus === 'taken' || nickStatus === 'checking'
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true">
-      <div className="p-6 w-full max-w-xl bg-white rounded-2xl border border-gray-200 shadow-xl dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">프로필 수정</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" aria-label="닫기">✕</button>
-        </div>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex overflow-y-auto fixed inset-0 z-50 justify-center items-center p-4"
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* 배경 오버레이 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 backdrop-blur-sm bg-black/50"
+        />
+        
+        {/* 우측 상단 닫기 버튼 */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg"
+          aria-label="닫기"
+        >
+          ✕
+        </button>
+        
+        {/* 모달 컨테이너 */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: -10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: -10 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="relative w-full max-w-2xl my-8 max-h-[calc(100vh-4rem)] bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* 스크롤 가능한 컨텐츠 영역 */}
+          <div className="overflow-y-auto max-h-[calc(100vh-4rem)]">
+            {/* 헤더 */}
+            <div className="relative sticky top-0 z-10 p-6 pb-4 bg-white border-b border-gray-100">
+              <div className="text-center">
+                <div className="inline-flex justify-center items-center mb-3 w-12 h-12 bg-gradient-to-br from-orange-400 to-amber-400 rounded-full shadow-lg sm:w-16 sm:h-16 sm:mb-4">
+                  <Sparkles className="w-6 h-6 text-white sm:w-8 sm:h-8" />
+                </div>
+                <h2 className="mb-2 text-xl font-bold text-gray-900 sm:text-2xl">
+                  프로필 수정
+                </h2>
+                <p className="text-sm text-gray-600 sm:text-base">
+                  프로필 정보를 수정해보세요
+                </p>
+              </div>
+            </div>
 
-        <div className="mt-4 space-y-4">
-          <div>
-            <label className="block mb-1 text-sm font-medium">프로필 사진</label>
-            <div className="flex gap-4 items-center">
-              <img src={imagePreview || 'https://avatars.githubusercontent.com/u/1?v=4'} alt="미리보기" className="object-cover w-16 h-16 rounded-full ring-1 ring-gray-200 dark:ring-gray-700" />
-              <input
-                type="file"
-                accept="image/*"
-                aria-label="프로필 사진 업로드"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (!file) return
-                  const reader = new FileReader()
-                  reader.onload = () => {
-                    const dataUrl = reader.result as string
-                    console.log('[EditProfileDialog] image selected, length=', dataUrl?.length)
-                    setImagePreview(dataUrl)
-                  }
-                  reader.readAsDataURL(file)
-                }}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block mb-1 text-sm font-medium">이름(닉네임)</label>
-            <input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="p-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
-              placeholder="닉네임을 입력하세요"
-              aria-invalid={nickStatus === 'taken'}
-              aria-describedby="nickname-help"
-            />
-            <p id="nickname-help" className={`mt-1 text-xs ${nickStatus === 'taken' ? 'text-red-600' : nickStatus === 'available' ? 'text-green-600' : 'text-gray-500'}`} aria-live="polite">
-              {nickMsg}
-            </p>
-          </div>
-          <div>
-            <label className="block mb-1 text-sm font-medium">성별</label>
-            <select value={gender} onChange={(e) => setGender(e.target.value as Profile['gender'])} className="p-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
-              <option value="MALE">남성</option>
-              <option value="FEMALE">여성</option>
-              <option value="OTHER">기타</option>
-            </select>
-          </div>
-          <div>
-            <label className="block mb-1 text-sm font-medium">자기소개</label>
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} className="p-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800" placeholder="간단한 소개를 입력하세요" />
-          </div>
-          <div>
-            <label className="block mb-1 text-sm font-medium">관심사</label>
-            <div className="flex gap-2">
-              <input value={interestInput} onChange={(e) => setInterestInput(e.target.value)} className="flex-1 p-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800" placeholder="관심사를 입력하고 Enter" onKeyUp={(e) => e.key === 'Enter' && (e.preventDefault(), addInterest())} />
-              <Button onClick={addInterest} type="button">추가</Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {interests.map((it) => (
-                <span key={it} className="inline-flex gap-1 items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full dark:bg-blue-500/10 dark:text-blue-300">
-                  #{it}
-                  <button onClick={() => removeInterest(it)} className="ml-1 text-blue-500 hover:text-blue-700">×</button>
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+            {/* 폼 */}
+            <div className="px-4 pb-6 sm:px-6">
+              <form className="pt-4 space-y-4 sm:space-y-6">
+                {/* 프로필 사진 */}
+                <div>
+                  <Label className="block mb-3 text-xs font-medium text-gray-700 sm:text-sm">
+                    프로필 사진
+                  </Label>
+                  <div className="flex gap-4 items-center">
+                    <div className="relative">
+                      <img 
+                        src={imagePreview || 'https://avatars.githubusercontent.com/u/1?v=4'} 
+                        alt="프로필 미리보기" 
+                        className="object-cover w-20 h-20 rounded-full ring-4 ring-orange-100 sm:w-24 sm:h-24" 
+                      />
+                      <div className="flex absolute -right-1 -bottom-1 justify-center items-center w-8 h-8 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full shadow-md">
+                        <Camera className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        aria-label="프로필 사진 업로드"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const reader = new FileReader()
+                          reader.onload = () => {
+                            const dataUrl = reader.result as string
+                            console.log('[EditProfileDialog] image selected, length=', dataUrl?.length)
+                            setImagePreview(dataUrl)
+                          }
+                          reader.readAsDataURL(file)
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-        <div className="flex gap-2 justify-end mt-6">
-          <Button variant="ghost" onClick={onClose}>취소</Button>
-          <Button onClick={onSubmit} disabled={isSubmitDisabled} aria-label="저장">
-            {isPending || nickStatus === 'checking' ? '저장 중...' : '저장'}
-          </Button>
-        </div>
-      </div>
-    </div>
+                {/* 이름(닉네임) */}
+                <div>
+                  <Label htmlFor="displayName" className="text-xs font-medium text-gray-700 sm:text-sm">
+                    이름(닉네임)
+                  </Label>
+                  <div className="relative mt-1">
+                    <User className="absolute left-3 top-1/2 w-3 h-3 text-gray-400 transform -translate-y-1/2 sm:w-4 sm:h-4" />
+                    <Input
+                      id="displayName"
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="pl-9 h-10 text-sm rounded-xl border-gray-300 sm:pl-10 sm:h-12 sm:text-base focus:border-orange-500 focus:ring-orange-500"
+                      placeholder="닉네임을 입력하세요"
+                      aria-invalid={nickStatus === 'taken'}
+                      aria-describedby="nickname-help"
+                    />
+                  </div>
+                  {nickMsg && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      id="nickname-help"
+                      className={`mt-2 text-xs sm:text-sm ${nickStatus === 'taken' ? 'text-red-600' : nickStatus === 'available' ? 'text-green-600' : 'text-gray-500'}`}
+                      aria-live="polite"
+                    >
+                      {nickStatus === 'checking' && <Loader2 className="inline mr-1 w-3 h-3 animate-spin" />}
+                      {nickMsg}
+                    </motion.p>
+                  )}
+                </div>
+
+                {/* 성별 */}
+                <div>
+                  <Label className="text-xs font-medium text-gray-700 sm:text-sm">
+                    성별
+                  </Label>
+                  <div className="mt-1">
+                    <Select value={gender} onValueChange={(value) => setGender(value as Profile['gender'])}>
+                      <SelectTrigger className={cn(
+                        "h-10 text-sm rounded-xl border-2 border-gray-200 transition-all duration-200 sm:h-12 sm:text-base focus:ring-4 focus:ring-orange-500/20 dark:border-gray-600 focus:border-orange-500"
+                      )}>
+                        <SelectValue placeholder="성별을 선택해주세요" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MALE">남성</SelectItem>
+                        <SelectItem value="FEMALE">여성</SelectItem>
+                        <SelectItem value="OTHER">기타</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* 자기소개 */}
+                <div>
+                  <Label htmlFor="bio" className="text-xs font-medium text-gray-700 sm:text-sm">
+                    자기소개
+                  </Label>
+                  <div className="relative mt-1">
+                    <textarea 
+                      id="bio"
+                      value={bio} 
+                      onChange={(e) => setBio(e.target.value)} 
+                      rows={4} 
+                      className="p-3 w-full text-sm rounded-xl border-2 border-gray-200 transition-all duration-200 resize-none sm:p-4 sm:text-base focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20" 
+                      placeholder="간단한 소개를 입력하세요"
+                    />
+                  </div>
+                </div>
+
+                {/* 관심사 */}
+                <div>
+                  <Label htmlFor="interests" className="text-xs font-medium text-gray-700 sm:text-sm">
+                    관심사
+                  </Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      id="interests"
+                      value={interestInput} 
+                      onChange={(e) => setInterestInput(e.target.value)} 
+                      className="flex-1 h-10 text-sm rounded-xl border-gray-300 sm:h-12 sm:text-base focus:border-orange-500 focus:ring-orange-500" 
+                      placeholder="관심사를 입력하고 Enter" 
+                      onKeyUp={(e) => e.key === 'Enter' && (e.preventDefault(), addInterest())} 
+                    />
+                    <Button 
+                      onClick={addInterest} 
+                      type="button"
+                      className="px-4 h-10 text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl sm:h-12 hover:from-orange-500 hover:to-amber-500"
+                    >
+                      추가
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {interests.map((it) => (
+                      <motion.span 
+                        key={it}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex gap-1 items-center px-3 py-1 text-xs font-medium text-orange-700 bg-orange-50 rounded-full border border-orange-200 sm:text-sm"
+                      >
+                        #{it}
+                        <button 
+                          onClick={() => removeInterest(it)} 
+                          className="ml-1 text-orange-500 transition-colors hover:text-orange-700"
+                          aria-label={`${it} 관심사 제거`}
+                        >
+                          ×
+                        </button>
+                      </motion.span>
+                    ))}
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* 버튼 영역 */}
+            <div className="px-4 pb-6 sm:px-6">
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={onClose}
+                  className="flex-1 h-10 text-sm text-gray-700 rounded-xl border border-gray-300 sm:h-12 sm:text-base hover:bg-gray-50"
+                >
+                  취소
+                </Button>
+                <Button 
+                  onClick={onSubmit} 
+                  disabled={isSubmitDisabled}
+                  className="flex-1 h-10 text-sm font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 rounded-xl transition-all duration-300 transform sm:h-12 sm:text-base hover:from-orange-500 hover:to-amber-500 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  aria-label="저장"
+                >
+                  {isPending || nickStatus === 'checking' ? (
+                    <div className="flex gap-2 items-center">
+                      <Loader2 className="w-3 h-3 animate-spin sm:w-4 sm:h-4" />
+                      저장 중...
+                    </div>
+                  ) : (
+                    '저장'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   )
 }
