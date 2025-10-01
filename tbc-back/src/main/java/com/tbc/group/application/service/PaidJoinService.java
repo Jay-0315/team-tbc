@@ -31,6 +31,23 @@ public class PaidJoinService {
         GroupEntity group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GROUP_NOT_FOUND"));
 
+        // Guard: 종료/상태/정산 상태/정원
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        if (group.getStartAt() != null && !group.getStartAt().isAfter(now)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_ALREADY_STARTED");
+        }
+        if (group.getStatus() != null && !"OPEN".equalsIgnoreCase(group.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_NOT_OPEN");
+        }
+        if (group.getSettlementStatus() != null && !"PENDING".equalsIgnoreCase(group.getSettlementStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_NOT_SETTLE_PENDING");
+        }
+        int currentJoined = memberRepo.countActiveMembers(groupId);
+        int capacity = group.getCapacity() == 0 ? group.getMaxParticipants() : group.getCapacity();
+        if (capacity > 0 && currentJoined >= capacity) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_FULL");
+        }
+
         boolean isPaid = "PAID".equalsIgnoreCase(group.getFeeType());
         int amountPopcorn = group.getFeeAmount() == null ? 0 : group.getFeeAmount();
         final long POPCORN_TO_WON = 100L;

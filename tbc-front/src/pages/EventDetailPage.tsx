@@ -83,6 +83,8 @@ export default function EventDetailPage() {
   const isPaid = feePopcorn > 0
   const isStarted = !!(startAt && now >= startAt)
   const startAtDisplay = startAt ? startAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : null
+  const isFinalized = settlementStatus === 'SETTLED' || settlementStatus === 'REFUNDED'
+  const joinBlocked = isStarted || isFinalized
 
   let settlementLabel: string | null = null
   let settlementDotColor = 'bg-zinc-400'
@@ -450,7 +452,7 @@ export default function EventDetailPage() {
                 <button
                   type="button"
                   className={`w-full h-11 font-semibold rounded-2xl transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-black/20 disabled:opacity-60 disabled:cursor-not-allowed ${
-                    isFull || alreadyJoined ? 'bg-zinc-200 text-zinc-500' : 'bg-[#F5E6B3] text-gray-900 hover:bg-[#E8D89C]'
+                    isFull || alreadyJoined || joinBlocked ? 'bg-zinc-200 text-zinc-500' : 'bg-[#F5E6B3] text-gray-900 hover:bg-[#E8D89C]'
                   }`}
                   aria-label="참가하기"
                   aria-busy={loadingWallet}
@@ -460,6 +462,10 @@ export default function EventDetailPage() {
                       return
                     }
                     if (alreadyJoined || isFull) return
+                    if (joinBlocked) {
+                      toast.error(isStarted ? '이미 시작된 모임입니다.' : '모집이 종료되었습니다.', { duration: 1600 })
+                      return
+                    }
                     if (feePopcorn > 0) {
                       if (loadingWallet) return
                       if (hasInsufficient) {
@@ -470,13 +476,15 @@ export default function EventDetailPage() {
                     }
                     setOpenJoin(true)
                   }}
-                  disabled={!isAuthenticated || isFull || alreadyJoined || (feePopcorn > 0 && loadingWallet)}
+                  disabled={!isAuthenticated || isFull || alreadyJoined || joinBlocked || (feePopcorn > 0 && loadingWallet)}
                 >
                   {!isAuthenticated && '로그인 후 참가'}
                   {isAuthenticated && alreadyJoined && '참가 완료'}
                   {isAuthenticated && !alreadyJoined && isFull && '마감'}
+                  {isAuthenticated && !alreadyJoined && !isFull && isStarted && '종료됨'}
+                  {isAuthenticated && !alreadyJoined && !isFull && !isStarted && isFinalized && '모집 종료'}
                   {isAuthenticated && !alreadyJoined && !isFull && feePopcorn > 0 && loadingWallet && '잔액 확인 중…'}
-                  {isAuthenticated && !alreadyJoined && !isFull && ((feePopcorn === 0) || (feePopcorn > 0)) && '참가하기'}
+                  {isAuthenticated && !alreadyJoined && !isFull && !joinBlocked && ((feePopcorn === 0) || (feePopcorn > 0)) && '참가하기'}
                 </button>
               )}
 
