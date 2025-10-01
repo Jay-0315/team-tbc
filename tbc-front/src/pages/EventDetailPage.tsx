@@ -14,13 +14,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import Map from '../components/Map'
 import { useParticipants } from '@/features/events/api/useParticipants'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchMyWallet } from '@/services/events'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const numericId = useMemo(() => (id ? Number(id) : undefined), [id])
+  const queryClient = useQueryClient()
   const { data, isLoading, isError, refetch } = useEventDetail(numericId)
   const { isAuthenticated, user } = useAuth()
   const { data: participants = [] } = useParticipants(numericId)
@@ -129,6 +130,17 @@ export default function EventDetailPage() {
       setTimeout(() => setCopied(false), 1500)
     } catch (e) {
       console.error('링크 복사 실패', e)
+    }
+  }
+
+  const handleJoinSuccess = () => {
+    // 이벤트 상세 정보 리프레시
+    refetch()
+    // 참가자 목록 리프레시
+    queryClient.invalidateQueries({ queryKey: ['participants', numericId] })
+    // 지갑 잔액 리프레시 (유료 모임인 경우)
+    if (feePopcorn > 0) {
+      refetchWallet()
     }
   }
 
@@ -508,7 +520,12 @@ export default function EventDetailPage() {
             </aside>
           </div>
           {numericId ? (
-            <JoinDialog eventId={numericId} open={openJoin} onOpenChange={setOpenJoin} />
+            <JoinDialog 
+              eventId={numericId} 
+              open={openJoin} 
+              onOpenChange={setOpenJoin}
+              onSuccess={handleJoinSuccess}
+            />
           ) : null}
         </div>
       </div>
