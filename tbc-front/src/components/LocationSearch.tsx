@@ -49,7 +49,7 @@ export default function LocationSearch({
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`,
+        `/api/nominatim/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`,
         {
           headers: {
             'Accept-Language': 'ko,en',

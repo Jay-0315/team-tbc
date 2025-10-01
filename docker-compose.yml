@@ -3,12 +3,10 @@ version: "3.8"
 services:
   # Spring Boot 백엔드
   tbc-back:
-    build:
-      context: ./tbc-back
-      dockerfile: Dockerfile
+    image: tbc-back:latest
     container_name: tbc-back
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=local
       - TZ=Asia/Seoul
     volumes:
       # 업로드된 이미지 파일 영구 저장
@@ -17,33 +15,21 @@ services:
       - tbc-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-
-  # React 프론트엔드 빌드
-  tbc-front:
-    build:
-      context: ./tbc-front
-      dockerfile: Dockerfile
-    container_name: tbc-front
-    image: tbc-front:latest
+      start_period: 60s
 
   # Nginx 리버스 프록시
   nginx:
-    build:
-      context: .
-      dockerfile: nginx/Dockerfile
+    image: tbc-nginx:latest
     container_name: tbc-nginx
     ports:
       - "80:80"
     depends_on:
       tbc-back:
         condition: service_healthy
-      tbc-front:
-        condition: service_completed_successfully
     networks:
       - tbc-net
     restart: unless-stopped
