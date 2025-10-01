@@ -148,21 +148,15 @@ export default function App() {
     
     // 이벤트 목록 캐시 무효화 (새로 생성된 소셜링이 메인 화면에 표시되도록)
     queryClient.invalidateQueries({ queryKey: ['events'] })
+    queryClient.invalidateQueries({ queryKey: ['groups'] })
     
     // 홈으로 이동
     navigate('/')
     
     // 성공 알림 Toast 표시
-    toast.success('신청하신 소셜링의 그룹채팅이 시작되었습니다.', {
-      description: '채팅방에서 다른 참가자들과 소통해보세요.',
-      duration: 5000,
-      action: {
-        label: '채팅방 이동',
-        onClick: () => {
-          // 채팅 Modal 열기
-          setIsChatModalOpen(true)
-        }
-      }
+    toast.success('소셜링이 성공적으로 생성되었습니다! 🎉', {
+      description: '새로운 소셜링이 메인 화면에 표시됩니다.',
+      duration: 4000,
     })
   }
 
