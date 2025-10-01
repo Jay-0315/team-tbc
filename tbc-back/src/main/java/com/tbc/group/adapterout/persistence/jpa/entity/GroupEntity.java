@@ -39,7 +39,10 @@ public class GroupEntity {
     @Column(name="image_path", length=500) String imagePath;  // 업로드 이미지 경로
     @Column(name="event_date") LocalDate eventDate;
     @Column(name="event_time") LocalTime eventTime;
+    @Builder.Default @Column(name="status", nullable=false, length=16) String status = "OPEN"; // OPEN | UPCOMING | WAITLIST | CLOSED
     @Column(name="start_at") LocalDateTime startAt;  // 시작 시간 (eventDate + eventTime 조합)
+    @Column(name="settlement_status", length=16) String settlementStatus; // PENDING/SETTLED/REFUNDED
+    @Column(name="settled_at") LocalDateTime settledAt;
     @CreationTimestamp @Column(name="created_at", nullable=false, updatable=false) LocalDateTime createdAt;
     @UpdateTimestamp   @Column(name="updated_at", nullable=false) LocalDateTime updatedAt;
 }

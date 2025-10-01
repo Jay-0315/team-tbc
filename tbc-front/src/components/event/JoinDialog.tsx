@@ -62,13 +62,22 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
 
   return (
     <div
-      className="flex fixed inset-0 z-50 justify-center items-center"
+      className="flex fixed inset-0 z-50 justify-center items-center bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-labelledby="join-title"
       aria-describedby="join-desc"
       aria-modal="true"
     >
-      <div className="absolute inset-0 bg-black/40" onClick={() => onOpenChange(false)} />
+      {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+      <button
+        onClick={() => onOpenChange(false)}
+        className="absolute top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg"
+        aria-label="닫기"
+      >
+        ✕
+      </button>
+      
+      <div className="absolute inset-0 bg-black/40" />
       <div ref={dialogRef} className="relative z-10 p-4 w-full max-w-md bg-white rounded-xl shadow-lg">
         <h2 id="join-title" className="text-lg font-semibold">참가 신청</h2>
         <p id="join-desc" className="mt-1 text-sm text-zinc-600">약관에 동의해주세요.</p>

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
 import { useEffect, useState } from 'react'
@@ -14,6 +14,7 @@ interface HeaderProps {
 export default function Header({ user, onLogout }: HeaderProps) {
   const { isAuthenticated } = useAuth()
   const { data: profile, refetch: refetchProfile } = useProfile()
+  const location = useLocation()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
@@ -48,6 +49,17 @@ export default function Header({ user, onLogout }: HeaderProps) {
     setIsDropdownOpen(false)
   }
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (location.pathname === '/') {
+      // 이미 홈페이지에 있으면 새로고침만
+      window.location.reload()
+    } else {
+      // 다른 페이지에서는 홈페이지로 이동 (자동 새로고침됨)
+      window.location.href = '/'
+    }
+  }
+
   const handleUserIconClick = () => {
     if (isAuthenticated) {
       setIsDropdownOpen(!isDropdownOpen)
@@ -61,9 +73,10 @@ export default function Header({ user, onLogout }: HeaderProps) {
       <div className="px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80"
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80 cursor-pointer"
+              aria-label="홈으로 이동"
             >
               {/* HolaPop 로고 */}
               <img 
@@ -71,7 +84,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                 alt="HolaPop" 
                 className="w-auto h-30"
               />
-            </Link>
+            </button>
           </div>
         
         <div className="flex items-center space-x-4">

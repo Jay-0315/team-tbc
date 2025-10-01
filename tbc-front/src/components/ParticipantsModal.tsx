@@ -55,23 +55,24 @@ export function ParticipantsModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
       role="dialog"
       aria-modal="true"
     >
+      {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg"
+        aria-label="닫기"
+      >
+        ✕
+      </button>
+      
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900">
             참여자 목록 ({participants.length}명)
           </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="닫기"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
         </div>
 
         {/* 참여자 목록 */}
