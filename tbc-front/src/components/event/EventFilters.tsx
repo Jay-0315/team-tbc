@@ -74,7 +74,7 @@ export default function EventFilters({
                 onSearch(searchQuery)
               }
             }}
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-[#DCD494] focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 shadow-sm hover:shadow-md"
             aria-label="이벤트 검색"
           />
         </div>

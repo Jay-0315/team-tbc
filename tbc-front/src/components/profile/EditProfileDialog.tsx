@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useUpdateProfile, type Profile } from '@/hooks/useProfile'
+import { useAuth } from '@/hooks/useAuth'
 import apiClient from '@/lib/api'
 
 interface Props {
@@ -10,7 +11,9 @@ interface Props {
 }
 
 export function EditProfileDialog({ profile, onClose, onSuccess }: Props) {
-  const [displayName, setDisplayName] = useState(profile?.displayName ?? '')
+  const { user } = useAuth()
+  // 프로필이 없을 때(처음 생성) user의 nickname을 기본값으로 사용
+  const [displayName, setDisplayName] = useState(profile?.displayName ?? user?.nickname ?? '')
   const [gender, setGender] = useState<Profile['gender']>(profile?.gender ?? 'OTHER')
   const [bio, setBio] = useState(profile?.bio ?? '')
   const [interestInput, setInterestInput] = useState('')

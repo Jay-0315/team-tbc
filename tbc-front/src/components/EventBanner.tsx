@@ -19,7 +19,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1740&auto=format&fit=crop",
     gradient: "from-purple-600/80 to-pink-600/80",
     ctaText: "지금 참여하기",
-    ctaLink: "/events"
+    ctaLink: "/"
   },
   {
     id: 2,
@@ -28,7 +28,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?q=80&w=1740&auto=format&fit=crop",
     gradient: "from-green-600/80 to-blue-600/80",
     ctaText: "캠핑 참여하기",
-    ctaLink: "/events?category=camping"
+    ctaLink: "/?category=camping"
   },
   {
     id: 3,
@@ -37,7 +37,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "https://images.unsplash.com/photo-1480796927426-f609979314bd?q=80&w=1740&auto=format&fit=crop",
     gradient: "from-blue-600/80 to-purple-600/80",
     ctaText: "스터디 참여하기",
-    ctaLink: "/events?category=study"
+    ctaLink: "/?category=study"
   },
   {
     id: 4,
@@ -46,7 +46,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?q=80&w=1740&auto=format&fit=crop",
     gradient: "from-pink-600/80 to-orange-600/80",
     ctaText: "워크샵 참여하기",
-    ctaLink: "/events?category=art"
+    ctaLink: "/?category=art"
   }
 ]
 

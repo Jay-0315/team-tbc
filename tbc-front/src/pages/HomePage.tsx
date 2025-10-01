@@ -195,7 +195,7 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
                   {isAuthenticated && (
                     <button 
                       onClick={onCreateSocialing}
-                      className="px-8 py-4 font-semibold text-black bg-gradient-to-r from-[#FFA700] to-[#FFFFFF] rounded-2xl transition-all duration-300 transform hover:from-[#FFA700]/80 hover:to-[#FFFFFF]/80 hover:scale-105"
+                      className="px-8 py-3 sm:py-4 text-sm sm:text-base bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105"
                     >
                       소셜링 만들기
                     </button>

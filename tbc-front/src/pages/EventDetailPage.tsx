@@ -189,10 +189,10 @@ export default function EventDetailPage() {
               <div className="text-center">
                 <div className="mb-4 text-gray-500">표시할 상세 정보가 없습니다</div>
                 <button
-                  onClick={() => navigate('/events')}
+                  onClick={() => navigate('/')}
                   className="px-4 py-2 text-gray-900 bg-[#F5E6B3] rounded-lg hover:bg-[#E8D89C]"
                 >
-                  이벤트 목록으로
+                  홈으로 돌아가기
                 </button>
               </div>
             </div>
