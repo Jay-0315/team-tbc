@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom'
 import { Copy, Star, Edit, Trash2, MapPin, Calendar, Users } from 'lucide-react'
 import { useEventDetail } from '../features/events/api/useEventDetail'
@@ -13,14 +14,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import Map from '../components/Map'
 import { useParticipants } from '@/features/events/api/useParticipants'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { fetchMyWallet } from '@/features/payments/api/useBalance'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const numericId = useMemo(() => (id ? Number(id) : undefined), [id])
-  const queryClient = useQueryClient()
   const { data, isLoading, isError, refetch } = useEventDetail(numericId)
   const { isAuthenticated, user } = useAuth()
   const { data: participants = [] } = useParticipants(numericId)
@@ -42,7 +42,14 @@ export default function EventDetailPage() {
   const latitude = data?.latitude ?? null
   const longitude = data?.longitude ?? null
   const location = data?.location || ''
-  const imagePath = data?.imagePath ?? null
+  // 이미지 경로: imagePath, coverUrl, imageUrl 순서로 확인 (빈 문자열 체크)
+  const rawImagePath = (data?.imagePath && data.imagePath.trim()) 
+    || (data?.coverUrl && data.coverUrl.trim()) 
+    || ((data as any)?.imageUrl && (data as any).imageUrl.trim()) 
+    || null
+  
+  // EventCard와 동일한 방식으로 이미지 경로 구성 (리버스 프록시 환경용)
+  const imagePath = rawImagePath ? `/img/${rawImagePath.split('/').pop()}` : null
 
 
   // 호스트 여부 확인
@@ -87,23 +94,18 @@ export default function EventDetailPage() {
   const joinBlocked = isStarted || isFinalized
 
   let settlementLabel: string | null = null
-  let settlementDotColor = 'bg-zinc-400'
   if (isPaid) {
     if (settlementStatus === 'SETTLED') {
       settlementLabel = '정산 완료(호스트 지급)'
-      settlementDotColor = 'bg-emerald-500'
     } else if (settlementStatus === 'REFUNDED') {
       settlementLabel = '정산 실패(환불)'
-      settlementDotColor = 'bg-rose-500'
     } else if (settlementStatus === 'PENDING' || settlementStatus === null) {
       // 백엔드 상태가 없으면 기존 추론을 보조적으로 사용
       if (!isStarted) {
         settlementLabel = '정산 예정'
-        settlementDotColor = 'bg-zinc-400'
       } else {
         // 시작 이후에도 상태가 없으면 처리 중으로 표시
         settlementLabel = joined >= minParticipants ? '정산 처리 중…' : '환불 처리 중…'
-        settlementDotColor = 'bg-amber-500'
       }
     }
   }
@@ -132,16 +134,6 @@ export default function EventDetailPage() {
     }
   }
 
-  const handleJoinSuccess = () => {
-    // 이벤트 상세 정보 리프레시
-    refetch()
-    // 참가자 목록 리프레시
-    queryClient.invalidateQueries({ queryKey: ['participants', numericId] })
-    // 지갑 잔액 리프레시 (유료 모임인 경우)
-    if (feePopcorn > 0) {
-      refetchWallet()
-    }
-  }
 
   if (isLoading) {
     return (
@@ -212,10 +204,11 @@ export default function EventDetailPage() {
                 {imagePath ? (
                   <div className="overflow-hidden relative w-full aspect-[16/9]">
                         <img
-                          src={`/uploads/${imagePath.split('/').pop()}`}
+                          src={imagePath}
                       alt={data.title}
                       className="object-cover w-full h-full"
                       onError={(e) => {
+                        console.error('Image load error:', imagePath)
                         e.currentTarget.style.display = 'none'
                         const parent = e.currentTarget.parentElement
                         if (parent) {
@@ -519,7 +512,6 @@ export default function EventDetailPage() {
               eventId={numericId} 
               open={openJoin} 
               onOpenChange={setOpenJoin}
-              onSuccess={handleJoinSuccess}
             />
           ) : null}
         </div>

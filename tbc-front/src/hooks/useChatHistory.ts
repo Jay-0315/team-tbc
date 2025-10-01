@@ -38,7 +38,7 @@ export function useChatHistory(roomId: number, limit = 50) {
     enabled: !!roomId,
     refetchOnMount: true,
     refetchOnWindowFocus: false,
-    staleTime: 30000,     // 30초간 캐시
-    gcTime: 5 * 60 * 1000  // 5분간 보관
+    staleTime: 5 * 60 * 1000,  // 5분간 캐시 (더 오래 유지)
+    gcTime: 10 * 60 * 1000     // 10분간 보관
   })
 }

@@ -83,6 +83,28 @@ export default defineConfig({
         secure: false,
         ws: false,
       },
+      // Nominatim API 프록시 (OpenStreetMap 장소 검색)
+      "/api/nominatim": {
+        target: "https://nominatim.openstreetmap.org",
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/nominatim/, ''),
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            // Nominatim은 User-Agent 헤더가 필수
+            proxyReq.setHeader('User-Agent', 'TBC-Holapop/1.0 (contact: admin@example.com)');
+            // Referer 헤더 제거 (nominatim 정책)
+            proxyReq.removeHeader('referer');
+            console.log(`🗺️  Nominatim ${req.method} ${req.url}`);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log(`🗺️  Nominatim ${req.method} ${req.url} -> ${proxyRes.statusCode}`);
+          });
+          proxy.on('error', (err, req, _res) => {
+            console.error('🗺️  Nominatim error:', err.message, 'for', req.url);
+          });
+        },
+      },
     },
   },
   resolve: {

@@ -61,11 +61,14 @@ class StompClientManager {
    * should be performed on CONNECT frame using the header below.
    */
   connect(token: string, roomId: number) {
+    console.log(`[stompClient] 연결 요청: roomId=${roomId}, 현재상태=${this.connectionState}`)
+    
     if (!this.client) {
       this.setupClient()
     }
 
     if (this.connectionState === 'CONNECTING' || this.connectionState === 'CONNECTED') {
+      console.log(`[stompClient] 이미 연결 중이거나 연결됨: ${this.connectionState}`)
       return
     }
 
@@ -97,15 +100,17 @@ class StompClientManager {
   subscribeToRoom(roomId: number, callback: (message: ChatMessage) => void) {
     const subscribe = () => {
       if (!this.client || this.connectionState !== 'CONNECTED') {
-        console.error('STOMP client not connected')
+        console.error(`[stompClient] 구독 실패 - 연결되지 않음: roomId=${roomId}`)
         return
       }
 
       const topic = `/topic/rooms/${roomId}`
+      console.log(`[stompClient] 구독 시작: ${topic}`)
+      
       const subscription = this.client.subscribe(topic, (message: IMessage) => {
         try {
           const chatMessage: ChatMessage = JSON.parse(message.body)
-          console.log('[stompClient] 메시지 수신:', chatMessage)
+          console.log(`[stompClient] 메시지 수신: ${topic}`, chatMessage)
           callback(chatMessage)
         } catch (error) {
           console.error('Failed to parse chat message:', error)
@@ -120,6 +125,7 @@ class StompClientManager {
     
     // ✅ 연결 안 됐으면 대기 후 재시도
     if (this.connectionState !== 'CONNECTED') {
+      console.log(`[stompClient] 연결 대기 중 - 구독 대기열에 추가: roomId=${roomId}`)
       this.pending.push(() => subscribe())
       return
     }
@@ -132,11 +138,12 @@ class StompClientManager {
       if (!this.client) return
       const destination = `/app/rooms/${roomId}/send`
       const message = { content, userId, timestamp: new Date().toISOString(), type: 'CHAT' }
+      console.log(`[stompClient] 메시지 전송: ${destination}`, message)
       this.client.publish({ destination, body: JSON.stringify(message) })
     }
 
     if (!this.client || this.connectionState !== 'CONNECTED') {
-      console.warn('STOMP client not connected yet; queuing message')
+      console.warn(`[stompClient] 연결되지 않음 - 메시지 대기열에 추가: roomId=${roomId}`)
       this.pending.push(publish)
       return
     }
