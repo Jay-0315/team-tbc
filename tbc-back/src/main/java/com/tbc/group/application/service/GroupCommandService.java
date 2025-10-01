@@ -35,13 +35,13 @@ public class GroupCommandService {
         if ("PAID".equals(req.feeType()) && (req.feeAmount() == null || req.feeAmount() < 0))
             throw new IllegalArgumentException("fee required");
 
-        // eventDate와 eventTime을 조합해서 startAt 생성
-        LocalDate eventDate = req.eventDate() != null ? LocalDate.parse(req.eventDate()) : null;
-        LocalTime eventTime = req.eventTime() != null ? LocalTime.parse(req.eventTime()) : null;
-        LocalDateTime startAt = null;
-        if (eventDate != null && eventTime != null) {
-            startAt = LocalDateTime.of(eventDate, eventTime);
+        // eventDate와 eventTime 필수 검증 및 startAt 생성
+        if (req.eventDate() == null || req.eventTime() == null) {
+            throw new IllegalArgumentException("eventDate and eventTime are required");
         }
+        LocalDate eventDate = LocalDate.parse(req.eventDate());
+        LocalTime eventTime = LocalTime.parse(req.eventTime());
+        LocalDateTime startAt = LocalDateTime.of(eventDate, eventTime);
 
         try {
             var group = Group.create(

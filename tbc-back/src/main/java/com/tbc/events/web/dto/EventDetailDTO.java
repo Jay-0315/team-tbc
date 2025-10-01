@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,17 @@ public class EventDetailDTO extends EventCardDTO {
     @Schema(description = "요금 정보", example = "무료")
     public String feeInfo;
 
+    @Schema(description = "최소 참가 인원", example = "5")
+    public Integer minParticipants;
+
+    @Schema(description = "최대 참가 인원", example = "20")
+    public Integer maxParticipants;
+
+    @Schema(description = "정산 상태", example = "PENDING|SETTLED|REFUNDED")
+    public String settlementStatus;
+    @Schema(description = "정산 시각(UTC)")
+    public java.time.Instant settledAt;
+
     public static EventDetailDTO fromGroupEntity(GroupEntity e, Boolean favorited, List<String> tags, String hostName, String hostNickname, String hostProfileImage) {
         EventDetailDTO dto = new EventDetailDTO();
         dto.id = e.getId();
@@ -43,7 +55,8 @@ public class EventDetailDTO extends EventCardDTO {
         dto.capacity = e.getCapacity();
         dto.joined = e.getJoined();
         dto.remainingSeats = Math.max(0, e.getCapacity() - e.getJoined());
-        dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atOffset(ZoneOffset.UTC).toInstant();
+        // Interpret DB LocalDateTime as Asia/Seoul local time for correct frontend display
+        dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toInstant();
         dto.location = e.getLocation();
         dto.eventDate = e.getEventDate();
         dto.eventTime = e.getEventTime();
@@ -58,6 +71,10 @@ public class EventDetailDTO extends EventCardDTO {
         dto.feeType = e.getFeeType();
         dto.feeAmount = e.getFeeAmount();
         dto.feeInfo = e.getFeeInfo();
+        dto.minParticipants = e.getMinParticipants();
+        dto.maxParticipants = e.getMaxParticipants();
+        dto.settlementStatus = e.getSettlementStatus();
+        dto.settledAt = e.getSettledAt() == null ? null : e.getSettledAt().atZone(ZoneId.of("Asia/Seoul")).toInstant();
         dto.hostId = e.getHostId();
         dto.contentHtml = e.getContentHtml();
         dto.latitude = e.getLatitude();

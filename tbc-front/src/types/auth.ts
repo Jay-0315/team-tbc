@@ -11,11 +11,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-<<<<<<< HEAD
-  token: string
-=======
   accessToken: string
->>>>>>> origin/dev
   refreshToken?: string
 }
 

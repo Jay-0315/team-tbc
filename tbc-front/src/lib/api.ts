@@ -11,25 +11,6 @@ export const apiClient = axios.create({
     },
 })
 
-<<<<<<< HEAD
-/**
- * setAuthToken - 로그인 성공 시 토큰을 여기에 설정
- * - token이 null이면 헤더 제거
- */
-export function setAuthToken(token: string | null) {
-    if (token) {
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        // localStorage에도 저장
-        localStorage.setItem('authToken', token)
-    } else {
-        delete apiClient.defaults.headers.common['Authorization']
-        // localStorage에서도 제거
-        localStorage.removeItem('authToken')
-    }
-}
-
-export default apiClient
-=======
 // JWT 토큰 자동 첨부를 위한 요청 인터셉터 추가
 // 문제: 기존에는 수동으로 setAuthToken을 호출해야 했지만, 이제 모든 요청에 자동으로 토큰이 붙음
 apiClient.interceptors.request.use((config) => {
@@ -157,4 +138,3 @@ export async function login(username: string, password: string) {
         }
     }
 }
->>>>>>> origin/dev

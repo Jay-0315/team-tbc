@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '../lib/api'
+import axios from 'axios'
 import { eventKeys } from '../features/events/api/keys'
 import type { ReviewDTO } from '../types/review'
 import type { Page, EventListParams, EventCardDTO } from '../types/event'
+export type WalletBalanceResponse = { userId: number; balance: number }
 
 type ToggleFavoriteResponse = { favorited: boolean }
 
@@ -31,8 +33,16 @@ export type JoinRequest = { qty?: number }
 export type JoinResponse = { ok: true }
 
 async function joinEventRequest(eventId: number): Promise<JoinResponse> {
-  await apiClient.post(`/groups/${eventId}/join`)
-  return { ok: true }
+  try {
+    await apiClient.post(`/groups/${eventId}/join`)
+    return { ok: true }
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err) && err.response?.status === 402) {
+      // 백엔드: 잔액 부족 시 402 반환 → 프런트 표준 에러 메시지로 변환
+      throw new Error('INSUFFICIENT_BALANCE')
+    }
+    throw err instanceof Error ? err : new Error('JOIN_FAILED')
+  }
 }
 
 export function useJoinEvent(eventId: number) {
@@ -46,6 +56,12 @@ export function useJoinEvent(eventId: number) {
       ])
     },
   })
+}
+
+// Wallet
+export async function fetchMyWallet(): Promise<WalletBalanceResponse> {
+  const { data } = await apiClient.get<WalletBalanceResponse>('/payments/wallet/me')
+  return data
 }
 
 // Events - /api/groups 엔드포인트 사용 (events 테이블)

@@ -54,6 +54,11 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
       onOpenChange(false)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : '신청 중 오류가 발생했습니다.'
+      if (message === 'INSUFFICIENT_BALANCE') {
+        showToast('잔액이 부족합니다. 충전 페이지로 이동합니다.', true)
+        window.location.href = '/payments/charge'
+        return
+      }
       showToast(message, true)
     }
   }
@@ -62,19 +67,19 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
 
   return (
     <div
-      className="flex fixed inset-0 z-50 justify-center items-center"
+      className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-labelledby="join-title"
       aria-describedby="join-desc"
       aria-modal="true"
     >
       <div className="absolute inset-0 bg-black/40" onClick={() => onOpenChange(false)} />
-      <div ref={dialogRef} className="relative z-10 p-4 w-full max-w-md bg-white rounded-xl shadow-lg">
+      <div ref={dialogRef} className="relative z-10 w-full max-w-md p-4 bg-white shadow-lg rounded-xl">
         <h2 id="join-title" className="text-lg font-semibold">참가 신청</h2>
         <p id="join-desc" className="mt-1 text-sm text-zinc-600">약관에 동의해주세요.</p>
 
         <div className="mt-4 space-y-3">
-          <label className="inline-flex gap-2 items-center text-sm">
+          <label className="inline-flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={agree}
@@ -85,17 +90,17 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
           </label>
         </div>
 
-        <div className="flex gap-2 justify-end mt-5">
+        <div className="flex justify-end gap-2 mt-5">
           <button
             type="button"
-            className="px-4 h-10 rounded border border-zinc-300 hover:bg-zinc-50"
+            className="h-10 px-4 border rounded border-zinc-300 hover:bg-zinc-50"
             onClick={() => onOpenChange(false)}
           >
             취소
           </button>
           <button
             type="button"
-            className="px-4 h-10 text-white bg-black rounded disabled:opacity-50"
+            className="h-10 px-4 text-white bg-black rounded disabled:opacity-50"
             disabled={!canSubmit}
             onClick={submit}
             aria-busy={isPending}

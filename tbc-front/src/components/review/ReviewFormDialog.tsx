@@ -73,54 +73,6 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
   }
 
   return (
-<<<<<<< HEAD
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
-      <DialogContent 
-        className="sm:max-w-md bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800"
-        role="dialog"
-        aria-labelledby="review-dialog-title"
-        aria-describedby="review-dialog-description"
-      >
-        <DialogHeader>
-          <DialogTitle id="review-dialog-title" className="text-lg font-semibold">
-            후기 작성
-          </DialogTitle>
-          <DialogDescription id="review-dialog-description" className="text-sm text-zinc-500 dark:text-zinc-400">
-            모임에 대한 솔직한 후기를 남겨주세요.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 평점 선택 */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">평점을 선택해주세요</label>
-            <div className="flex items-center gap-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(star)}
-                  className={`p-1 rounded transition-colors ${
-                    star <= rating
-                      ? 'text-yellow-400'
-                      : 'text-zinc-400 hover:text-yellow-300'
-                  }`}
-                  aria-label={`${star}점 선택`}
-                >
-                  <Star
-                    className={`h-6 w-6 ${
-                      star <= rating ? 'fill-current' : ''
-                    }`}
-                  />
-                </button>
-              ))}
-              <span className="ml-2 text-sm text-zinc-600 dark:text-zinc-400">
-                {rating}점
-              </span>
-=======
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
@@ -166,33 +118,8 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
                   {rating}점
                 </span>
               </div>
->>>>>>> origin/dev
             </div>
 
-<<<<<<< HEAD
-          {/* 댓글 입력 */}
-          <div className="space-y-2">
-            <label 
-              htmlFor="review-comment" 
-              className="text-sm font-medium"
-            >
-              후기 내용
-            </label>
-            <Textarea
-              id="review-comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="모임에 대한 솔직한 후기를 작성해주세요..."
-              className="min-h-[120px] resize-none bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
-              maxLength={500}
-              required
-            />
-            <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
-              <span>최대 500자</span>
-              <span className={comment.length > 450 ? 'text-orange-500' : ''}>
-                {comment.length}/500
-              </span>
-=======
             {/* 댓글 입력 */}
             <div className="space-y-2">
               <label 
@@ -216,34 +143,8 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
                   {comment.length}/500
                 </span>
               </div>
->>>>>>> origin/dev
             </div>
 
-<<<<<<< HEAD
-          {/* 버튼 */}
-          <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={createReview.isPending}
-              className="border-zinc-300 dark:border-zinc-700"
-            >
-              취소
-            </Button>
-            <Button
-              type="submit"
-              disabled={createReview.isPending || !comment.trim()}
-              aria-busy={createReview.isPending}
-              className="bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
-            >
-              {createReview.isPending ? '작성 중...' : '후기 작성'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-=======
             {/* 버튼 */}
             <div className="flex justify-end gap-3">
               <Button
@@ -275,6 +176,5 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
         initialMode="login"
       />
     </>
->>>>>>> origin/dev
   )
 }

@@ -102,12 +102,6 @@ app:
   seed.always: false
   seed.reviews: false
 
-<<<<<<< HEAD
-jwt:
-  secret: "mySecretKey123456789012345678901234567890"  # 32자 이상
-  access-token-expiration: "1h"
-  refresh-token-expiration: "7d"
-=======
 management:
   endpoints:
     web:
@@ -120,7 +114,6 @@ management:
 chat:
   max-content-length: 1000
   max-qps-per-session: 10
->>>>>>> origin/dev
 
 ---
 spring:

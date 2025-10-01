@@ -5,22 +5,16 @@ import { fileURLToPath, URL } from "node:url";
 
 const API_TARGET = process.env.VITE_API_TARGET || "http://127.0.0.1:8080";
 
-
 export default defineConfig({
   plugins: [react()],
   server: {
-<<<<<<< HEAD
-=======
     port: 5173,
->>>>>>> origin/dev
     proxy: {
       "/api": {
         target: API_TARGET,
         changeOrigin: true,
         secure: false,
         ws: false,
-<<<<<<< HEAD
-=======
         // 모든 헤더를 백엔드로 전달
         configure: (proxy, _options) => {
           proxy.on('proxyReq', (proxyReq, req, _res) => {
@@ -46,7 +40,6 @@ export default defineConfig({
             console.error('❌ Proxy error:', err.message, 'for', req.url);
           });
         },
->>>>>>> origin/dev
       },
       "/ws": {
         target: API_TARGET,

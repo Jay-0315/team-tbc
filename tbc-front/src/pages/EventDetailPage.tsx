@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Star, Edit, Trash2, MapPin } from 'lucide-react'
+import { Copy, Star, Edit, Trash2, MapPin, Calendar, Users } from 'lucide-react'
 import { useEventDetail } from '../features/events/api/useEventDetail'
 import FavoriteButton from '../components/event/FavoriteButton'
 import JoinDialog from '../components/event/JoinDialog'
@@ -9,10 +9,13 @@ import { ReviewFormDialog } from '../components/review/ReviewFormDialog'
 import { EditEventDialog } from '../components/event/EditEventDialog'
 import { DeleteEventDialog } from '../components/event/DeleteEventDialog'
 import { Button } from '../components/ui/button'
-import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import Map from '../components/Map'
 import { useParticipants } from '@/features/events/api/useParticipants'
+import { useQuery } from '@tanstack/react-query'
+import { fetchMyWallet } from '@/services/events'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
@@ -45,6 +48,77 @@ export default function EventDetailPage() {
   // 호스트 여부 확인
   const isHost = user && hostId && user.id === hostId
 
+  // 좌석/참가 상태
+  const capacity = (data as unknown as { capacity?: number })?.capacity ?? (data as unknown as { maxParticipants?: number })?.maxParticipants ?? 0
+  const joined = (data as unknown as { joined?: number })?.joined ?? 0
+  const seatsLeft = Math.max(0, capacity - joined)
+  const isFull = seatsLeft <= 0
+
+  // 내 잔액(유료 모임 시 필요)
+  const { data: wallet, isLoading: loadingWallet, refetch: refetchWallet } = useQuery({
+    queryKey: ['wallet', 'me'],
+    queryFn: fetchMyWallet,
+    enabled: !!isAuthenticated,
+    staleTime: 30_000,
+  })
+  const feeWon = feePopcorn > 0 ? feePopcorn * 100 : 0
+  const myBalanceWon = wallet?.balance ?? null
+  const hasInsufficient = isAuthenticated && feeWon > 0 && myBalanceWon !== null && myBalanceWon < feeWon
+
+  // 이미 참가 여부
+  const alreadyJoined = !!(user && participants.some(p => p.userId === user.id))
+
+  // 정산 상태 표시 (백엔드 필드 우선: settlement_status/settlementStatus)
+  const settlementStatus = (data as unknown as { settlement_status?: string })?.settlement_status
+    ?? (data as unknown as { settlementStatus?: string })?.settlementStatus
+    ?? null
+  const minParticipants = (data as unknown as { min_participants?: number })?.min_participants
+    ?? (data as unknown as { minParticipants?: number })?.minParticipants
+    ?? 0
+  const startAtStr = (data as unknown as { start_at?: string })?.start_at
+    ?? (data as unknown as { startAt?: string })?.startAt
+    ?? null
+  const startAt = startAtStr ? new Date(startAtStr) : null
+  const now = new Date()
+  const isPaid = feePopcorn > 0
+  const isStarted = !!(startAt && now >= startAt)
+  const startAtDisplay = startAt ? startAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : null
+
+  let settlementLabel: string | null = null
+  let settlementDotColor = 'bg-zinc-400'
+  if (isPaid) {
+    if (settlementStatus === 'SETTLED') {
+      settlementLabel = '정산 완료(호스트 지급)'
+      settlementDotColor = 'bg-emerald-500'
+    } else if (settlementStatus === 'REFUNDED') {
+      settlementLabel = '정산 실패(환불)'
+      settlementDotColor = 'bg-rose-500'
+    } else if (settlementStatus === 'PENDING' || settlementStatus === null) {
+      // 백엔드 상태가 없으면 기존 추론을 보조적으로 사용
+      if (!isStarted) {
+        settlementLabel = '정산 예정'
+        settlementDotColor = 'bg-zinc-400'
+      } else {
+        // 시작 이후에도 상태가 없으면 처리 중으로 표시
+        settlementLabel = joined >= minParticipants ? '정산 처리 중…' : '환불 처리 중…'
+        settlementDotColor = 'bg-amber-500'
+      }
+    }
+  }
+
+  // 시작 시각 경과 후, 내가 참가자이고 유료이며 최종 상태가 REFUNDED이면 지갑 자동 새고침(환불 반영)
+  useEffect(() => {
+    if (!isAuthenticated) return
+    if (!alreadyJoined) return
+    if (!isPaid) return
+    if (settlementStatus !== 'REFUNDED') return
+    // 약간의 지연 후 한 번 새로고침
+    const t = setTimeout(() => {
+      refetchWallet()
+    }, 10_000)
+    return () => clearTimeout(t)
+  }, [isAuthenticated, alreadyJoined, isPaid, settlementStatus, refetchWallet])
+
 
   const handleCopy = async () => {
     try {
@@ -54,73 +128,15 @@ export default function EventDetailPage() {
     } catch (e) {
       console.error('링크 복사 실패', e)
     }
-<<<<<<< HEAD
-  }
-
-  return (
-    <main role="main" aria-labelledby="page-title" className="max-w-5xl px-4 py-6 mx-auto">
-      <h1 id="page-title" className="sr-only">
-        이벤트 상세 페이지
-      </h1>
-
-      {isLoading && (
-        <div role="status" className="space-y-4" aria-live="polite" aria-busy>
-          <div className="aspect-[16/9] rounded-xl bg-zinc-200 animate-pulse" />
-          <div className="w-2/3 h-6 rounded animate-pulse bg-zinc-200" />
-          <div className="w-1/2 h-4 rounded animate-pulse bg-zinc-200" />
-        </div>
-      )}
-
-      {isError && (
-        <div role="alert" className="flex items-center justify-between text-sm text-red-600">
-          상세 정보를 불러오지 못했습니다.
-          <button
-            type="button"
-            className="ml-4 px-3 py-1.5 rounded border border-zinc-300 hover:bg-zinc-50"
-            onClick={() => refetch()}
-            aria-label="다시 시도"
-          >
-            재시도
-          </button>
-        </div>
-      )}
-
-      {!isLoading && !isError && !data && (
-        <div className="text-sm text-zinc-600">표시할 상세 정보가 없습니다.</div>
-      )}
-
-      {!isLoading && !isError && data && (
-        <>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <section className="space-y-4 lg:col-span-2">
-            <div className="overflow-hidden bg-white border rounded-xl border-zinc-200">
-              <img
-                src={data.coverUrl}
-                alt={`${data.title} 커버 이미지`}
-                className="w-full aspect-[16/9] object-cover"
-                loading="lazy"
-              />
-              <div className="p-4">
-                <div className="mb-2">
-                  <span className="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-[11px] text-zinc-700 bg-white">
-                    {data.category}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-bold">{data.title}</h2>
-                <div className="flex flex-col gap-2 mt-3 text-sm text-zinc-700">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4" aria-hidden="true" />
-                    <span>{new Date(data.startAt).toLocaleString()}</span>
-=======
   }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
         <div className="px-6 py-8 pt-16">
-          <div className="mx-auto max-w-6xl">
-            <div className="flex justify-center items-center h-64" role="status" aria-live="polite">
-              <div className="w-12 h-12 rounded-full border-b-2 border-black animate-spin"></div>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-center h-64" role="status" aria-live="polite">
+              <div className="w-12 h-12 border-b-2 border-black rounded-full animate-spin"></div>
             </div>
           </div>
         </div>
@@ -132,8 +148,8 @@ export default function EventDetailPage() {
     return (
       <div className="min-h-screen bg-white">
         <div className="px-6 py-8 pt-16">
-          <div className="mx-auto max-w-6xl">
-            <div className="flex justify-center items-center h-64">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-center h-64">
               <div className="text-center" role="alert" aria-live="assertive">
                 <div className="mb-4 text-red-600">오류가 발생했습니다</div>
                 <button
@@ -154,8 +170,8 @@ export default function EventDetailPage() {
     return (
       <div className="min-h-screen bg-white">
         <div className="px-6 py-8 pt-16">
-          <div className="mx-auto max-w-6xl">
-            <div className="flex justify-center items-center h-64">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="mb-4 text-gray-500">표시할 상세 정보가 없습니다</div>
                 <button
@@ -175,10 +191,10 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="px-6 py-8 pt-16">
-        <div className="mx-auto max-w-6xl">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <section className="space-y-4 lg:col-span-2">
-              <div className="overflow-hidden rounded-3xl border border-gray-200 shadow-xl backdrop-blur-sm bg-white/80">
+              <div className="overflow-hidden border border-gray-200 shadow-xl rounded-3xl backdrop-blur-sm bg-white/80">
                 {/* 커버 이미지 또는 카테고리 그라디언트 */}
                 {imagePath ? (
                   <div className="overflow-hidden relative w-full aspect-[16/9]">
@@ -194,38 +210,11 @@ export default function EventDetailPage() {
                         }
                       }}
                     />
->>>>>>> origin/dev
                   </div>
                 ) : (
                   <div className="w-full aspect-[16/9] bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
                     <span className="text-2xl font-bold text-white">{data.category}</span>
                   </div>
-<<<<<<< HEAD
-                </div>
-                <div className="mt-4">
-                  <HostBadge host={{ name: data.hostName }} />
-                </div>
-              </div>
-            </div>
-
-            <article className="p-4 bg-white border rounded-xl border-zinc-200" aria-label="이벤트 소개">
-              <h3 className="mb-2 text-lg font-semibold">소개</h3>
-              <ExpandableText text={data.description} />
-            </article>
-
-            {/* 리뷰 섹션 */}
-            <section className="p-4 bg-white border rounded-xl border-zinc-200" aria-label="이벤트 후기">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">후기</h3>
-                {numericId && (
-                  <ReviewFormDialog eventId={numericId}>
-                    <Button size="sm" className="gap-2">
-                      <Star className="w-4 h-4" />
-                      후기 작성
-                    </Button>
-                  </ReviewFormDialog>
-=======
->>>>>>> origin/dev
                 )}
                 <div className="p-4">
                   <div className="mb-2">
@@ -235,8 +224,8 @@ export default function EventDetailPage() {
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">{data.title}</h2>
                   <div className="flex flex-wrap gap-2 mt-3 text-xs text-gray-700">
-                    <span className="px-2 py-1 bg-gray-50 rounded border border-gray-100">{data.mode || 'OFFLINE'}</span>
-                    <span className="px-2 py-1 bg-gray-50 rounded border border-gray-100">
+                    <span className="px-2 py-1 border border-gray-100 rounded bg-gray-50">{data.mode || 'OFFLINE'}</span>
+                    <span className="px-2 py-1 border border-gray-100 rounded bg-gray-50">
                       {data.feeType === 'FREE' ? '무료' : `${feePopcorn} 팝콘`}
                     </span>
                   </div>
@@ -245,31 +234,62 @@ export default function EventDetailPage() {
                   </div>
                 </div>
               </div>
-<<<<<<< HEAD
-              {numericId ? (
-                <EventReviews eventId={numericId} />
-              ) : (
-                <div className="py-8 text-sm text-center text-zinc-500">
-                  이벤트 정보를 불러올 수 없습니다.
-=======
 
               {/* 소개 (content_html 우선) */}
               {(() => {
                 const html = contentHtml
                 if (html) {
                   return (
-                    <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-md">
+                    <div className="p-4 bg-white border border-gray-100 shadow-md rounded-2xl">
                       <h3 className="mb-3 text-lg font-semibold text-gray-900">상세 정보</h3>
+                      {/* 모임 시간/모집 인원 - 상세 정보 상단 강조 표시 */}
+                      <div className="p-3 mb-3 border border-gray-100 rounded-xl bg-gray-50">
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          <div className="flex items-center gap-2" aria-label="모임 시간">
+                            <Calendar className="w-4 h-4 text-gray-700" aria-hidden="true" />
+                            <div>
+                              <div className="text-xs text-gray-500">모임 시간</div>
+                              <div className="text-sm font-medium text-gray-900">{startAtDisplay || '-'}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2" aria-label="모집 인원">
+                            <Users className="w-4 h-4 text-gray-700" aria-hidden="true" />
+                            <div>
+                              <div className="text-xs text-gray-500">모집 인원</div>
+                              <div className="text-sm font-medium text-gray-900">최소 {minParticipants} · 최대 {capacity} · 현재 {joined}명</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <div 
-                        className="max-w-none prose prose-sm"
+                        className="prose-sm prose max-w-none"
                         dangerouslySetInnerHTML={{ __html: html }}
                       />
                     </div>
                   )
                 }
                 return data.description ? (
-                  <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-md">
+                  <div className="p-4 bg-white border border-gray-100 shadow-md rounded-2xl">
                     <h3 className="mb-3 text-lg font-semibold text-gray-900">상세 정보</h3>
+                    {/* 모임 시간/모집 인원 - 상세 정보 상단 강조 표시 */}
+                    <div className="p-3 mb-3 border border-gray-100 rounded-xl bg-gray-50">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <div className="flex items-center gap-2" aria-label="모임 시간">
+                          <Calendar className="w-4 h-4 text-gray-700" aria-hidden="true" />
+                          <div>
+                            <div className="text-xs text-gray-500">모임 시간</div>
+                            <div className="text-sm font-medium text-gray-900">{startAtDisplay || '-'}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2" aria-label="모집 인원">
+                          <Users className="w-4 h-4 text-gray-700" aria-hidden="true" />
+                          <div>
+                            <div className="text-xs text-gray-500">모집 인원</div>
+                            <div className="text-sm font-medium text-gray-900">최소 {minParticipants} · 최대 {capacity} · 현재 {joined}명</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <ExpandableText text={data.description} />
                   </div>
                 ) : null
@@ -277,12 +297,13 @@ export default function EventDetailPage() {
 
               {/* 장소 및 지도 */}
               {location && (
-                <div className="p-4 space-y-4 bg-white rounded-2xl border border-gray-100 shadow-md">
-                  <div className="flex gap-2 items-center">
+                <div className="p-4 space-y-4 bg-white border border-gray-100 shadow-md rounded-2xl">
+                  <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5 text-gray-800" />
                     <h3 className="text-lg font-semibold text-gray-900">모임 장소</h3>
                   </div>
                   <p className="text-gray-700">{location}</p>
+                  {/* 시간/인원 정보는 상세 정보 박스에서 표시 */}
                   {latitude !== null && longitude !== null && latitude !== undefined && longitude !== undefined ? (
                     <div className="mt-4">
                       <Map
@@ -294,19 +315,18 @@ export default function EventDetailPage() {
                       />
                     </div>
                   ) : (
-                    <div className="p-4 mt-4 text-sm text-center text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-                      <MapPin className="inline-block mr-2 w-4 h-4" />
+                    <div className="p-4 mt-4 text-sm text-center text-gray-500 border border-gray-200 rounded-lg bg-gray-50">
+                      <MapPin className="inline-block w-4 h-4 mr-2" />
                       지도 정보가 없습니다
                     </div>
                   )}
->>>>>>> origin/dev
                 </div>
               )}
 
               {/* 후기 섹션 */}
               {isAuthenticated ? (
-                <section className="p-4 bg-white rounded-2xl border border-gray-100 shadow-md" aria-label="이벤트 후기">
-                  <div className="flex justify-between items-center mb-4">
+                <section className="p-4 bg-white border border-gray-100 shadow-md rounded-2xl" aria-label="이벤트 후기">
+                  <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">후기</h3>
                     {numericId && (
                       <ReviewFormDialog eventId={numericId}>
@@ -326,9 +346,9 @@ export default function EventDetailPage() {
                   )}
                 </section>
               ) : (
-                <section className="p-4 bg-white rounded-2xl border border-gray-100 shadow-md" aria-label="이벤트 후기">
+                <section className="p-4 bg-white border border-gray-100 shadow-md rounded-2xl" aria-label="이벤트 후기">
                   <div className="py-8 text-center">
-                    <div className="inline-flex justify-center items-center mb-4 w-16 h-16 text-gray-800 bg-gray-100 rounded-full">
+                    <div className="inline-flex items-center justify-center w-16 h-16 mb-4 text-gray-800 bg-gray-100 rounded-full">
                       <Star className="w-8 h-8" />
                     </div>
                     <h3 className="mb-2 text-lg font-semibold text-gray-800">후기를 보려면 로그인이 필요합니다</h3>
@@ -344,46 +364,25 @@ export default function EventDetailPage() {
               )}
             </section>
 
-<<<<<<< HEAD
-          <aside className="space-y-3 lg:col-span-1" aria-label="행동 영역">
-            <button
-              type="button"
-              className="w-full font-semibold text-white bg-black rounded-lg h-11 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black"
-              aria-label="참가하기"
-              onClick={() => setOpenJoin(true)}
-            >
-              참가하기
-            </button>
-
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center justify-center flex-1 border rounded-lg h-11 border-zinc-300 hover:bg-zinc-50">
-                {numericId ? <FavoriteButton eventId={numericId} initialFavorited={false} size={20} /> : null}
-              </div>
-              <button
-                type="button"
-                className="border rounded-lg w-11 h-11 border-zinc-300 hover:bg-zinc-50"
-                onClick={handleCopy}
-                aria-label="링크 복사"
-              >
-                <Copy className="w-4 h-4 mx-auto" aria-hidden="true" />
-              </button>
-            </div>
-
-            <div role="status" aria-live="polite" className="h-4 text-xs text-emerald-600">
-              {copied ? '링크를 복사했어요.' : ''}
-            </div>
-          </aside>
-=======
             <aside className="space-y-3 lg:col-span-1" aria-label="행동 영역">
+              {/* 정산 상태 표시 (유료일 때만) */}
+              {settlementLabel && (
+                <div className="p-3 text-sm bg-white border border-gray-100 shadow rounded-2xl" role="status" aria-live="polite">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+                    <span className="text-gray-800">{settlementLabel}</span>
+                  </div>
+                </div>
+              )}
               {/* 호스트/참여자 정보 */}
-              <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-md">
+              <div className="p-4 bg-white border border-gray-100 shadow-md rounded-2xl">
                 {/* HOST (항상 표시) */}
                 {hostId && (
-                  <div className="flex gap-3 items-center mb-3">
+                  <div className="flex items-center gap-3 mb-3">
                     <img
                       src={hostImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(hostNickname || `사용자 ${hostId}`)}&background=000000&color=ffffff&size=48`}
                       alt={`${hostNickname || `사용자 ${hostId}`} 프로필`}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="object-cover w-10 h-10 rounded-full"
                     />
                     <div>
                       <div className="text-sm font-semibold text-gray-900">{hostNickname || `사용자 ${hostId}`}</div>
@@ -406,7 +405,7 @@ export default function EventDetailPage() {
                             key={m.userId}
                             src={mAvatar}
                             alt={`${mName} 프로필`}
-                            className="inline-block w-8 h-8 rounded-full ring-2 ring-white object-cover"
+                            className="inline-block object-cover w-8 h-8 rounded-full ring-2 ring-white"
                           />
                         )
                       })}
@@ -446,29 +445,52 @@ export default function EventDetailPage() {
                 </div>
               )}
 
-              {/* 일반 사용자인 경우 참가하기 버튼 */}
+              {/* 일반 사용자인 경우 참가하기 버튼 (상태 반영) */}
               {!isHost && (
                 <button
                   type="button"
-                  className="w-full h-11 font-semibold text-gray-900 bg-[#F5E6B3] rounded-2xl transition-colors duration-200 hover:bg-[#E8D89C] focus-visible:ring-2 focus-visible:ring-black/20"
+                  className={`w-full h-11 font-semibold rounded-2xl transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-black/20 disabled:opacity-60 disabled:cursor-not-allowed ${
+                    isFull || alreadyJoined ? 'bg-zinc-200 text-zinc-500' : 'bg-[#F5E6B3] text-gray-900 hover:bg-[#E8D89C]'
+                  }`}
                   aria-label="참가하기"
-                  onClick={() => setOpenJoin(true)}
+                  aria-busy={loadingWallet}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      navigate('/login')
+                      return
+                    }
+                    if (alreadyJoined || isFull) return
+                    if (feePopcorn > 0) {
+                      if (loadingWallet) return
+                      if (hasInsufficient) {
+                        toast.error('잔액이 부족합니다. 충전 페이지로 이동합니다.', { duration: 1600 })
+                        navigate('/payments/charge')
+                        return
+                      }
+                    }
+                    setOpenJoin(true)
+                  }}
+                  disabled={!isAuthenticated || isFull || alreadyJoined || (feePopcorn > 0 && loadingWallet)}
                 >
-                  참가하기
+                  {!isAuthenticated && '로그인 후 참가'}
+                  {isAuthenticated && alreadyJoined && '참가 완료'}
+                  {isAuthenticated && !alreadyJoined && isFull && '마감'}
+                  {isAuthenticated && !alreadyJoined && !isFull && feePopcorn > 0 && loadingWallet && '잔액 확인 중…'}
+                  {isAuthenticated && !alreadyJoined && !isFull && ((feePopcorn === 0) || (feePopcorn > 0)) && '참가하기'}
                 </button>
               )}
 
-              <div className="flex gap-2 items-center">
-                <div className="inline-flex flex-1 justify-center items-center h-11 rounded-2xl border border-gray-100 hover:bg-gray-50">
+              <div className="flex items-center gap-2">
+                <div className="inline-flex items-center justify-center flex-1 border border-gray-100 h-11 rounded-2xl hover:bg-gray-50">
                   {numericId ? <FavoriteButton eventId={numericId} initialFavorited={data?.favorited || false} size={20} /> : null}
                 </div>
                 <button
                   type="button"
-                  className="w-11 h-11 rounded-2xl border border-gray-100 hover:bg-gray-50"
+                  className="border border-gray-100 w-11 h-11 rounded-2xl hover:bg-gray-50"
                   onClick={handleCopy}
                   aria-label="링크 복사"
                 >
-                  <Copy className="mx-auto w-4 h-4" aria-hidden="true" />
+                  <Copy className="w-4 h-4 mx-auto" aria-hidden="true" />
                 </button>
               </div>
 
@@ -480,7 +502,6 @@ export default function EventDetailPage() {
           {numericId ? (
             <JoinDialog eventId={numericId} open={openJoin} onOpenChange={setOpenJoin} />
           ) : null}
->>>>>>> origin/dev
         </div>
       </div>
     </div>

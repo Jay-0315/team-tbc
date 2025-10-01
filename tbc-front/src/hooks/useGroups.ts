@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useQuery } from '@tanstack/react-query'
-=======
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
->>>>>>> origin/dev
 import { apiClient } from '@/lib/api'
 
 export interface GroupCard {
@@ -47,17 +43,6 @@ export function useGroups(page = 0, size = 12, category?: string) {
   })
 }
 
-<<<<<<< HEAD
-export function useGroupDetail(id: number | undefined) {
-  return useQuery({
-    queryKey: ['groups', 'detail', id],
-    queryFn: async (): Promise<GroupCard> => {
-      if (!id) throw new Error('invalid id')
-      const res = await apiClient.get(`/groups/${id}`)
-      return (res.data && res.data.data) ? res.data.data : res.data
-    },
-    enabled: typeof id === 'number' && !Number.isNaN(id),
-=======
 export interface GroupDetail {
   id: number
   title: string
@@ -95,6 +80,5 @@ export function useJoinGroup(groupId?: number) {
       qc.invalidateQueries({ queryKey: ['group', 'detail', groupId] })
       qc.invalidateQueries({ queryKey: ['profile', 'groups'] })
     },
->>>>>>> origin/dev
   })
 }

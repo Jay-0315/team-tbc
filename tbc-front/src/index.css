@@ -16,24 +16,12 @@
 }
 
 html {
-<<<<<<< HEAD
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html.dark {
-  background-color: #111827 !important;
-  color: #f9fafb !important;
-}
-=======
   background-color: #ffffff !important; /* 흰색 배경 */
   color: #000000 !important; /* 검은색 글씨 */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 다크모드 관련 스타일 제거 */
->>>>>>> origin/dev
 
 body {
   margin: 0;
@@ -41,26 +29,13 @@ body {
   font-family: 'BMHanna', Pretendard, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-<<<<<<< HEAD
-  background-color: #ffffff !important;
-  color: #111827 !important;
-=======
   background-color: #ffffff !important; /* 흰색 배경 */
   color: #000000 !important; /* 검은색 글씨 */
->>>>>>> origin/dev
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-<<<<<<< HEAD
-/* 다크모드 */
-html.dark body {
-  background-color: #111827 !important;
-  color: #f9fafb !important;
-}
-=======
 /* 다크모드 관련 스타일 제거 */
->>>>>>> origin/dev
 
 /* 접근성 - 스크린 리더 전용 */
 .sr-only {
@@ -91,15 +66,9 @@ body.modal-open {
   position: sticky;
   top: 0;
   z-index: 100;
-<<<<<<< HEAD
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid #333333;
-=======
   background: rgba(255, 255, 255, 0.95); /* 흰색 배경 */
   backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid #cccccc; /* 밝은 회색 테두리 */
->>>>>>> origin/dev
 }
 
 .header-content {
@@ -112,11 +81,7 @@ body.modal-open {
 .logo {
   font-size: 26px;
   font-weight: 900;
-<<<<<<< HEAD
-  color: #ffffff;
-=======
   color: #000000; /* 검은색 글씨 */
->>>>>>> origin/dev
 }
 
 .header-actions {
@@ -135,24 +100,14 @@ body.modal-open {
 .user-greeting {
   font-size: 14px;
   font-weight: 600;
-<<<<<<< HEAD
-  color: #ffffff;
-=======
   color: #000000; /* 검은색 글씨 */
->>>>>>> origin/dev
 }
 
 /* ================== 버튼 ================== */
 .btn-black {
-<<<<<<< HEAD
-  background: #000000;
-  color: #ffffff;
-  border: 1px solid #ffffff;
-=======
   background: #F97316; /* tangerine-500 */
   color: #ffffff; /* 흰색 글씨 */
   border: 1px solid #F97316; /* tangerine-500 */
->>>>>>> origin/dev
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 600;
@@ -161,16 +116,6 @@ body.modal-open {
 }
 
 .btn-black:hover {
-<<<<<<< HEAD
-  background: #333333;
-  border-color: #ffffff;
-}
-
-.btn-white {
-  background: #ffffff;
-  color: #000000;
-  border: 1px solid #000000;
-=======
   background: #EA580C; /* tangerine-600 */
   border-color: #C2410C; /* tangerine-700 */
 }
@@ -179,7 +124,6 @@ body.modal-open {
   background: #ffffff; /* 흰색 배경 */
   color: #F97316; /* tangerine-500 */
   border: 1px solid #F97316; /* tangerine-500 */
->>>>>>> origin/dev
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 600;
@@ -188,13 +132,8 @@ body.modal-open {
 }
 
 .btn-white:hover {
-<<<<<<< HEAD
-  background: #f5f5f5;
-  color: #000000;
-=======
   background: #FFF7ED; /* tangerine-50 */
   color: #EA580C; /* tangerine-600 */
->>>>>>> origin/dev
 }
 
 .btn-full {
@@ -208,11 +147,7 @@ body.modal-open {
   left: 0;
   width: 100%;
   height: 100%;
-<<<<<<< HEAD
-  background: rgba(0,0,0,0.8);
-=======
   background: rgba(0,0,0,0.5); /* 어두운 회색 배경 */
->>>>>>> origin/dev
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,22 +156,13 @@ body.modal-open {
 }
 
 .modal-content {
-<<<<<<< HEAD
-  background: #000000;
-  border: 1px solid #333333;
-=======
   background: #ffffff; /* 흰색 배경 */
   border: 1px solid #cccccc; /* 밝은 회색 테두리 */
->>>>>>> origin/dev
   border-radius: 8px;
   padding: 32px 28px;
   width: 400px;
   max-width: 90%;
-<<<<<<< HEAD
-  box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-=======
   box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* 그림자 색상 조정 */
->>>>>>> origin/dev
   position: relative;
   animation: slideIn 0.3s ease-out;
 }
@@ -249,11 +175,7 @@ body.modal-open {
 .modal-title {
   font-size: 22px;
   font-weight: 700;
-<<<<<<< HEAD
-  color: #ffffff;
-=======
   color: #000000; /* 검은색 글씨 */
->>>>>>> origin/dev
 }
 
 .modal-close {
@@ -264,19 +186,11 @@ body.modal-open {
   border: none;
   font-size: 20px;
   cursor: pointer;
-<<<<<<< HEAD
-  color: #ffffff;
-}
-
-.modal-close:hover {
-  color: #cccccc;
-=======
   color: #000000; /* 검은색 글씨 */
 }
 
 .modal-close:hover {
   color: #666666;
->>>>>>> origin/dev
 }
 
 /* 입력 폼 */
@@ -293,49 +207,28 @@ body.modal-open {
 .form-group label {
   font-weight: 600;
   margin-bottom: 6px;
-<<<<<<< HEAD
-  color: #ffffff;
-=======
   color: #000000; /* 검은색 글씨 */
->>>>>>> origin/dev
 }
 
 .form-input {
   width: 100%;
   padding: 12px;
-<<<<<<< HEAD
-  border: 1px solid #333333;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 14px;
-  background-color: #000000;
-  color: #ffffff;
-=======
   border: 1px solid #cccccc; /* 밝은 회색 테두리 */
   border-radius: 6px;
   box-sizing: border-box;
   font-size: 14px;
   background-color: #ffffff; /* 흰색 배경 */
   color: #000000; /* 검은색 글씨 */
->>>>>>> origin/dev
   transition: border-color 0.3s ease;
 }
 
 .form-input:focus {
   outline: none;
-<<<<<<< HEAD
-  border-color: #ffffff;
-}
-
-.form-input::placeholder {
-  color: #666666;
-=======
   border-color: #F97316; /* tangerine-500 */
 }
 
 .form-input::placeholder {
   color: #999999; /* 회색 플레이스홀더 */
->>>>>>> origin/dev
 }
 
 .form-row {
@@ -366,21 +259,13 @@ body.modal-open {
   margin-top: 16px;
   text-align: center;
   font-size: 14px;
-<<<<<<< HEAD
-  color: #ffffff;
-=======
   color: #000000; /* 검은색 글씨 */
->>>>>>> origin/dev
 }
 
 .link-btn {
   background: none;
   border: none;
-<<<<<<< HEAD
-  color: #74c0fc;
-=======
   color: #F97316; /* tangerine-500 */
->>>>>>> origin/dev
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -388,11 +273,7 @@ body.modal-open {
 }
 
 .link-btn:hover {
-<<<<<<< HEAD
-  color: #339af0;
-=======
   color: #EA580C; /* tangerine-600 */
->>>>>>> origin/dev
 }
 
 /* 애니메이션 */
@@ -428,43 +309,6 @@ body.modal-open {
   }
 }
 
-<<<<<<< HEAD
-/* CKEditor 다크 테마 스타일 */
-.ck-editor__editable {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid #4b5563 !important;
-}
-
-.ck-editor__editable p {
-  color: #ffffff !important;
-}
-
-.ck-editor__editable.ck-focused {
-  border-color: #ffffff !important;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
-}
-
-.ck-editor__toolbar {
-  background-color: #1f2937 !important;
-  border: 1px solid #4b5563 !important;
-}
-
-.ck-editor__toolbar .ck-button {
-  color: #ffffff !important;
-}
-
-.ck-editor__toolbar .ck-button:hover {
-  background-color: #374151 !important;
-}
-
-.ck-editor__toolbar .ck-button.ck-on {
-  background-color: #4b5563 !important;
-}
-
-.ck-editor__editable::placeholder {
-  color: #9ca3af !important;
-=======
 /* CKEditor 스타일 */
 .ck-editor__editable {
   background-color: #ffffff !important; /* 흰색 배경 */
@@ -500,19 +344,10 @@ body.modal-open {
 
 .ck-editor__editable::placeholder {
   color: #999999 !important; /* 회색 플레이스홀더 */
->>>>>>> origin/dev
 }
 
 /* CKEditor 툴바 버튼 스타일 */
 .ck-editor__toolbar .ck-button__label {
-<<<<<<< HEAD
-  color: #ffffff !important;
-}
-
-.ck-editor__toolbar .ck-button__icon {
-  color: #ffffff !important;
-}
-=======
   color: #000000 !important; /* 검은색 글씨 */
 }
 
@@ -907,4 +742,3 @@ body.modal-open {
 .swiper-wrapper {
   overflow: visible !important;
 }
->>>>>>> origin/dev

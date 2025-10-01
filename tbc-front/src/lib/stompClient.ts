@@ -8,17 +8,13 @@ class StompClientManager {
   private listeners: Map<string, (message: ChatMessage) => void> = new Map()
   private stateListeners: ((state: ConnectionState) => void)[] = []
   private pending: Array<() => void> = []
-<<<<<<< HEAD
-=======
   private currentRoomId: number | null = null
->>>>>>> origin/dev
 
   constructor() {
     this.setupClient()
   }
 
   private setupClient() {
-    // SockJS 연결은 항상 상대경로 '/ws' 사용 (vite proxy가 백엔드로 포워딩)
     this.client = new Client({
       webSocketFactory: () => new SockJS('/ws'),
       debug: (str) => {
@@ -54,20 +50,12 @@ class StompClientManager {
   }
 
   /**
-<<<<<<< HEAD
-   * Connect to STOMP server with a JWT token.
-=======
    * Connect to STOMP server with a JWT token and room ID.
->>>>>>> origin/dev
    * Note: SockJS's initial /ws/info XHR cannot include Authorization headers,
    * so backend must permit /ws/info (handled in SecurityConfig). Actual auth
    * should be performed on CONNECT frame using the header below.
    */
-<<<<<<< HEAD
-  connect(token: string) {
-=======
   connect(token: string, roomId: number) {
->>>>>>> origin/dev
     if (!this.client) {
       this.setupClient()
     }
@@ -76,21 +64,14 @@ class StompClientManager {
       return
     }
 
-<<<<<<< HEAD
-=======
     this.currentRoomId = roomId
->>>>>>> origin/dev
     this.connectionState = 'CONNECTING'
     this.notifyStateListeners()
 
     if (this.client) {
-      // Put token into STOMP CONNECT headers
-      // Backend should validate token from CONNECT headers (or query param if implemented)
       this.client.connectHeaders = {
         Authorization: `Bearer ${token}`,
       }
-
-      // Activate (will trigger SockJS /ws/info XHR first; that endpoint must be permitted by server)
       this.client.activate()
     }
   }
@@ -99,10 +80,7 @@ class StompClientManager {
     if (this.client && this.connectionState === 'CONNECTED') {
       this.client.deactivate()
       this.connectionState = 'DISCONNECTED'
-<<<<<<< HEAD
-=======
       this.currentRoomId = null
->>>>>>> origin/dev
       this.notifyStateListeners()
     }
   }
@@ -123,7 +101,6 @@ class StompClientManager {
       }
     })
 
-    // Store listener for cleanup
     this.listeners.set(topic, callback)
 
     return subscription
@@ -145,7 +122,6 @@ class StompClientManager {
     publish()
   }
 
-  // Subscribe to connection state changes
   onConnectionStateChange(callback: (state: ConnectionState) => void) {
     this.stateListeners.push(callback)
     return () => {
@@ -164,13 +140,10 @@ class StompClientManager {
     return this.connectionState
   }
 
-<<<<<<< HEAD
-=======
   getCurrentRoomId(): number | null {
     return this.currentRoomId
   }
 
->>>>>>> origin/dev
   cleanup() {
     this.disconnect()
     this.listeners.clear()
@@ -178,6 +151,5 @@ class StompClientManager {
   }
 }
 
-// Singleton instance
 export const stompClient = new StompClientManager()
 export default stompClient
