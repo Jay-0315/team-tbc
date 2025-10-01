@@ -1,49 +1,8 @@
 import { Link } from 'react-router-dom'
-<<<<<<< HEAD
-import { useTheme } from 'next-themes'
-import { ThemeToggle } from '../ui/ThemeToggle'
-import { useEffect, useState } from 'react'
-
-export default function Header() {
-  const { theme } = useTheme()
-  const [isDark, setIsDark] = useState(false)
-
-  // 테마 변경 감지
-  useEffect(() => {
-    setIsDark(theme === 'dark')
-  }, [theme])
-
-  return (
-    <header 
-      className="sticky top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter] transition-colors duration-300"
-      style={{
-        borderColor: isDark ? '#374151' : '#e5e7eb',
-        backgroundColor: isDark ? 'rgba(17, 24, 39, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)'
-      }}
-    >
-      <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center">
-          <Link 
-            to="/" 
-            className="flex items-center space-x-2 text-xl font-bold transition-colors duration-300 hover:opacity-80"
-            style={{ 
-              color: isDark ? '#f9fafb' : '#111827'
-            }}
-          >
-            <span>TEAM-TBC</span>
-          </Link>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
-        </div>
-      </div>
-=======
 import { useAuth } from '@/hooks/useAuth'
-import { useProfile } from '@/hooks/useProfile'
 import { useEffect, useState } from 'react'
+import { fetchMyWallet } from '@/services/events'
+import { useProfile } from '@/hooks/useProfile'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
 
 import type { User as TbcUser } from '@/types/auth'
@@ -59,6 +18,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
   // 인증 상태가 변경되면 프로필 다시 가져오기
   useEffect(() => {
@@ -66,6 +26,25 @@ export default function Header({ user, onLogout }: HeaderProps) {
       refetchProfile()
     }
   }, [isAuthenticated, refetchProfile])
+
+  // 지갑 잔액 불러오기
+  useEffect(() => {
+    let ignore = false
+    const load = async () => {
+      if (!isAuthenticated) {
+        setWalletBalance(null)
+        return
+      }
+      try {
+        const res = await fetchMyWallet()
+        if (!ignore) setWalletBalance(res.balance)
+      } catch {
+        if (!ignore) setWalletBalance(null)
+      }
+    }
+    load()
+    return () => { ignore = true }
+  }, [isAuthenticated])
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -99,9 +78,9 @@ export default function Header({ user, onLogout }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white transition-colors duration-300">
+    <header className="sticky top-0 z-50 w-full transition-colors duration-300 bg-white border-b border-gray-200">
       <div className="px-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center h-16">
+        <div className="flex items-center justify-between h-16 mx-auto max-w-7xl">
           <div className="flex items-center">
             <Link 
               to="/" 
@@ -122,7 +101,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
             <div className="relative dropdown-container">
               <button
                 onClick={handleUserIconClick}
-                className="flex overflow-hidden justify-center items-center w-10 h-10 bg-white rounded-full border-2 border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                className="flex items-center justify-center w-10 h-10 overflow-hidden transition-all duration-300 bg-white border-2 border-gray-300 rounded-full hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 aria-haspopup="menu"
                 aria-expanded={isDropdownOpen}
                 aria-label="사용자 메뉴"
@@ -148,26 +127,44 @@ export default function Header({ user, onLogout }: HeaderProps) {
               {/* 드롭다운 메뉴 */}
               {isDropdownOpen && (
                 <div
-                  className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
+                  className="absolute right-0 z-50 w-auto min-w-[10rem] max-w-[18rem] mt-2 transition-all duration-200 bg-white border border-gray-200 rounded-md shadow-lg"
                   role="menu"
                 >
-                  <div className="py-1">
-                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                    <div className="py-1">
+                    <div className="px-4 pt-2 pb-1 text-sm text-gray-500 truncate">
                       {profile?.nickname || profile?.displayName || user?.realName || user?.nickname}님
                     </div>
+                    {/* Wallet balance and charge just under nickname */}
+                    <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-900">
+                      <span aria-label="지갑 잔액">
+                        🍿 {walletBalance !== null ? `${Math.floor(walletBalance / 100)}  ` : '잔액 조회'}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                          window.location.href = '/payments/charge'
+                        }}
+                        className="px-2 py-1 text-xs font-medium text-white bg-black rounded hover:bg-black/90"
+                        role="menuitem"
+                        aria-label="충전하기"
+                      >
+                        충전
+                      </button>
+                    </div>
+                    <div className="border-t border-gray-100" />
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false)
                         window.location.href = '/mypage'
                       }}
-                      className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                       role="menuitem"
                     >
                       마이페이지
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                       role="menuitem"
                     >
                       로그아웃
@@ -184,7 +181,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                   setAuthModalMode('login')
                   setIsAuthModalOpen(true)
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
               >
                 로그인
               </button>
@@ -209,7 +206,6 @@ export default function Header({ user, onLogout }: HeaderProps) {
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authModalMode}
       />
->>>>>>> origin/dev
     </header>
   )
 }

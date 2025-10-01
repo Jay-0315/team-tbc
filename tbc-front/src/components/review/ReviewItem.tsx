@@ -36,11 +36,7 @@ export function ReviewItem({ eventId, review }: ReviewItemProps) {
 
   return (
     <div className="p-4 space-y-3 rounded-lg border">
-<<<<<<< HEAD
-      {/* 헤더: 평점, 작성자, 날짜 */}
-=======
       {/* 헤더: 평점, 작성자, 날짜, 액션 버튼 */}
->>>>>>> origin/dev
       <div className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
           {/* 별점 시각화 */}
@@ -62,14 +58,6 @@ export function ReviewItem({ eventId, review }: ReviewItemProps) {
           </div>
         </div>
         
-<<<<<<< HEAD
-        <div className="flex gap-2 items-center text-sm text-gray-500">
-          <span>익명#{review.userId}</span>
-          <span>•</span>
-          <time dateTime={review.createdAt}>
-            {formatDate(review.createdAt)}
-          </time>
-=======
         <div className="flex gap-2 items-center">
           <div className="flex gap-2 items-center text-sm text-gray-500">
             <span>
@@ -107,7 +95,6 @@ export function ReviewItem({ eventId, review }: ReviewItemProps) {
               </DeleteReviewDialog>
             </div>
           )}
->>>>>>> origin/dev
         </div>
       </div>
 

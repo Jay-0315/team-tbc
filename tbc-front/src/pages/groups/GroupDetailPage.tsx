@@ -1,10 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-<<<<<<< HEAD
-import { useGroupDetail } from '@/hooks/useGroups'
-=======
 import { useGroupDetail, useJoinGroup } from '@/hooks/useGroups'
->>>>>>> origin/dev
 import { Copy, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EventReviews } from '@/components/review/EventReviews'
@@ -34,10 +30,7 @@ export default function GroupDetailPage() {
   const { id } = useParams()
   const numericId = useMemo(() => (id ? Number(id) : undefined), [id])
   const { data, isLoading, isError, refetch } = useGroupDetail(numericId)
-<<<<<<< HEAD
-=======
   const { mutateAsync: joinAsync, isPending: joining } = useJoinGroup(numericId)
->>>>>>> origin/dev
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -141,13 +134,6 @@ export default function GroupDetailPage() {
             <aside className="lg:col-span-1 space-y-3" aria-label="행동 영역">
               <button
                 type="button"
-<<<<<<< HEAD
-                className="w-full h-11 rounded-lg bg-black text-white font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black"
-                aria-label="참가하기"
-                onClick={() => { /* TODO: 참가 로직 연동 */ }}
-              >
-                참가하기
-=======
                 className="w-full h-11 rounded-lg bg-black text-white font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:ring-black disabled:opacity-60"
                 aria-label="참가하기"
                 onClick={async () => {
@@ -162,7 +148,6 @@ export default function GroupDetailPage() {
                 disabled={joining}
               >
                 {joining ? '신청 중…' : '참가하기'}
->>>>>>> origin/dev
               </button>
 
               <div className="flex items-center gap-2">

@@ -42,6 +42,8 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .imagePath(g.imagePath())
                 .eventDate(g.eventDate())
                 .eventTime(g.eventTime())
+                .status("OPEN")
+                .settlementStatus("PENDING")
                 .startAt(g.eventDate() != null && g.eventTime() != null ? g.eventDate().atTime(g.eventTime()) : null)
                 .build();
         return repo.save(e).getId();

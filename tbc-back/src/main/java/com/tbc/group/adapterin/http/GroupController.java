@@ -50,8 +50,10 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            memberRepository.addMember(groupId, userId);
+            groupFacade.joinGroup(groupId, userId);
             return ResponseEntity.ok().build();
+        } catch (org.springframework.web.server.ResponseStatusException rse) {
+            return ResponseEntity.status(rse.getStatusCode()).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
