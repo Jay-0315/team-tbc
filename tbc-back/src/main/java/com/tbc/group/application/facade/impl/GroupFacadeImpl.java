@@ -21,6 +21,10 @@ public class GroupFacadeImpl implements GroupFacade {
 
     @Override
     public void joinGroup(Long groupId, Long userId) {
+        System.out.println("=== GroupFacadeImpl.joinGroup ===");
+        System.out.println("GroupId: " + groupId + ", UserId: " + userId);
+        System.out.println("Calling paidJoinService.joinWithWalletHold...");
         paidJoinService.joinWithWalletHold(groupId, userId);
+        System.out.println("✅ GroupFacadeImpl.joinGroup completed successfully");
     }
 }
