@@ -155,8 +155,15 @@ export default function App() {
     
     // 성공 알림 Toast 표시
     toast.success('소셜링이 성공적으로 생성되었습니다! 🎉', {
-      description: '새로운 소셜링이 메인 화면에 표시됩니다.',
-      duration: 4000,
+      description: '채팅방에서 다른 참가자들과 소통해보세요.',
+      duration: 5000,
+      action: {
+        label: '채팅방 이동',
+        onClick: () => {
+          // 채팅 Modal 열기
+          setIsChatModalOpen(true)
+        }
+      }
     })
   }
 
