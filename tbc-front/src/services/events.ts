@@ -23,6 +23,7 @@ export function useToggleFavorite(eventId: number) {
       await Promise.all([
         qc.invalidateQueries({ queryKey: eventKeys.root }),
         qc.invalidateQueries({ queryKey: eventKeys.detail(eventId) }),
+        qc.invalidateQueries({ queryKey: eventKeys.favorites() }), // 찜한 모임 목록도 업데이트
       ])
     },
   })

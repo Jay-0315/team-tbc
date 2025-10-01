@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Heart, MapPin, Calendar, Clock } from 'lucide-react'
-import { useState } from 'react'
+import { MapPin, Calendar, Clock } from 'lucide-react'
 import type { EventCardDTO } from '../../features/events/types'
 import { useAuth } from '../../hooks/useAuth'
-import { useToggleFavorite } from '../../services/events'
 import { useParticipants } from '../../features/events/api/useParticipants'
 
 // 카테고리 한글 이름 매핑
@@ -24,8 +22,6 @@ interface EventCardProps {
 export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
-  const [isFavorited, setIsFavorited] = useState(event.favorited || false)
-  const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
   
   // ✅ 실시간 참가인원 수 조회
   const { data: participants = [] } = useParticipants(event.id)
@@ -51,24 +47,6 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
       return
     }
     navigate(`/events/${event.id}`)
-  }
-
-  const handleFavoriteClick = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    
-    if (!isAuthenticated) {
-      if (onLoginRequired) {
-        onLoginRequired()
-      }
-      return
-    }
-
-    try {
-      const result = await toggleFavorite()
-      setIsFavorited(result.favorited)
-    } catch (error) {
-      console.error('Failed to toggle favorite:', error)
-    }
   }
 
   return (
@@ -123,19 +101,6 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
           </div>
         </div>
 
-        {/* 우측 하단: 좋아요 */}
-        <div className="absolute bottom-3 right-3">
-          <button
-            onClick={handleFavoriteClick}
-            disabled={isPending}
-            aria-label={isFavorited ? '찜 해제' : '찜하기'}
-            className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Heart
-              className={`w-4 h-4 transition-all duration-200 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-400'}`}
-            />
-          </button>
-        </div>
       </div>
 
       {/* 카드 내용 */}

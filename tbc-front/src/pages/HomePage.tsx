@@ -88,12 +88,12 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
     })
   }, [setSearchParams])
 
-  // 검색 활성화 여부 확인
-  const isSearchActive = searchQuery.trim().length > 0
+  // 검색/필터 활성화 여부 확인 (검색어 또는 카테고리가 있을 때)
+  const isSearchActive = searchQuery.trim().length > 0 || category.length > 0
 
   // 검색 핸들러
   const handleSearch = useCallback(() => {
-    updateSearchParams({ search: searchQuery || null })
+    updateSearchParams({ q: searchQuery || null })
   }, [searchQuery, updateSearchParams])
 
   // 더보기 버튼 핸들러
