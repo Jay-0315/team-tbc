@@ -31,6 +31,12 @@ public class PaidJoinService {
         GroupEntity group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GROUP_NOT_FOUND"));
 
+        // Guard: 중복 참가 체크 (최우선)
+        boolean alreadyJoined = memberRepo.existsActiveMember(groupId, userId);
+        if (alreadyJoined) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "ALREADY_JOINED");
+        }
+
         // Guard: 종료/상태/정산 상태/정원
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
         if (group.getStartAt() != null && !group.getStartAt().isAfter(now)) {
