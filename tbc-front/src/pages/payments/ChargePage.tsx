@@ -61,7 +61,7 @@ export default function ChargePage() {
       })
     } catch (err) {
       console.error('INIT error:', err)
-      toast.error('결제 초기화 실패')
+      toast.error('결제를 취소하셨습니다.')
     }
   }
 
