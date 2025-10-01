@@ -4,7 +4,7 @@ import axios from 'axios'
 export const apiClient = axios.create({
     baseURL: '/api',            // Vite dev proxy가 /api 요청을 백엔드(8080)로 포워딩
     timeout: 15000,
-    withCredentials: true,      // OAuth2 세션 쿠키 전달 필요
+    withCredentials: false,     // JWT 기반 인증: 쿠키 불필요
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

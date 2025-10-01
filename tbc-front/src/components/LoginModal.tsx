@@ -60,12 +60,10 @@ export default function LoginModal({
     )
   }
 
-  // 구글 OAuth 로그인 (Spring Security OAuth2 표준 경로 사용)
-  const handleGoogleLogin = () => {
-    // Spring Security가 자동으로 생성하는 OAuth2 인증 경로로 리다이렉트
-    // 상대 경로 사용하여 Vite 프록시를 통해 백엔드로 요청
-    window.location.href = '/oauth2/authorization/google'
-  }
+  // OAuth 기능 비활성화
+  // const handleGoogleLogin = () => {
+  //   window.location.href = '/oauth2/authorization/google'
+  // }
 
   if (!isOpen) return null
 
@@ -117,15 +115,15 @@ export default function LoginModal({
           </button>
         </form>
 
-        {/* OAuth 로그인 */}
-        <div className="modal-footer">
+        {/* OAuth 기능 비활성화 */}
+        {/* <div className="modal-footer">
           <button
             onClick={handleGoogleLogin}
             className="btn-white btn-full"
           >
             Google 계정으로 로그인
           </button>
-        </div>
+        </div> */}
 
         <div className="modal-footer">
           <p>

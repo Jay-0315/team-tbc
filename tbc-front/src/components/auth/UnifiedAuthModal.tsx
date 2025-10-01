@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, Loader2, X, Mail, Lock, User, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const GOOGLE_OAUTH_URL = '/api/oauth2/google/login'
+// OAuth 기능 비활성화
+// const GOOGLE_OAUTH_URL = '/api/oauth2/google/login'
 
 interface UnifiedAuthModalProps {
   isOpen: boolean
@@ -109,9 +110,10 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
     if (error) setError('')
   }
 
-  const handleGoogleLogin = () => {
-    window.location.href = GOOGLE_OAUTH_URL
-  }
+  // OAuth 기능 비활성화
+  // const handleGoogleLogin = () => {
+  //   window.location.href = GOOGLE_OAUTH_URL
+  // }
 
   if (!isOpen) return null
 
@@ -335,7 +337,8 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
               </Button>
 
               {/* 구분선 */}
-              {mode === 'login' && (
+              {/* OAuth 기능 비활성화 */}
+              {/* {mode === 'login' && (
                 <div className="relative my-3 sm:my-4">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-300"></div>
@@ -346,7 +349,6 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                 </div>
               )}
 
-              {/* 구글 로그인 버튼 */}
               {mode === 'login' && (
                 <Button
                   type="button"
@@ -362,7 +364,7 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
                   <span className="hidden sm:inline">Google로 로그인</span>
                   <span className="sm:hidden">Google 로그인</span>
                 </Button>
-              )}
+              )} */}
             </form>
 
             {/* 모드 전환 */}
