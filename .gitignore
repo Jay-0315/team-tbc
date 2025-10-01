@@ -1,0 +1,4 @@
+# 잘못 생성된 파일 무시
+" --date=short  findstr "
+*--date=short*
+

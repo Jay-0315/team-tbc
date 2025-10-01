@@ -2,6 +2,8 @@
 @import "react-day-picker/dist/style.css";
 
 /* 폰트 추가 */
+/* ⚠️ BMHanna 폰트 파일이 없어서 주석 처리 - 필요시 폰트 파일을 /public/fonts/ 에 추가하세요 */
+/*
 @font-face {
   font-family: 'BMHanna';
   src: url('/fonts/BMHANNAAir_ttf.ttf') format('truetype');
@@ -9,6 +11,7 @@
   font-style: normal;
   font-display: swap;
 }
+*/
 
 /* 기본 스타일 */
 * {
@@ -26,7 +29,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'BMHanna', Pretendard, Arial, sans-serif;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff !important; /* 흰색 배경 */

@@ -5,10 +5,9 @@ interface JoinDialogProps {
   eventId: number
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
 }
 
-export default function JoinDialog({ eventId, open, onOpenChange, onSuccess }: JoinDialogProps) {
+export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const firstFocusable = useRef<HTMLButtonElement | null>(null)
   const [agree, setAgree] = useState<boolean>(false)
@@ -51,16 +50,10 @@ export default function JoinDialog({ eventId, open, onOpenChange, onSuccess }: J
     if (!canSubmit) return
     try {
       await mutateAsync({ qty: 1 })
-      showToast('참가 신청이 완료되었습니다! 🎉')
+      showToast('신청 완료')
       onOpenChange(false)
-      onSuccess?.() // 성공 시 콜백 호출 (데이터 리프레시)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : '신청 중 오류가 발생했습니다.'
-      if (message === 'INSUFFICIENT_BALANCE') {
-        showToast('잔액이 부족합니다. 충전 페이지로 이동합니다.', true)
-        window.location.href = '/payments/charge'
-        return
-      }
       showToast(message, true)
     }
   }
@@ -69,19 +62,28 @@ export default function JoinDialog({ eventId, open, onOpenChange, onSuccess }: J
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="flex fixed inset-0 z-50 justify-center items-center bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-labelledby="join-title"
       aria-describedby="join-desc"
       aria-modal="true"
     >
-      <div className="absolute inset-0 bg-black/40" onClick={() => onOpenChange(false)} />
-      <div ref={dialogRef} className="relative z-10 w-full max-w-md p-4 bg-white shadow-lg rounded-xl">
+      {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+      <button
+        onClick={() => onOpenChange(false)}
+        className="absolute top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg"
+        aria-label="닫기"
+      >
+        ✕
+      </button>
+      
+      <div className="absolute inset-0 bg-black/40" />
+      <div ref={dialogRef} className="relative z-10 p-4 w-full max-w-md bg-white rounded-xl shadow-lg">
         <h2 id="join-title" className="text-lg font-semibold">참가 신청</h2>
         <p id="join-desc" className="mt-1 text-sm text-zinc-600">약관에 동의해주세요.</p>
 
         <div className="mt-4 space-y-3">
-          <label className="inline-flex items-center gap-2 text-sm">
+          <label className="inline-flex gap-2 items-center text-sm">
             <input
               type="checkbox"
               checked={agree}
@@ -92,17 +94,17 @@ export default function JoinDialog({ eventId, open, onOpenChange, onSuccess }: J
           </label>
         </div>
 
-        <div className="flex justify-end gap-2 mt-5">
+        <div className="flex gap-2 justify-end mt-5">
           <button
             type="button"
-            className="h-10 px-4 border rounded border-zinc-300 hover:bg-zinc-50"
+            className="px-4 h-10 rounded border border-zinc-300 hover:bg-zinc-50"
             onClick={() => onOpenChange(false)}
           >
             취소
           </button>
           <button
             type="button"
-            className="h-10 px-4 text-white bg-black rounded disabled:opacity-50"
+            className="px-4 h-10 text-white bg-black rounded disabled:opacity-50"
             disabled={!canSubmit}
             onClick={submit}
             aria-busy={isPending}

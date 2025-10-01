@@ -72,15 +72,35 @@ export function ReviewFormDialog({ eventId, children }: ReviewFormDialogProps) {
     }
   }
 
+  const handleClose = () => {
+    if (!createReview.isPending) {
+      setOpen(false)
+      setComment('')
+      setRating(5)
+    }
+  }
+
   return (
     <>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
+      <Dialog open={open} onOpenChange={() => {}}>
         <DialogTrigger asChild>
           {children}
         </DialogTrigger>
         <DialogContent 
           className="sm:max-w-md bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 border-2 border-zinc-300 dark:border-zinc-600 shadow-2xl"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
+          {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+          <button
+            onClick={handleClose}
+            disabled={createReview.isPending}
+            className="absolute top-4 right-4 z-50 flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="닫기"
+          >
+            ✕
+          </button>
+          
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
               후기 작성

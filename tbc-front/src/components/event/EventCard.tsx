@@ -1,9 +1,18 @@
 import { useNavigate } from 'react-router-dom'
-import { Heart, MapPin, Calendar, Clock } from 'lucide-react'
-import { useState } from 'react'
+import { MapPin, Calendar, Clock } from 'lucide-react'
 import type { EventCardDTO } from '../../features/events/types'
 import { useAuth } from '../../hooks/useAuth'
-import { useToggleFavorite } from '../../services/events'
+import { useParticipants } from '../../features/events/api/useParticipants'
+
+// 카테고리 한글 이름 매핑
+const CATEGORY_NAME_MAP: Record<string, string> = {
+  ETC: '기타',
+  GAME: '게임',
+  FOOD: '음식',
+  STUDY: '스터디',
+  SPORTS: '스포츠',
+  CULTURE: '문화',
+}
 
 interface EventCardProps {
   event: EventCardDTO
@@ -13,8 +22,10 @@ interface EventCardProps {
 export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
-  const [isFavorited, setIsFavorited] = useState(event.favorited || false)
-  const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
+  
+  // ✅ 실시간 참가인원 수 조회
+  const { data: participants = [] } = useParticipants(event.id)
+  const currentJoined = participants.length || event.joined || 0
 
   // 날짜와 시간 포맷팅
   const formatDate = (dateStr?: string) => {
@@ -38,24 +49,6 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
     navigate(`/events/${event.id}`)
   }
 
-  const handleFavoriteClick = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    
-    if (!isAuthenticated) {
-      if (onLoginRequired) {
-        onLoginRequired()
-      }
-      return
-    }
-
-    try {
-      const result = await toggleFavorite()
-      setIsFavorited(result.favorited)
-    } catch (error) {
-      console.error('Failed to toggle favorite:', error)
-    }
-  }
-
   return (
     <div
       role="article"
@@ -67,7 +60,7 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
     <div className="relative h-48 overflow-hidden bg-gray-100">
       {event.imagePath ? (
         <img
-          src={`/uploads/${event.imagePath.split('/').pop()}`}
+          src={`http://localhost:8080/img/${event.imagePath.split('/').pop()}`}
           alt={event.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
@@ -85,38 +78,29 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
         </div>
       )}
 
-        {/* 좌측 상단: 태그 */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
-          <span className="inline-block px-3 py-1 bg-black/80 text-white text-xs font-medium rounded-full">
-            {event.category}
+        {/* 좌측 상단: 카테고리 태그 */}
+        <div className="absolute top-3 left-3">
+          <span className="inline-flex items-center justify-center px-2.5 py-1 bg-black/80 text-white text-xs font-medium rounded-full text-center min-w-[50px]">
+            {CATEGORY_NAME_MAP[event.category] || event.category}
           </span>
-          {event.feeType === 'PAID' && event.feeAmount && (
-            <span className="inline-block px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
-              🍿 {event.feeAmount}P
-            </span>
-          )}
         </div>
 
-        {/* 우측 상단: 참가인원수 */}
+        {/* 좌측 하단: 팝콘 태그 */}
+        {event.feeType === 'PAID' && event.feeAmount && (
+          <div className="absolute bottom-3 left-3">
+            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full text-center min-w-[50px]">
+              🍿 {event.feeAmount}P
+            </span>
+          </div>
+        )}
+
+        {/* 우측 상단: 참가인원수 (실시간) */}
         <div className="absolute top-3 right-3">
-          <div className="bg-black/80 text-white px-3 py-1 rounded-full text-xs font-medium">
-            {event.joined}/{event.capacity}명
+          <div className="inline-flex items-center justify-center bg-black/80 text-white px-2.5 py-1 rounded-full text-xs font-medium text-center min-w-[50px]">
+            {currentJoined}/{event.capacity}명
           </div>
         </div>
 
-        {/* 우측 하단: 좋아요 */}
-        <div className="absolute bottom-3 right-3">
-          <button
-            onClick={handleFavoriteClick}
-            disabled={isPending}
-            aria-label={isFavorited ? '찜 해제' : '찜하기'}
-            className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Heart
-              className={`w-4 h-4 transition-all duration-200 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-400'}`}
-            />
-          </button>
-        </div>
       </div>
 
       {/* 카드 내용 */}

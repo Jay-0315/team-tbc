@@ -14,7 +14,7 @@ import CreateEventWizard from '@/pages/events/CreateEventWizard'
 import GroupChatPage from '@/pages/groups/GroupChatPage'
 import EventDetailPage from '@/pages/EventDetailPage'
 // import GroupDetailPage from '@/pages/groups/GroupDetailPage'
-import EventsPage from '@/pages/EventsPage'
+
 import { FloatingChatButton } from '@/components/FloatingChatButton'
 import FloatingButton from '@/components/FloatingButton'
 import { ChatRoomModal } from '@/components/ChatRoomModal'
@@ -26,6 +26,7 @@ import TermsPage from '@/pages/TermsPage'
 import PrivacyPage from '@/pages/PrivacyPage'
 import NoticePage from '@/pages/NoticePage'
 import FAQPage from '@/pages/FAQPage'
+import { Pencil } from 'lucide-react'
 
 export default function App() {
   const { user, logoutAsync, isLoading } = useAuth()
@@ -196,7 +197,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage onCreateSocialing={handleCreateSocialing} />} />
           <Route path="/home" element={<HomePage onCreateSocialing={handleCreateSocialing} />} />
-          <Route path="/events" element={<EventsPage />} />
+          <Route path="/events" element={<HomePage onCreateSocialing={handleCreateSocialing} />} />
           {/* <Route path="/groups/:id" element={<GroupDetailPage />} /> */}
           <Route path="/events/:id" element={<EventDetailPage />} />
           {/* <Route path="/posts" element={<PostsPage />} /> */}
@@ -226,6 +227,7 @@ export default function App() {
         <>
           {/* 소셜링 만들기 버튼 (위쪽) */}
           <FloatingButton
+            icon={<Pencil className="w-5 h-5" />}
             label="소셜링 만들기"
             position="bottom-right"
             variant="primary"
