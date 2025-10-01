@@ -25,9 +25,6 @@ public class GroupCommandService {
 
     @Transactional
     public Long create(GroupCreateRequest req, Long hostId) {
-        System.out.println("GroupCommandService.create() called with request: " + req);
-        System.out.println("Host ID: " + hostId);
-        
         // 검증
         if (req.minParticipants() == null || req.maxParticipants() == null ||
                 req.minParticipants() < 1 || req.maxParticipants() < req.minParticipants())
@@ -43,43 +40,33 @@ public class GroupCommandService {
         LocalTime eventTime = LocalTime.parse(req.eventTime());
         LocalDateTime startAt = LocalDateTime.of(eventDate, eventTime);
 
-        try {
-            var group = Group.create(
-                    req.title(), req.category(), req.topic(),
-                    req.minParticipants(), req.maxParticipants(),
-                    Mode.valueOf(req.mode()),
-                    FeeType.valueOf(req.feeType()),
-                    req.feeAmount(), req.feeInfo(),
-                    req.tags(), req.contentHtml(),
-                    hostId,
-                    req.location(),
-                    req.latitude(),  // 위도
-                    req.longitude(), // 경도
-                    req.imagePath(), // 이미지 경로
-                    eventDate,
-                    eventTime,
-                    req.maxParticipants(), // capacity = maxParticipants
-                    0, // joined = 0 (초기값)
-                    "https://picsum.photos/800/400", // coverUrl = 기본 이미지
-                    startAt // startAt = eventDate + eventTime 조합
-            );
-            System.out.println("Group created successfully: " + group);
+        var group = Group.create(
+                req.title(), req.category(), req.topic(),
+                req.minParticipants(), req.maxParticipants(),
+                Mode.valueOf(req.mode()),
+                FeeType.valueOf(req.feeType()),
+                req.feeAmount(), req.feeInfo(),
+                req.tags(), req.contentHtml(),
+                hostId,
+                req.location(),
+                req.latitude(),  // 위도
+                req.longitude(), // 경도
+                req.imagePath(), // 이미지 경로
+                eventDate,
+                eventTime,
+                req.maxParticipants(), // capacity = maxParticipants
+                0, // joined = 0 (초기값)
+                "https://picsum.photos/800/400", // coverUrl = 기본 이미지
+                startAt // startAt = eventDate + eventTime 조합
+        );
 
-            Long groupId = groupRepo.save(group);
-            System.out.println("Group saved with ID: " + groupId);
-            
-            memberRepo.addHost(groupId, hostId);
-            System.out.println("Host added to group");
+        Long groupId = groupRepo.save(group);
+        
+        memberRepo.addHost(groupId, hostId);
 
-            // 커밋 후 채팅 생성
-            events.publishEvent(new GroupCreatedEvent(groupId, hostId));
-            System.out.println("GroupCreatedEvent published");
-            
-            return groupId;
-        } catch (Exception e) {
-            System.err.println("Error in GroupCommandService.create(): " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        // 커밋 후 채팅 생성
+        events.publishEvent(new GroupCreatedEvent(groupId, hostId));
+        
+        return groupId;
     }
 }

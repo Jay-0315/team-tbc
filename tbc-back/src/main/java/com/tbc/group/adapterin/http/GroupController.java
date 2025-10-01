@@ -35,39 +35,24 @@ public class GroupController {
     @PostMapping
     public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
                                       @RequestHeader("X-User-Id") Long hostId) {
-        System.out.println("Received group creation request: " + req);
-        System.out.println("Host ID: " + hostId);
         Long id = groupFacade.createGroup(req, hostId);
-        System.out.println("Created group with ID: " + id);
         return new GroupCreateResponse(id);
     }
 
     // 본인만 신청: 수량 입력 제거, 즉시 MEMBER로 등록
     @PostMapping("/{groupId}/join")
     public ResponseEntity<Void> join(@PathVariable Long groupId, HttpServletRequest request) {
-        System.out.println("=== GroupController.join ===");
-        System.out.println("GroupId: " + groupId);
-        System.out.println("Request URI: " + request.getRequestURI());
-        System.out.println("Request Method: " + request.getMethod());
-        
         Long userId = jwtUtils.getUserIdFromRequest(request);
-        System.out.println("Extracted UserId: " + userId);
         
         if (userId == null) {
-            System.out.println("❌ UserId is null - UNAUTHORIZED");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            System.out.println("Calling groupFacade.joinGroup...");
             groupFacade.joinGroup(groupId, userId);
-            System.out.println("✅ Join successful");
             return ResponseEntity.ok().build();
         } catch (org.springframework.web.server.ResponseStatusException rse) {
-            System.out.println("❌ ResponseStatusException: " + rse.getStatusCode() + " - " + rse.getReason());
             return ResponseEntity.status(rse.getStatusCode()).build();
         } catch (Exception e) {
-            System.out.println("❌ General Exception: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

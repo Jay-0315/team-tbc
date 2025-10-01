@@ -28,54 +28,36 @@ public class PaidJoinService {
 
     @Transactional
     public void joinWithWalletHold(Long groupId, Long userId) {
-        System.out.println("=== PaidJoinService.joinWithWalletHold ===");
-        System.out.println("GroupId: " + groupId + ", UserId: " + userId);
-        
         GroupEntity group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GROUP_NOT_FOUND"));
 
-        System.out.println("Group found: " + group.getTitle());
-        System.out.println("Status: " + group.getStatus());
-        System.out.println("SettlementStatus: " + group.getSettlementStatus());
-        System.out.println("StartAt: " + group.getStartAt());
-
         // Guard: 중복 참가 체크 (최우선)
         boolean alreadyJoined = memberRepo.existsActiveMember(groupId, userId);
-        System.out.println("Already joined check: " + alreadyJoined);
         if (alreadyJoined) {
-            System.out.println("❌ ALREADY_JOINED");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "ALREADY_JOINED");
         }
 
         // Guard: 종료/상태/정산 상태/정원
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        System.out.println("Current time: " + now);
         
         if (group.getStartAt() != null && !group.getStartAt().isAfter(now)) {
-            System.out.println("❌ GROUP_ALREADY_STARTED: startAt=" + group.getStartAt() + ", now=" + now);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_ALREADY_STARTED");
         }
         
         if (group.getStatus() != null && !"OPEN".equalsIgnoreCase(group.getStatus())) {
-            System.out.println("❌ GROUP_NOT_OPEN: status=" + group.getStatus());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_NOT_OPEN");
         }
         
         if (group.getSettlementStatus() != null && !"PENDING".equalsIgnoreCase(group.getSettlementStatus())) {
-            System.out.println("❌ GROUP_NOT_SETTLE_PENDING: settlementStatus=" + group.getSettlementStatus());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_NOT_SETTLE_PENDING");
         }
         
         int currentJoined = memberRepo.countActiveMembers(groupId);
         int capacity = group.getCapacity() == 0 ? group.getMaxParticipants() : group.getCapacity();
-        System.out.println("Current joined: " + currentJoined + ", Capacity: " + capacity);
         
         if (capacity > 0 && currentJoined >= capacity) {
-            System.out.println("❌ GROUP_FULL");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GROUP_FULL");
         }
-        
-        System.out.println("✅ All checks passed, proceeding with join...");
 
         boolean isPaid = "PAID".equalsIgnoreCase(group.getFeeType());
         int amountPopcorn = group.getFeeAmount() == null ? 0 : group.getFeeAmount();
