@@ -8,7 +8,7 @@ server:
     session:
       cookie:
         secure: false
-        same-site: none
+        same-site: lax
         http-only: true
   tomcat:
     threads:
@@ -49,23 +49,24 @@ spring:
     group:
       local: local
       
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 1068516074798-neppki360t5gskgabpt53nasf673th5j.apps.googleusercontent.com
-            client-secret: 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
-            scope:
-              - email
-              - profile
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
-            token-uri: https://www.googleapis.com/oauth2/v4/token
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            user-name-attribute: id
+  # OAuth2 기능 비활성화
+  # security:
+  #   oauth2:
+  #     client:
+  #       registration:
+  #         google:
+  #           client-id: 1068516074798-neppki360t5gskgabpt53nasf673th5j.apps.googleusercontent.com
+  #           client-secret: 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
+  #           scope:
+  #             - email
+  #             - profile
+  #           redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+  #       provider:
+  #         google:
+  #           authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+  #           token-uri: https://www.googleapis.com/oauth2/v4/token
+  #           user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+  #           user-name-attribute: sub
 
 
 
@@ -101,6 +102,8 @@ app:
   seed: false
   seed.always: false
   seed.reviews: false
+  upload:
+    dir: ./img
 
 management:
   endpoints:

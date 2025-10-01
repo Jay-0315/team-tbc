@@ -19,7 +19,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "/event1.png",
     gradient: "from-purple-600/80 to-pink-600/80",
     ctaText: "지금 참여하기",
-    ctaLink: "/events"
+    ctaLink: "/"
   },
   {
     id: 2,
@@ -28,7 +28,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "/event2.png",
     gradient: "from-green-600/80 to-blue-600/80",
     ctaText: "캠핑 참여하기",
-    ctaLink: "/events?category=camping"
+    ctaLink: "/?category=camping"
   },
   {
     id: 3,
@@ -37,7 +37,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "/event3.png",
     gradient: "from-blue-600/80 to-purple-600/80",
     ctaText: "스터디 참여하기",
-    ctaLink: "/events?category=study"
+    ctaLink: "/?category=study"
   },
   {
     id: 4,
@@ -46,7 +46,7 @@ const eventBanners: EventBanner[] = [
     imageUrl: "/eventg4.png",
     gradient: "from-pink-600/80 to-orange-600/80",
     ctaText: "워크샵 참여하기",
-    ctaLink: "/events?category=art"
+    ctaLink: "/?category=art"
   }
 ]
 

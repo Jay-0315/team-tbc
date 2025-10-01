@@ -26,9 +26,9 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .topic(g.topic())
                 .minParticipants(g.minParticipants())
                 .maxParticipants(g.maxParticipants())
-                .capacity(g.maxParticipants())  // capacity는 maxParticipants와 동일
-                .joined(0)  // 기본값으로 0 설정
-                .coverUrl("")  // 기본값으로 빈 문자열 설정
+                .capacity(g.maxParticipants())
+                .joined(1)  // 호스트가 자동으로 참가하므로 1로 시작
+                .coverUrl("")
                 .mode(g.mode().name())
                 .feeType(g.feeType().name())
                 .feeAmount(g.feeAmount())
@@ -42,8 +42,9 @@ public class GroupRepositoryAdapter implements GroupRepository {
                 .imagePath(g.imagePath())
                 .eventDate(g.eventDate())
                 .eventTime(g.eventTime())
-                .startAt(g.eventDate() != null && g.eventTime() != null ? 
-                    g.eventDate().atTime(g.eventTime()) : null)
+                .status("OPEN")
+                .settlementStatus("PENDING")
+                .startAt(g.eventDate() != null && g.eventTime() != null ? g.eventDate().atTime(g.eventTime()) : null)
                 .build();
         return repo.save(e).getId();
     }

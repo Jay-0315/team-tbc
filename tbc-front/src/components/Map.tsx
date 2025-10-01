@@ -34,11 +34,11 @@ export default function Map({ lat, lng, locationName, zoom = 15, height = "300px
   const position: [number, number] = [lat, lng]
 
   return (
-    <div className="overflow-hidden rounded-xl border-2 border-gray-200 shadow-lg" style={{ height }}>
+    <div className="overflow-hidden rounded-xl border-2 border-gray-200 shadow-lg relative z-10" style={{ height }}>
       <MapContainer
         center={position}
         zoom={zoom}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', zIndex: 10 }}
         scrollWheelZoom={false}
       >
         <ChangeView center={position} zoom={zoom} />

@@ -2,6 +2,7 @@ package com.tbc.group.adapterin.http;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,8 @@ import java.util.UUID;
 @Tag(name = "Image Upload", description = "이미지 업로드 API")
 public class ImageUploadController {
 
-    private static final String UPLOAD_DIR = "D:/team-tbc/tbc-back/img";
+    @Value("${app.upload.dir:./img}")
+    private String uploadDir;
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
 
@@ -50,24 +52,26 @@ public class ImageUploadController {
                     "허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)"));
             }
 
-            // 업로드 디렉토리 생성
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
+            // 업로드 디렉토리 생성 (절대 경로로 변환)
+            File uploadDirFile = new File(uploadDir).getAbsoluteFile();
+                if (!uploadDirFile.exists()) {
+                    boolean created = uploadDirFile.mkdirs();
+                    if (!created) {
+                        return ResponseEntity.internalServerError()
+                                .body(new ImageUploadResponse(null, "업로드 디렉토리 생성에 실패했습니다: " + uploadDirFile.getAbsolutePath()));
+                    }
+                }
 
             // UUID 파일명 생성
             String uuid = UUID.randomUUID().toString();
             String newFilename = uuid + "." + extension;
-            Path filePath = Paths.get(UPLOAD_DIR, newFilename);
+            Path filePath = Paths.get(uploadDir, newFilename);
 
             // 파일 저장
             Files.write(filePath, file.getBytes());
 
             // 저장된 파일 경로 반환 (웹에서 접근 가능한 경로)
             String imagePath = "/uploads/" + newFilename;
-
-            System.out.println("Image uploaded successfully: " + imagePath);
 
             return ResponseEntity.ok(new ImageUploadResponse(imagePath, "이미지 업로드 성공"));
 

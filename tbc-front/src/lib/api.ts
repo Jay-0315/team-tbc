@@ -4,24 +4,16 @@ import axios from 'axios'
 export const apiClient = axios.create({
     baseURL: '/api',            // Vite dev proxy가 /api 요청을 백엔드(8080)로 포워딩
     timeout: 15000,
-    withCredentials: false,     // JWT Authorization header 방식이면 false로 유지
+    withCredentials: false,     // JWT 기반 인증: 쿠키 불필요
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
     },
 })
 
-// JWT 토큰 자동 첨부를 위한 요청 인터셉터 추가
-// 문제: 기존에는 수동으로 setAuthToken을 호출해야 했지만, 이제 모든 요청에 자동으로 토큰이 붙음
+// JWT 토큰 자동 첨부를 위한 요청 인터셉터
 apiClient.interceptors.request.use((config) => {
-    // 기존 authToken을 accessToken으로 마이그레이션
-    const oldToken = localStorage.getItem('authToken')
-    if (oldToken && !localStorage.getItem('accessToken')) {
-        localStorage.setItem('accessToken', oldToken)
-        localStorage.removeItem('authToken')
-    }
-    
-    const token = localStorage.getItem('accessToken') // accessToken 키로 변경 (요구사항에 맞춤)
+    const token = localStorage.getItem('accessToken')
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
@@ -46,11 +38,10 @@ apiClient.interceptors.response.use(
             if (!error.config?.url?.includes('/auth/login')) {
                 // 토큰 제거
                 localStorage.removeItem('accessToken')
-                localStorage.removeItem('authToken')
                 
-                // 커스텀 이벤트 발생으로 useAuth 훅에 토큰 제거 알림
+                // 로그아웃 이벤트 발생
                 if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('authTokenRemoved'))
+                    window.dispatchEvent(new CustomEvent('authLogout'))
                 }
             }
             
@@ -64,30 +55,8 @@ apiClient.interceptors.response.use(
     }
 )
 
-/**
- * setAuthToken - 로그인 성공 시 토큰을 여기에 설정
- * - token이 null이면 헤더 제거
- * - 수정: accessToken 키로 localStorage에 저장하도록 변경
- */
-export function setAuthToken(token: string | null) {
-    if (token) {
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        // localStorage에 accessToken 키로 저장 (요구사항에 맞춤)
-        localStorage.setItem('accessToken', token)
-    } else {
-        delete apiClient.defaults.headers.common['Authorization']
-        // localStorage에서도 제거
-        localStorage.removeItem('accessToken')
-    }
-}
-
-/**
- * getStoredToken - localStorage에서 저장된 토큰을 가져옴
- * - 수정: accessToken 키로 변경
- */
-export function getStoredToken(): string | null {
-    return localStorage.getItem('accessToken')
-}
+// 세션 기반 인증: JWT 토큰 관련 함수들은 더 이상 사용하지 않음
+// setAuthToken, getStoredToken 함수 제거
 
 // 개발 환경에서 디버깅을 위해 window 객체에 노출
 if (typeof window !== 'undefined') {
@@ -116,7 +85,7 @@ export function getOAuth2GoogleLoginUrl(): string {
     return googleAuthUrl
 }
 
-// 로그인 함수
+// 로그인 함수 (세션 기반)
 export async function login(username: string, password: string) {
     try {
         const response = await apiClient.post('/auth/login', {
@@ -125,8 +94,8 @@ export async function login(username: string, password: string) {
         })
         
         if (response.data.success) {
-            setAuthToken(response.data.token)
-            return { success: true, token: response.data.token }
+            // 세션 기반 인증: 토큰 저장 불필요, 세션이 자동으로 생성됨
+            return { success: true }
         } else {
             return { success: false, message: response.data.message }
         }
