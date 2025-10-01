@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useChatHistory } from "@/hooks/useChatHistory"
 import type { ChatMessage as HistoryMessage } from "@/hooks/useChatHistory"
-import { Button } from '@/components/ui/button'
 import { stompClient } from '@/lib/stompClient'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
@@ -21,7 +20,7 @@ interface ChatRoomProps {
   onClose?: () => void
 }
 
-export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }: ChatRoomProps) {
+export function ChatRoom({ roomId, userId, roomName, embedded = false }: ChatRoomProps) {
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -66,11 +65,45 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
   const [newMessage, setNewMessage] = useState('')
   const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // ✅ 채팅방별 메시지 캐시 (roomId 변경 시에도 메시지 유지)
+  const [messageCache, setMessageCache] = useState<Record<number, ChatMessage[]>>({})
+  const isRestoringFromCache = useRef(false)
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  // ✅ 채팅방 변경 시 메시지 초기화 및 캐시 복원
+  useEffect(() => {
+    console.log(`[ChatRoom] 채팅방 변경: ${roomId}`)
+    
+    // 채팅방 변경 시 메시지 초기화
+    setMessages([])
+    
+    // 캐시된 메시지가 있으면 복원
+    if (messageCache[roomId] && messageCache[roomId].length > 0) {
+      console.log(`[ChatRoom] 채팅방 ${roomId} 캐시된 메시지 복원:`, messageCache[roomId].length)
+      isRestoringFromCache.current = true
+      setMessages(messageCache[roomId])
+    }
+  }, [roomId]) // messageCache 의존성 제거하여 무한 루프 방지
+
+  // ✅ 메시지 변경 시 캐시 업데이트 (캐시에서 복원 중이 아닐 때만)
+  useEffect(() => {
+    if (messages.length > 0 && !isRestoringFromCache.current) {
+      setMessageCache(prev => ({
+        ...prev,
+        [roomId]: messages
+      }))
+    }
+    
+    // 복원 완료 후 플래그 리셋
+    if (isRestoringFromCache.current) {
+      isRestoringFromCache.current = false
+    }
+  }, [messages, roomId])
 
   // 채팅 히스토리 로드 시 메시지 상태 업데이트 + 닉네임 보강 + 읽음 처리
   useEffect(() => {
@@ -91,9 +124,24 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
           userProfileImage: profileImageCache[m.userId],
           timestamp: timestamp,  // ✅ 안전한 timestamp
           type: m.type === 'CHAT' ? 'MESSAGE' : 'SYSTEM',
+          status: 'SENT', // 히스토리 메시지는 모두 전송 완료 상태
         }
       })
-      setMessages(normalized)
+      
+      // ✅ 기존 메시지와 병합 (중복 제거)
+      setMessages((prevMessages) => {
+        const existingIds = new Set(prevMessages.map(m => m.id))
+        const newMessages = normalized.filter(m => !existingIds.has(m.id))
+        
+        if (newMessages.length > 0) {
+          console.log(`[ChatRoom] 히스토리에서 ${newMessages.length}개 새 메시지 로드`)
+          return [...prevMessages, ...newMessages].sort((a, b) => 
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          )
+        }
+        
+        return prevMessages
+      })
 
       // 캐시에 없는 상대 닉네임 비동기 조회
       Promise.allSettled(
@@ -138,6 +186,7 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
       return
     }
 
+    console.log(`[ChatRoom] STOMP 연결 시작: roomId=${roomId}`)
     stompClient.connect(token, roomId)
 
     let subscribed = false
@@ -152,8 +201,10 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
         toast.error('채팅 연결에 실패했습니다.')
       } else if (state === 'CONNECTED') {
         if (!subscribed) {
+          console.log(`[ChatRoom] STOMP 구독 시작: roomId=${roomId}`)
           // 메시지 구독
           const unsub = stompClient.subscribeToRoom(roomId, async (message: ChatMessage) => {
+            console.log(`[ChatRoom] STOMP 메시지 수신: roomId=${roomId}`, message)
             const raw: Partial<ChatMessage> & { createdAt?: string } = message
             const senderId = Number(raw.userId ?? 0)
             
@@ -180,7 +231,7 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
               status: 'SENT',
             }
             
-            // ✅ 중복 메시지 방지 (같은 ID가 있으면 추가 안 함)
+            // ✅ 중복 메시지 방지 및 낙관적 업데이트 메시지 교체
             setMessages((prev) => {
               const exists = prev.some(m => m.id === normalized.id)
               if (exists) {
@@ -189,8 +240,24 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
               }
               
               console.log('[ChatRoom] 새 메시지 추가:', normalized)
-              const filtered = prev.filter(m => m.status !== 'SENDING')
-              return [...filtered, normalized]
+              
+              // 임시 메시지 제거: SENDING/SENT 상태이고 같은 내용의 메시지
+              const filtered = prev.filter(m => {
+                if (m.status === 'SENDING' || m.status === 'SENT') {
+                  // 같은 사용자가 같은 내용을 보낸 임시 메시지는 제거
+                  if (m.userId === normalized.userId && 
+                      m.content.trim() === normalized.content.trim() &&
+                      m.id.startsWith('temp-')) {
+                    console.log('[ChatRoom] 임시 메시지 제거:', m.id)
+                    return false
+                  }
+                }
+                return true
+              })
+              
+              const newMessages = [...filtered, normalized]
+              console.log(`[ChatRoom] 메시지 업데이트: ${filtered.length} -> ${newMessages.length}`)
+              return newMessages
             })
             
             // 브라우저 알림 (백그라운드일 때만)
@@ -289,33 +356,42 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
     }
 
     try {
-      // 낙관적 업데이트
-      const tempId = `temp-${Date.now()}`
-      const tempMessage: ChatMessage = {
+      const messageContent = newMessage.trim()
+      console.log('[ChatRoom] 메시지 전송:', messageContent)
+      
+      // ✅ 낙관적 업데이트: 즉시 메시지 표시
+      const tempId = `temp-${Date.now()}-${Math.random()}`
+      const optimisticMessage: ChatMessage = {
         id: tempId,
-        content: newMessage.trim(),
+        content: messageContent,
         userId: userId,
         userNickname: user?.nickname ?? '나',
-        userProfileImage: user?.profileImageUrl,
+        userProfileImage: undefined, // TODO: 사용자 프로필 이미지 필드 확인 필요
         timestamp: new Date().toISOString(),
         type: 'MESSAGE',
-        status: 'SENDING'
+        status: 'SENDING',
       }
-      setMessages(prev => [...prev, tempMessage])
       
-      stompClient.sendMessage(roomId, newMessage.trim(), userId)
+      setMessages(prev => [...prev, optimisticMessage])
       setNewMessage('')
       
+      // 500ms 후 SENT 상태로 변경
       setTimeout(() => {
         setMessages(prev => prev.map(msg => 
           msg.id === tempId ? { ...msg, status: 'SENT' as const } : msg
         ))
       }, 500)
+      
+      // 서버로 메시지 전송
+      stompClient.sendMessage(roomId, messageContent, userId)
+      
+      console.log('[ChatRoom] 낙관적 업데이트 완료, 서버 응답 대기 중...')
     } catch (error) {
+      console.error('[ChatRoom] 메시지 전송 실패:', error)
       toast.error('메시지 전송에 실패했습니다.')
-      setMessages(prev => prev.map(msg => 
-        msg.status === 'SENDING' ? { ...msg, status: 'FAILED' as const } : msg
-      ))
+      
+      // 실패 시 낙관적 메시지 제거
+      setMessages(prev => prev.filter(msg => !msg.id.startsWith('temp-')))
     }
   }
 
@@ -327,7 +403,7 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
   }
 
   // 타이핑 알림
-  const typingTimeoutRef = useRef<NodeJS.Timeout>()
+  const typingTimeoutRef = useRef<number | undefined>(undefined)
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value)
     
@@ -362,20 +438,6 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
     }
   }
 
-  const getConnectionStatusColor = () => {
-    switch (connectionState) {
-      case 'CONNECTING':
-        return 'text-yellow-500'
-      case 'CONNECTED':
-        return 'text-emerald-600'
-      case 'DISCONNECTED':
-        return 'text-gray-400'
-      case 'ERROR':
-        return 'text-red-500'
-      default:
-        return 'text-gray-400'
-    }
-  }
 
   if (historyLoading) {
     return (
@@ -615,3 +677,4 @@ export function ChatRoom({ roomId, userId, roomName, embedded = false, onClose }
     </div>
   )
 }
+

@@ -1,6 +1,14 @@
 version: "3.8"
 
 services:
+  # React 프론트엔드
+  tbc-front:
+    image: tbc-front:latest
+    container_name: tbc-front
+    networks:
+      - tbc-net
+    restart: unless-stopped
+
   # Spring Boot 백엔드
   tbc-back:
     image: tbc-back:latest
@@ -30,6 +38,8 @@ services:
     depends_on:
       tbc-back:
         condition: service_healthy
+      tbc-front:
+        condition: service_started
     networks:
       - tbc-net
     restart: unless-stopped

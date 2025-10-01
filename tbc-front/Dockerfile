@@ -1,5 +1,5 @@
-# Vite + React 프로덕션 빌드
-FROM node:20 AS build
+# Vite + React 개발 서버
+FROM node:20
 
 WORKDIR /app
 
@@ -11,9 +11,8 @@ RUN npm install && \
 # 소스 코드 복사
 COPY . .
 
-# Vite 프로덕션 빌드 (타입 체크 없이)
-RUN npx vite build
+# 포트 노출
+EXPOSE 5173
 
-# 빌드 결과물만 유지 (dist 폴더)
-FROM scratch AS export
-COPY --from=build /app/dist /dist
+# 개발 서버 실행
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

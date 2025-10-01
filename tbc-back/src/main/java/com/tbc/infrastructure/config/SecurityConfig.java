@@ -58,12 +58,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 운영 환경에서는 아래 리스트를 정확한 도메인으로 바꿔주세요.
-        // 예: Arrays.asList("https://app.example.com", "https://admin.example.com")
+        // 리버스 프록시 환경을 위한 CORS 설정
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "https://app.example.com",   // <--- production domain (교체)
-                "http://localhost:*",
-                "http://127.0.0.1:*"
+                "http://localhost:*",        // 개발 환경
+                "http://127.0.0.1:*",       // 개발 환경
+                "http://*",                  // 리버스 프록시 환경 (모든 HTTP 도메인)
+                "https://*"                  // 리버스 프록시 환경 (모든 HTTPS 도메인)
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
@@ -135,6 +135,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/groups/**").permitAll()
                         .requestMatchers("/api/events/**").permitAll()
                         .requestMatchers("/api/images/upload").permitAll() // 이미지 업로드 허용
+                        .requestMatchers("/api/nominatim/**").permitAll() // Nominatim 프록시 허용
                         // 모니터링 허용
                         .requestMatchers("/actuator/**").permitAll()
 

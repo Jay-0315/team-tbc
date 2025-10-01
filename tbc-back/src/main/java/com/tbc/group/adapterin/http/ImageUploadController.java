@@ -71,7 +71,8 @@ public class ImageUploadController {
             Files.write(filePath, file.getBytes());
 
             // 저장된 파일 경로 반환 (웹에서 접근 가능한 경로)
-            String imagePath = "/uploads/" + newFilename;
+            // /img 디렉토리에 저장하고 /img 경로로 반환 (Nginx가 프록시함)
+            String imagePath = "/img/" + newFilename;
 
             return ResponseEntity.ok(new ImageUploadResponse(imagePath, "이미지 업로드 성공"));
 

@@ -60,7 +60,7 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
     <div className="relative h-48 overflow-hidden bg-gray-100">
       {event.imagePath ? (
         <img
-          src={`http://localhost:8080/img/${event.imagePath.split('/').pop()}`}
+          src={`/img/${event.imagePath.split('/').pop()}`}
           alt={event.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
