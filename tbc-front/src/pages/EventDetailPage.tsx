@@ -125,7 +125,7 @@ export default function EventDetailPage() {
                 {imagePath ? (
                   <div className="overflow-hidden relative w-full aspect-[16/9]">
                     <img
-                      src={`http://localhost:8080/img/${imagePath.split('/').pop()}`}
+                      src={imagePath}
                       alt={data.title}
                       className="object-cover w-full h-full"
                       onError={(e) => {

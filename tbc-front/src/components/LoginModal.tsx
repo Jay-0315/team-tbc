@@ -60,9 +60,11 @@ export default function LoginModal({
     )
   }
 
-  // 구글 OAuth 로그인
+  // 구글 OAuth 로그인 (Spring Security OAuth2 표준 경로 사용)
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google"
+    // Spring Security가 자동으로 생성하는 OAuth2 인증 경로로 리다이렉트
+    // 상대 경로 사용하여 Vite 프록시를 통해 백엔드로 요청
+    window.location.href = '/oauth2/authorization/google'
   }
 
   if (!isOpen) return null

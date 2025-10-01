@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, Loader2, X, Mail, Lock, User, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const GOOGLE_OAUTH_URL = 'http://localhost:8080/oauth2/authorization/google'
+const GOOGLE_OAUTH_URL = '/api/oauth2/google/login'
 
 interface UnifiedAuthModalProps {
   isOpen: boolean

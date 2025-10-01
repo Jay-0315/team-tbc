@@ -16,11 +16,6 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const [isFavorited, setIsFavorited] = useState(event.favorited || false)
   const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
   
-  // 디버깅: 호스트 정보 확인
-  console.log('EventCard - event.id:', event.id)
-  console.log('EventCard - event:', event)
-  console.log('EventCard - hostNickname:', event.hostNickname)
-  console.log('EventCard - hostProfileImage:', event.hostProfileImage)
 
   // 날짜와 시간 포맷팅
   const formatDate = (dateStr?: string) => {
@@ -73,7 +68,7 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
     <div className="relative h-48 overflow-hidden bg-gray-100">
       {event.imagePath ? (
         <img
-          src={`http://localhost:8080/img/${event.imagePath.split('/').pop()}`}
+          src={event.imagePath}
           alt={event.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
