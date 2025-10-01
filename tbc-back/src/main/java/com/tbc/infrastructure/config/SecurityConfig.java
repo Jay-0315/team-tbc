@@ -10,9 +10,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
-import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+// OAuth2 기능 비활성화
+// import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+// import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+// import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,25 +26,23 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final com.tbc.login.adapter.out.security.OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    // OAuth2 기능 비활성화
+    // private final com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    // private final com.tbc.login.adapter.out.security.OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                         com.tbc.login.adapter.out.security.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
-                         com.tbc.login.adapter.out.security.OAuth2LoginFailureHandler oAuth2LoginFailureHandler) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
-        this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
+        // this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        // this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
     }
 
     /**
-     * OAuth2 Authorization Request Repository
-     * 세션 기반으로 OAuth2 인증 요청 정보를 저장
+     * OAuth2 기능 비활성화
      */
-    @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
-        return new HttpSessionOAuth2AuthorizationRequestRepository();
-    }
+    // @Bean
+    // public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+    //     return new HttpSessionOAuth2AuthorizationRequestRepository();
+    // }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -80,8 +79,8 @@ public class SecurityConfig {
                 "Access-Control-Request-Headers"
         ));
 
-        // OAuth2 세션 쿠키 전달을 위해 true 설정
-        configuration.setAllowCredentials(true);
+        // JWT Bearer 방식(Authorization 헤더 사용)으로 통일할 경우 credentials는 false 권장.
+        configuration.setAllowCredentials(false);
 
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie", "Content-Type"));
         configuration.setMaxAge(3600L);
@@ -96,24 +95,21 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(sm -> sm
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .sessionFixation().newSession()
-                )
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                // OAuth2 로그인 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2LoginSuccessHandler)
-                        .failureHandler(oAuth2LoginFailureHandler)
-                        .authorizationEndpoint(auth -> auth
-                                .baseUri("/oauth2/authorization")
-                                .authorizationRequestRepository(authorizationRequestRepository())
-                        )
-                        .redirectionEndpoint(redirect -> redirect
-                                .baseUri("/login/oauth2/code/*")
-                        )
-                )
+                // OAuth2 기능 비활성화
+                // .oauth2Login(oauth2 -> oauth2
+                //         .successHandler(oAuth2LoginSuccessHandler)
+                //         .failureHandler(oAuth2LoginFailureHandler)
+                //         .authorizationEndpoint(auth -> auth
+                //                 .baseUri("/oauth2/authorization")
+                //                 .authorizationRequestRepository(authorizationRequestRepository())
+                //         )
+                //         .redirectionEndpoint(redirect -> redirect
+                //                 .baseUri("/login/oauth2/code/*")
+                //         )
+                // )
                 .authorizeHttpRequests(auth -> auth
                         // Preflight 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -125,9 +121,9 @@ public class SecurityConfig {
                         .requestMatchers("/img/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         
-                        // OAuth2 로그인 관련 경로 허용
-                        .requestMatchers("/oauth2/**").permitAll()
-                        .requestMatchers("/login/oauth2/**").permitAll()
+                        // OAuth2 기능 비활성화
+                        // .requestMatchers("/oauth2/**").permitAll()
+                        // .requestMatchers("/login/oauth2/**").permitAll()
                         
                         // 인증 없이 허용해야 하는 경로들
                         .requestMatchers("/api/auth/login").permitAll()

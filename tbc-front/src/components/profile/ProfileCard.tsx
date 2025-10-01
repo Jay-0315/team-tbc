@@ -51,8 +51,8 @@ export function ProfileCard({ profile, onEdit }: Props) {
         </div>
       </div>
 
-      {/* 구글 계정 연동 섹션 */}
-      <div className="px-4 py-3 mt-6 border rounded-xl bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800/30">
+      {/* OAuth 기능 비활성화 */}
+      {/* <div className="px-4 py-3 mt-6 border rounded-xl bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40">
@@ -71,8 +71,6 @@ export function ProfileCard({ profile, onEdit }: Props) {
           <Button
             aria-label="구글 계정 연동하기"
             onClick={() => {
-              // Spring Security OAuth2 표준 경로 사용
-              // 현재 JWT 토큰이 있어도 OAuth2 플로우 진행
               window.location.href = '/oauth2/authorization/google'
             }}
             className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
@@ -80,7 +78,7 @@ export function ProfileCard({ profile, onEdit }: Props) {
             연동하기
           </Button>
         </div>
-      </div>
+      </div> */}
 
       {/* 팝콘 재화 섹션 */}
       <div className="px-4 py-3 mt-6 border rounded-xl bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/30">
