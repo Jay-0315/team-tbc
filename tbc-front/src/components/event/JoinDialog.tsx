@@ -5,9 +5,10 @@ interface JoinDialogProps {
   eventId: number
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
-export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogProps) {
+export default function JoinDialog({ eventId, open, onOpenChange, onSuccess }: JoinDialogProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const firstFocusable = useRef<HTMLButtonElement | null>(null)
   const [agree, setAgree] = useState<boolean>(false)
@@ -50,8 +51,9 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
     if (!canSubmit) return
     try {
       await mutateAsync({ qty: 1 })
-      showToast('신청 완료')
+      showToast('참가 신청이 완료되었습니다! 🎉')
       onOpenChange(false)
+      onSuccess?.() // 성공 시 콜백 호출 (데이터 리프레시)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : '신청 중 오류가 발생했습니다.'
       if (message === 'INSUFFICIENT_BALANCE') {
