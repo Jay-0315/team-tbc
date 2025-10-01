@@ -15,12 +15,6 @@ export default function EventCard({ event, onLoginRequired }: EventCardProps) {
   const { isAuthenticated } = useAuth()
   const [isFavorited, setIsFavorited] = useState(event.favorited || false)
   const { mutateAsync: toggleFavorite, isPending } = useToggleFavorite(event.id)
-  
-  // 디버깅: 호스트 정보 확인
-  console.log('EventCard - event.id:', event.id)
-  console.log('EventCard - event:', event)
-  console.log('EventCard - hostNickname:', event.hostNickname)
-  console.log('EventCard - hostProfileImage:', event.hostProfileImage)
 
   // 날짜와 시간 포맷팅
   const formatDate = (dateStr?: string) => {
