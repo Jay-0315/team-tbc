@@ -1,29 +1,49 @@
 version: "3.8"
 
 services:
+  # React 프론트엔드
+  tbc-front:
+    image: tbc-front:latest
+    container_name: tbc-front
+    networks:
+      - tbc-net
+    restart: unless-stopped
+
+  # Spring Boot 백엔드
   tbc-back:
-    build: ./tbc-back
+    image: tbc-back:latest
     container_name: tbc-back
     environment:
       - SPRING_PROFILES_ACTIVE=local
-    ports:
-      - "8080:8080"
+      - TZ=Asia/Seoul
+    volumes:
+      # 업로드된 이미지 파일 영구 저장
+      - ./tbc-back/img:/app/img
     networks:
       - tbc-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
-  nginx:   # ✅ 반드시 services: 아래에 위치해야 함
-    build:
-      context: .
-      dockerfile: ./nginx/Dockerfile
+  # Nginx 리버스 프록시
+  nginx:
+    image: tbc-nginx:latest
     container_name: tbc-nginx
     ports:
       - "80:80"
     depends_on:
-      - tbc-back
+      tbc-back:
+        condition: service_healthy
+      tbc-front:
+        condition: service_started
     networks:
       - tbc-net
+    restart: unless-stopped
 
 networks:
   tbc-net:
     driver: bridge
-

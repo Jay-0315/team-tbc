@@ -7,15 +7,23 @@ export function useEvents(params: EventListParams) {
   return useQuery({
     queryKey: eventKeys.list(params),
     queryFn: async () => {
-      const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/events', { params })
+      // /api/events 엔드포인트 사용 (올바른 이벤트 엔드포인트)
+      const { data } = await apiClient.get<PageResponse<EventCardDTO>>('/events', { 
+        params: {
+          page: params.page || 0,
+          size: params.size || 12,
+          category: params.category,
+          status: params.status,
+          sort: params.sort || 'CREATED_DESC'
+        }
+      })
       return data
     },
     placeholderData: (prev) => prev, // keepPreviousData-like behavior
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    staleTime: 1000 * 30,
-    gcTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30초
+    gcTime: 1000 * 60 * 5, // 5분
+    refetchInterval: 1000 * 30, // ✅ 30초마다 자동 갱신 (참가인원 실시간 반영)
   })
 }
-
-

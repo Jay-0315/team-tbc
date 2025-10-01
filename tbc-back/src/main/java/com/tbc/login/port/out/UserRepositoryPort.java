@@ -1,0 +1,16 @@
+package com.tbc.login.port.out;
+
+import com.tbc.login.domain.User;
+import java.util.List;
+import java.util.Optional;
+
+public interface UserRepositoryPort {
+    User save(User user);
+    Optional<User> findById(Long id);
+    List<User> findByIdIn(List<Long> ids);
+    Optional<User> findByEmail(String email);
+    Optional<User> findByNickname(String nickname);
+    Optional<User> findByGoogleId(String googleId);
+    boolean existsByEmail(String email);
+    boolean existsByNickname(String nickname);
+}

@@ -1,4 +1,9 @@
+img/
+# Environment-specific configs (keep application.yml but ignore local configs)
 src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+
+# Build outputs
 HELP.md
 .gradle
 build/
@@ -36,3 +41,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+
+# Log files
+*.log

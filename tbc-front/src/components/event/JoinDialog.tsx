@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useJoinEvent } from '../../services/events'
+import { toast } from 'sonner'
 
 interface JoinDialogProps {
   eventId: number
@@ -10,7 +11,6 @@ interface JoinDialogProps {
 export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const firstFocusable = useRef<HTMLButtonElement | null>(null)
-  const [qty, setQty] = useState<number>(1)
   const [agree, setAgree] = useState<boolean>(false)
   const { mutateAsync, isPending } = useJoinEvent(eventId)
 
@@ -45,17 +45,27 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
     }
   }
 
-  const canSubmit = qty >= 1 && agree && !isPending
+  const canSubmit = agree && !isPending
 
   const submit = async () => {
     if (!canSubmit) return
     try {
-      await mutateAsync({ qty })
-      showToast('신청 완료')
+      await mutateAsync()
+      toast.success('🎉 모임 참가가 완료되었습니다!', {
+        description: '채팅방에서 다른 참가자들과 소통해보세요.',
+        duration: 3000,
+      })
       onOpenChange(false)
+      // 페이지 리프레시
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : '신청 중 오류가 발생했습니다.'
-      showToast(message, true)
+      toast.error('참가 신청 실패', {
+        description: message,
+        duration: 3000,
+      })
     }
   }
 
@@ -63,50 +73,28 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="flex fixed inset-0 z-50 justify-center items-center bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-labelledby="join-title"
       aria-describedby="join-desc"
       aria-modal="true"
     >
-      <div className="absolute inset-0 bg-black/40" onClick={() => onOpenChange(false)} />
-      <div ref={dialogRef} className="relative z-10 w-full max-w-md rounded-xl bg-white p-4 shadow-lg">
+      {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+      <button
+        onClick={() => onOpenChange(false)}
+        className="absolute top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg"
+        aria-label="닫기"
+      >
+        ✕
+      </button>
+      
+      <div className="absolute inset-0 bg-black/40" />
+      <div ref={dialogRef} className="relative z-10 p-4 w-full max-w-md bg-white rounded-xl shadow-lg">
         <h2 id="join-title" className="text-lg font-semibold">참가 신청</h2>
-        <p id="join-desc" className="text-sm text-zinc-600 mt-1">수량을 선택하고 약관에 동의해주세요.</p>
+        <p id="join-desc" className="mt-1 text-sm text-zinc-600">약관에 동의해주세요.</p>
 
         <div className="mt-4 space-y-3">
-          <div>
-            <label className="text-sm font-medium">수량</label>
-            <div className="mt-1 inline-flex items-center rounded border border-zinc-300 overflow-hidden">
-              <button
-                ref={firstFocusable}
-                type="button"
-                className="px-3 py-2 hover:bg-zinc-50"
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                aria-label="수량 감소"
-              >
-                -
-              </button>
-              <input
-                type="number"
-                min={1}
-                value={qty}
-                onChange={(e) => setQty(Math.max(1, Number(e.target.value)))}
-                className="w-16 text-center py-2 outline-none"
-                aria-label="수량"
-              />
-              <button
-                type="button"
-                className="px-3 py-2 hover:bg-zinc-50"
-                onClick={() => setQty((q) => q + 1)}
-                aria-label="수량 증가"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <label className="inline-flex items-center gap-2 text-sm">
+          <label className="inline-flex gap-2 items-center text-sm">
             <input
               type="checkbox"
               checked={agree}
@@ -117,7 +105,7 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
           </label>
         </div>
 
-        <div className="mt-5 flex justify-end gap-2">
+        <div className="flex gap-2 justify-end mt-5">
           <button
             type="button"
             className="px-4 h-10 rounded border border-zinc-300 hover:bg-zinc-50"
@@ -127,7 +115,7 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
           </button>
           <button
             type="button"
-            className="px-4 h-10 rounded bg-black text-white disabled:opacity-50"
+            className="px-4 h-10 text-white bg-black rounded disabled:opacity-50"
             disabled={!canSubmit}
             onClick={submit}
             aria-busy={isPending}
@@ -141,27 +129,5 @@ export default function JoinDialog({ eventId, open, onOpenChange }: JoinDialogPr
   )
 }
 
-function showToast(message: string, isError = false) {
-  const id = 'toast-area'
-  let area = document.getElementById(id)
-  if (!area) {
-    area = document.createElement('div')
-    area.id = id
-    area.setAttribute('role', 'status')
-    area.setAttribute('aria-live', 'polite')
-    area.style.position = 'fixed'
-    area.style.bottom = '16px'
-    area.style.left = '50%'
-    area.style.transform = 'translateX(-50%)'
-    document.body.appendChild(area)
-  }
-  const el = document.createElement('div')
-  el.textContent = message
-  el.className = `mt-1 px-3 py-2 rounded text-sm ${isError ? 'bg-red-600 text-white' : 'bg-black text-white'}`
-  area.appendChild(el)
-  setTimeout(() => {
-    area?.removeChild(el)
-  }, 1500)
-}
 
 

@@ -1,12 +1,13 @@
 package com.tbc.events.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.tbc.events.domain.Event;
-import com.tbc.events.domain.EventStatus;
+import com.tbc.group.adapterout.persistence.jpa.entity.GroupEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(name = "EventCardDTO", description = "이벤트 카드 요약 정보")
@@ -24,7 +25,7 @@ public class EventCardDTO {
     public String category;
 
     @Schema(description = "상태", example = "OPEN")
-    public EventStatus status;
+    public String status;
 
     @Schema(description = "남은 좌석 수", example = "90")
     public Integer remainingSeats;
@@ -34,7 +35,13 @@ public class EventCardDTO {
 
     @Schema(description = "장소", example = "Seoul")
     public String location;
+    
+    @Schema(description = "이벤트 날짜", example = "2025-09-10")
+    public LocalDate eventDate;
 
+    @Schema(description = "이벤트 시간", example = "14:30")
+    public LocalTime eventTime;
+    
     @Schema(description = "총 정원", example = "100")
     public Integer capacity;
 
@@ -44,22 +51,83 @@ public class EventCardDTO {
     @Schema(description = "즐겨찾기 여부(로그인 헤더 있을 때만 포함)", example = "false", nullable = true)
     public Boolean favorited;
 
-    public static EventCardDTO from(Event e, Boolean favorited) {
+    @Schema(description = "요금 유형", example = "PAID")
+    public String feeType;
+    
+    @Schema(description = "요금(팝콘)", example = "10")
+    public Integer feeAmount;
+    
+    @Schema(description = "호스트 사용자 ID", example = "42")
+    public Long hostId;
+
+    @Schema(description = "위도", example = "37.5663")
+    public Double latitude;
+    
+    @Schema(description = "경도", example = "126.9779")
+    public Double longitude;
+    
+    @Schema(description = "이미지 경로", example = "/uploads/abc-123.jpg")
+    public String imagePath;
+
+    @Schema(description = "호스트 닉네임", example = "홍길동")
+    public String hostNickname;
+
+    @Schema(description = "호스트 프로필 이미지 URL", example = "https://example.com/profile.jpg")
+    public String hostProfileImage;
+
+    // 기본 생성자
+    public EventCardDTO() {}
+
+    // DTO Projection을 위한 생성자 (쿼리 매개변수 순서와 정확히 일치)
+    public EventCardDTO(Long id, String title, String coverUrl, String category, String status,
+                       Integer capacity, Integer joined, Integer remainingSeats, Instant startAt,
+                       String location, LocalDate eventDate, LocalTime eventTime, Boolean favorited,
+                       String feeType, Integer feeAmount, Long hostId, Double latitude, Double longitude,
+                       String imagePath, String hostNickname, String hostProfileImage) {
+        this.id = id;
+        this.title = title;
+        this.coverUrl = coverUrl;
+        this.category = category;
+        this.status = status;
+        this.capacity = capacity;
+        this.joined = joined;
+        this.remainingSeats = remainingSeats;
+        this.startAt = startAt;
+        this.location = location;
+        this.eventDate = eventDate;
+        this.eventTime = eventTime;
+        this.favorited = favorited;
+        this.feeType = feeType;
+        this.feeAmount = feeAmount;
+        this.hostId = hostId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.imagePath = imagePath;
+        this.hostNickname = hostNickname;
+        this.hostProfileImage = hostProfileImage;
+    }
+
+    public static EventCardDTO fromGroupEntity(GroupEntity e, Boolean favorited) {
         EventCardDTO dto = new EventCardDTO();
         dto.id = e.getId();
         dto.title = e.getTitle();
         dto.coverUrl = e.getCoverUrl();
         dto.category = e.getCategory();
-        dto.status = e.getStatus();
+        dto.status = "OPEN"; // GroupEntity는 status 필드가 없으므로 기본값 설정
         dto.capacity = e.getCapacity();
         dto.joined = e.getJoined();
         dto.remainingSeats = Math.max(0, e.getCapacity() - e.getJoined());
         dto.startAt = e.getStartAt() == null ? null : e.getStartAt().atOffset(ZoneOffset.UTC).toInstant();
         dto.location = e.getLocation();
+        dto.eventDate = e.getEventDate();
+        dto.eventTime = e.getEventTime();
         dto.favorited = favorited;
+        dto.feeType = e.getFeeType();
+        dto.feeAmount = e.getFeeAmount();
+        dto.hostId = e.getHostId();
+        dto.latitude = e.getLatitude();
+        dto.longitude = e.getLongitude();
+        dto.imagePath = e.getImagePath();
         return dto;
     }
 }
-
-
-
