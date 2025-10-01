@@ -3,9 +3,9 @@ FROM node:20
 
 WORKDIR /app
 
-# 의존성 파일 복사 및 설치
-COPY package.json ./
-RUN npm install && \
+# 의존성 파일 복사 및 설치 (캐시 최적화)
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production=false && \
     npm cache clean --force
 
 # 소스 코드 복사

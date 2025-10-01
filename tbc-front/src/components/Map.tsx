@@ -31,6 +31,15 @@ function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }
 }
 
 export default function Map({ lat, lng, locationName, zoom = 15, height = "300px" }: MapProps) {
+  // 유효하지 않은 좌표 체크
+  if (isNaN(lat) || isNaN(lng) || lat === null || lng === null) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-gray-100 rounded-xl border-2 border-gray-200">
+        <p className="text-gray-500">유효하지 않은 좌표입니다.</p>
+      </div>
+    )
+  }
+
   const position: [number, number] = [lat, lng]
 
   return (
@@ -39,7 +48,8 @@ export default function Map({ lat, lng, locationName, zoom = 15, height = "300px
         center={position}
         zoom={zoom}
         style={{ height: '100%', width: '100%', zIndex: 10 }}
-        scrollWheelZoom={false}
+        scrollWheelZoom={true}
+        zoomControl={true}
       >
         <ChangeView center={position} zoom={zoom} />
         <TileLayer

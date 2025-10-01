@@ -1,6 +1,7 @@
 package com.tbc.events.web.controller;
 
 import com.tbc.events.application.facade.EventFacade;
+import com.tbc.events.application.service.LocationService;
 import com.tbc.events.web.dto.*;
 import com.tbc.login.domain.UserService;
 import com.tbc.login.domain.User;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
+import java.util.List;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class EventController {
 
         private final EventFacade eventFacade;
+        private final LocationService locationService;
         private final UserService userService;
 
         @GetMapping
@@ -212,6 +215,27 @@ public class EventController {
                     throw new org.springframework.security.access.AccessDeniedException("로그인이 필요합니다.");
             }
             return eventFacade.toggleFavorite(id, userId);
+    }
+
+    @GetMapping("/location/search")
+    @Operation(summary = "장소 검색", description = "Nominatim API를 통해 장소를 검색합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "검색 성공"),
+        @ApiResponse(responseCode = "400", description = "요청 오류"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    public ResponseEntity<List<LocationSearchResponse>> searchLocation(
+            @Parameter(description = "검색 키워드", required = true)
+            @RequestParam String q,
+            @Parameter(description = "결과 개수 제한", required = false)
+            @RequestParam(defaultValue = "5") int limit) {
+        
+        try {
+            List<LocationSearchResponse> results = locationService.searchLocation(q, limit);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
         private Long getUserId(Authentication authentication) {
