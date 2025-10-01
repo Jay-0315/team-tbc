@@ -1,0 +1,15 @@
+build/
+.gradle/
+bin/
+.git
+.gitignore
+*.log
+.DS_Store
+.vscode
+.idea
+*.md
+docker-compose*.yml
+Dockerfile.dev
+bootrun.out
+temp_*.java
+
