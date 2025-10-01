@@ -91,12 +91,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/api/events/*").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/events/*/reviews").permitAll()
 
-                        // WebSocket 허용 - ** 패턴 대신 구체적인 패턴 사용
-                        .requestMatchers("/ws").permitAll()
-                        .requestMatchers("/ws/").permitAll()
-                        .requestMatchers("/ws/info").permitAll()
-                        .requestMatchers("/ws/info/").permitAll()
-                        .requestMatchers("/ws/info/*").permitAll()
+                        // WebSocket 허용 - SockJS 모든 경로 허용
+                        .requestMatchers("/ws/**").permitAll()
 
                         // 정적 리소스 허용
                         .requestMatchers("/img/**").permitAll()

@@ -88,6 +88,9 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
     })
   }, [setSearchParams])
 
+  // 검색 활성화 여부 확인
+  const isSearchActive = searchQuery.trim().length > 0
+
   // 검색 핸들러
   const handleSearch = useCallback(() => {
     updateSearchParams({ search: searchQuery || null })
@@ -134,8 +137,65 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
           </div>
         </div>
 
-        {/* 최근 개설된 모임 - 4개 그리드 */}
-        <section className="px-6 py-4 bg-white">
+        {/* 검색 시 전체 모임을 먼저 표시 */}
+        {isSearchActive && (
+          <section className="px-6 py-8 bg-white">
+            <div className="max-w-7xl mx-auto">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-800">🔍 검색 결과</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {isLoading ? (
+                  <EventCardSkeletonGrid count={12} />
+                ) : isError ? (
+                  <div className="col-span-full py-16 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 mb-4 text-orange-400 bg-orange-50 rounded-full">
+                      <AlertCircle className="w-8 h-8" />
+                    </div>
+                    <h3 className="mb-2 text-xl font-semibold text-gray-800">데이터를 불러오는 중 오류가 발생했습니다</h3>
+                    {error && <p className="text-red-600">{(error as Error).message}</p>}
+                  </div>
+                ) : allEvents.length === 0 ? (
+                  <div className="col-span-full py-16 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 mb-4 text-orange-400 bg-orange-50 rounded-full">
+                      <Calendar className="w-8 h-8" />
+                    </div>
+                    <h3 className="mb-2 text-xl font-semibold text-gray-800">일치하는 내용이 없습니다.</h3>
+                    <p className="text-gray-600 mb-8">다른 검색어를 시도해보세요.</p>
+                  </div>
+                ) : (
+                  allEvents.slice(0, displayCount).map((event) => (
+                    <EventCard key={event.id} event={event} onLoginRequired={handleLoginRequired} />
+                  ))
+                )}
+              </div>
+
+              {/* 더보기 버튼 */}
+              {displayCount < allEvents.length && (
+                <div className="mt-12 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    className="inline-flex items-center gap-2 px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                    더보기 ({allEvents.length - displayCount}개 남음)
+                  </button>
+                </div>
+              )}
+
+              {/* 모든 데이터를 확인했을 때 */}
+              {displayCount >= allEvents.length && allEvents.length > 0 && (
+                <div className="mt-12 text-center">
+                  <p className="text-gray-500">모든 검색 결과를 확인했습니다</p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 최근 개설된 모임 - 4개 그리드 (검색 시 블러 처리) */}
+        <section className={`px-6 py-4 bg-white transition-all duration-300 ${isSearchActive ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
           <div className="mx-auto max-w-7xl">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800">🆕 최근 개설된 모임</h2>
@@ -159,8 +219,8 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
           </div>
         </section>
 
-        {/* 인기 모임 - 4개 그리드 */}
-        <section className="px-6 py-4 bg-white">
+        {/* 인기 모임 - 4개 그리드 (검색 시 블러 처리) */}
+        <section className={`px-6 py-4 bg-white transition-all duration-300 ${isSearchActive ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
           <div className="mx-auto max-w-7xl">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800">🔥 인기 모임</h2>
@@ -184,7 +244,8 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
           </div>
         </section>
 
-        {/* 전체 모임 - 그리드 */}
+        {/* 전체 모임 - 그리드 (검색 시 숨김) */}
+        {!isSearchActive && (
         <section className="px-6 py-8 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="mb-8">
@@ -246,6 +307,7 @@ export default function HomePage({ onCreateSocialing }: HomePageProps) {
             )}
           </div>
         </section>
+        )}
       </div>
 
       {/* 로그인 모달 */}

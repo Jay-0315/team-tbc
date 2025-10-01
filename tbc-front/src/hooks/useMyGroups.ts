@@ -15,6 +15,10 @@ export interface GroupCard {
   tags?: string[]
   hostId: number
   createdAt?: string
+  eventDate?: string  // ✅ 추가
+  startAt?: string    // ✅ 추가
+  status?: string     // ✅ 추가 (OPEN, CLOSED 등)
+  unreadCount?: number
 }
 
 export interface GroupsResponse {
