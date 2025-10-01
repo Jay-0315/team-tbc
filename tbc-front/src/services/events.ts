@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '../lib/api'
+import axios from 'axios'
 import { eventKeys } from '../features/events/api/keys'
 import type { ReviewDTO } from '../types/review'
 import type { Page, EventListParams, EventCardDTO } from '../types/event'
+export type WalletBalanceResponse = { userId: number; balance: number }
 
 type ToggleFavoriteResponse = { favorited: boolean }
 
@@ -31,8 +33,49 @@ export type JoinRequest = { qty?: number }
 export type JoinResponse = { ok: true }
 
 async function joinEventRequest(eventId: number): Promise<JoinResponse> {
-  await apiClient.post(`/groups/${eventId}/join`)
-  return { ok: true }
+  try {
+    await apiClient.post(`/groups/${eventId}/join`)
+    return { ok: true }
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status
+      const message = err.response?.data?.message || err.message
+      
+      // 402: 잔액 부족
+      if (status === 402) {
+        throw new Error('INSUFFICIENT_BALANCE')
+      }
+      
+      // 409: 중복 참가 등
+      if (status === 409) {
+        if (message?.includes('ALREADY_JOINED')) {
+          throw new Error('이미 참가한 소셜링입니다.')
+        }
+        if (message?.includes('GROUP_FULL')) {
+          throw new Error('정원이 마감되었습니다.')
+        }
+        if (message?.includes('GROUP_ALREADY_STARTED')) {
+          throw new Error('이미 시작된 소셜링입니다.')
+        }
+        if (message?.includes('GROUP_NOT_OPEN')) {
+          throw new Error('참가할 수 없는 상태입니다.')
+        }
+        throw new Error('참가할 수 없습니다.')
+      }
+      
+      // 404: 그룹을 찾을 수 없음
+      if (status === 404) {
+        throw new Error('소셜링을 찾을 수 없습니다.')
+      }
+      
+      // 401: 인증 필요
+      if (status === 401) {
+        throw new Error('로그인이 필요합니다.')
+      }
+    }
+    
+    throw err instanceof Error ? err : new Error('신청 중 오류가 발생했습니다.')
+  }
 }
 
 export function useJoinEvent(eventId: number) {
@@ -48,9 +91,14 @@ export function useJoinEvent(eventId: number) {
   })
 }
 
+// Wallet
+export async function fetchMyWallet(): Promise<WalletBalanceResponse> {
+  const { data } = await apiClient.get<WalletBalanceResponse>('/payments/wallet/me')
+  return data
+}
+
 // Events - /api/groups 엔드포인트 사용 (events 테이블)
 export async function fetchEvents(params: EventListParams = {}): Promise<Page<EventCardDTO>> {
-  console.log('fetchEvents called with params:', params)
   const { data } = await apiClient.get<Page<EventCardDTO>>('/groups', {
     params: {
       page: params.page ?? 0,
@@ -63,7 +111,6 @@ export async function fetchEvents(params: EventListParams = {}): Promise<Page<Ev
       ...(params.sort && { sort: params.sort }),
     }
   })
-  console.log('fetchEvents response:', data)
   return data
 }
 

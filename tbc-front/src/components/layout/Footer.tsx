@@ -58,7 +58,7 @@ export default function Footer() {
         </div>
 
         {/* 하단 구분선 */}
-        <div className="pt-6 mt-6 border-t border-gray-700">
+        <div className="pt-6 mt-6 border-t border-gray-500">
           <div className="flex flex-col gap-4 justify-between items-center text-sm text-gray-500 md:flex-row">
             <div className="text-center md:text-left">
               <p>© 2025 HolaPop. All rights reserved.</p>

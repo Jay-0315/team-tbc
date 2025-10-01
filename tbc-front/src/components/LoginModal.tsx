@@ -60,10 +60,10 @@ export default function LoginModal({
     )
   }
 
-  // 구글 OAuth 로그인
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google"
-  }
+  // OAuth 기능 비활성화
+  // const handleGoogleLogin = () => {
+  //   window.location.href = '/oauth2/authorization/google'
+  // }
 
   if (!isOpen) return null
 
@@ -115,15 +115,15 @@ export default function LoginModal({
           </button>
         </form>
 
-        {/* OAuth 로그인 */}
-        <div className="modal-footer">
+        {/* OAuth 기능 비활성화 */}
+        {/* <div className="modal-footer">
           <button
             onClick={handleGoogleLogin}
             className="btn-white btn-full"
           >
             Google 계정으로 로그인
           </button>
-        </div>
+        </div> */}
 
         <div className="modal-footer">
           <p>

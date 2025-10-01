@@ -31,7 +31,7 @@ export function DeleteEventDialog({ event, children }: DeleteEventDialogProps) {
       onSuccess: () => {
         toast.success('모임이 성공적으로 삭제되었습니다.')
         setOpen(false)
-        navigate('/events') // 이벤트 목록으로 이동
+        navigate('/') // 홈페이지로 이동
       },
       onError: (error) => {
         toast.error(`모임 삭제에 실패했습니다: ${error.message}`)

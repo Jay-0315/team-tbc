@@ -35,10 +35,7 @@ public class GroupController {
     @PostMapping
     public GroupCreateResponse create(@RequestBody GroupCreateRequest req,
                                       @RequestHeader("X-User-Id") Long hostId) {
-        System.out.println("Received group creation request: " + req);
-        System.out.println("Host ID: " + hostId);
         Long id = groupFacade.createGroup(req, hostId);
-        System.out.println("Created group with ID: " + id);
         return new GroupCreateResponse(id);
     }
 
@@ -46,12 +43,15 @@ public class GroupController {
     @PostMapping("/{groupId}/join")
     public ResponseEntity<Void> join(@PathVariable Long groupId, HttpServletRequest request) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
+        
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            memberRepository.addMember(groupId, userId);
+            groupFacade.joinGroup(groupId, userId);
             return ResponseEntity.ok().build();
+        } catch (org.springframework.web.server.ResponseStatusException rse) {
+            return ResponseEntity.status(rse.getStatusCode()).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

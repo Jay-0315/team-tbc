@@ -16,7 +16,7 @@ export default function CreateSocialingModal({ isOpen, onClose, onCreated }: Pro
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent 
-        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-gradient-to-br from-slate-50 via-white to-slate-100"
+        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-white"
         aria-describedby="create-socialing-description"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}

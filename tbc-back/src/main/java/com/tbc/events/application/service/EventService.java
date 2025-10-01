@@ -49,8 +49,6 @@ public class EventService {
         String normalizedCategory = (category == null || category.isBlank()) ? null : category;
         String normalizedQuery = (q == null || q.isBlank()) ? null : q.trim();
         
-        System.out.println("EventService.list - q: '" + q + "', normalizedQuery: '" + normalizedQuery + "'");
-        
         Sort s = mapSort(sort);
         Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), s);
         
@@ -82,8 +80,8 @@ public class EventService {
                     User user = userMap.get(group.getHostId());
                     ProfileEntity profile = profileMap.get(group.getHostId());
                     
-                    // 실제 참여자 수 계산
-                    int actualJoinedCount = groupMemberJpaRepository.countByGroupIdAndStatus(group.getId(), "ACTIVE");
+                        // 실제 참여자 수 계산
+                        int actualJoinedCount = groupMemberJpaRepository.countByGroupIdAndStatus(group.getId(), "ACTIVE");
                     
                     EventCardDTO dto = EventCardDTO.fromGroupEntity(group, null);
                     // 실제 참여자 수로 업데이트

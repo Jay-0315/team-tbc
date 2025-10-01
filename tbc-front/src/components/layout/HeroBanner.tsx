@@ -128,7 +128,7 @@ export default function HeroBanner({ isAuthenticated, onLoginClick, onSignupClic
                         </span>
                       </button>
                     </Link>
-                    <Link to="/events">
+                    <Link to="/">
                       <button className="px-8 py-4 text-lg font-semibold text-purple-500 rounded-2xl border-2 border-purple-200 backdrop-blur-sm transition-all duration-300 transform hover:bg-purple-25 hover:border-purple-300 hover:scale-105">
                         <span className="flex items-center gap-2">
                           <Calendar className="w-5 h-5" />
