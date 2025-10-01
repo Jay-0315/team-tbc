@@ -126,7 +126,6 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
-        onClick={onClose}
       >
         {/* 배경 오버레이 */}
         <motion.div
@@ -135,6 +134,15 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         />
+        
+        {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg"
+          aria-label="닫기"
+        >
+          ✕
+        </button>
         
         {/* 모달 컨테이너 - 반응형 스케일 조정 */}
         <motion.div
@@ -149,13 +157,6 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = 'login' }: Uni
           <div className="overflow-y-auto max-h-[calc(100vh-4rem)]">
             {/* 헤더 */}
             <div className="relative p-6 pb-4 bg-white sticky top-0 z-10 border-b border-gray-100">
-              <button
-                onClick={onClose}
-                aria-label="닫기"
-                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
-              >
-                <X className="w-5 h-5" />
-              </button>
               
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 bg-gradient-to-br from-orange-400 to-amber-400 rounded-full shadow-lg">

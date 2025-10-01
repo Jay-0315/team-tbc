@@ -229,7 +229,7 @@ public class ChatFacade {
     }
 
     // ✅ 사용자 온라인 상태 조회 (모든 채팅방 통합)
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true)date=short  findst
     public boolean isUserOnline(Long userId) {
         // 해당 사용자가 어느 채팅방이든 ONLINE 상태면 true
         List<ChatRoomPresence> userPresences = presenceRepo.findByIdUserId(userId);

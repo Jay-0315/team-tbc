@@ -6,13 +6,15 @@ export type WalletBalance = {
   balance: number
 }
 
+export async function fetchMyWallet(): Promise<WalletBalance> {
+  const { data } = await apiClient.get<WalletBalance>('/payments/wallet/me')
+  return data
+}
+
 export function useWalletBalance() {
   return useQuery<WalletBalance>({
     queryKey: ['wallet','balance','me'],
-    queryFn: async () => {
-      const { data } = await apiClient.get<WalletBalance>('/payments/wallet/me')
-      return data
-    },
+    queryFn: fetchMyWallet,
     staleTime: 0,
     retry: 1,
   })

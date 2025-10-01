@@ -40,11 +40,25 @@ export function DeleteEventDialog({ event, children }: DeleteEventDialogProps) {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={() => {}}>
       <AlertDialogTrigger asChild>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className="bg-white border-2 border-gray-300 shadow-2xl backdrop-blur-sm">
+      <AlertDialogContent 
+        className="bg-white border-2 border-gray-300 shadow-2xl backdrop-blur-sm"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
+        {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+        <button
+          onClick={() => setOpen(false)}
+          disabled={deleteEvent.isPending}
+          className="absolute top-4 right-4 z-50 flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="닫기"
+        >
+          ✕
+        </button>
+        
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <Trash2 className="h-5 w-5 text-red-500" />

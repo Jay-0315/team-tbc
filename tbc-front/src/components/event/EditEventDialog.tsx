@@ -105,13 +105,34 @@ export function EditEventDialog({ event, children }: EditEventDialogProps) {
       }
     }
   }
+  
+  const handleClose = () => {
+    if (!updateEvent.isPending) {
+      setOpen(false)
+      reset()
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={() => {}}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-2 border-gray-300 shadow-2xl backdrop-blur-sm">
+      <DialogContent 
+        className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-2 border-gray-300 shadow-2xl backdrop-blur-sm"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
+        {/* 우측 상단 닫기 버튼 - 반투명 동그라미 */}
+        <button
+          onClick={handleClose}
+          disabled={updateEvent.isPending}
+          className="absolute top-4 right-4 z-50 flex items-center justify-center w-10 h-10 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all hover:scale-110 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="닫기"
+        >
+          ✕
+        </button>
+        
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Edit className="h-5 w-5" />

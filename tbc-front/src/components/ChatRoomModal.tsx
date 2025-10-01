@@ -39,7 +39,6 @@ export function ChatRoomModal({ isOpen, onClose }: ChatRoomModalProps) {
       className="flex fixed inset-0 z-50 justify-center items-center bg-black/60 backdrop-blur-sm" 
       role="dialog" 
       aria-modal="true"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       {/* 닫기 버튼 - 반투명 동그라미 */}
       <button 

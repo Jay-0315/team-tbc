@@ -87,7 +87,19 @@ public class ProfileController {
     public ResponseEntity<ProfileResponse> getUserProfile(@PathVariable Long userId) {
         Optional<Profile> profile = profileService.findByUserId(userId);
         if (profile.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            // 프로필이 없을 때 기본 프로필 반환 (404 대신)
+            ProfileResponse defaultProfile = new ProfileResponse(
+                null,                        // id
+                userId,                      // userId
+                null,                        // profileImageUrl
+                "사용자" + userId,           // displayName
+                null,                        // gender
+                null,                        // bio
+                List.of(),                   // interests
+                null,                        // createdAt
+                null                         // updatedAt
+            );
+            return ResponseEntity.ok(defaultProfile);
         }
 
         return ResponseEntity.ok(ProfileResponse.from(profile.get()));
