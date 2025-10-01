@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
 import { useEffect, useState } from 'react'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
+import { fetchMyWallet } from '@/features/payments/api/useBalance'
 
 import type { User as TbcUser } from '@/types/auth'
 
@@ -18,6 +19,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
   // 인증 상태가 변경되면 프로필 다시 가져오기
   useEffect(() => {
@@ -25,6 +27,25 @@ export default function Header({ user, onLogout }: HeaderProps) {
       refetchProfile()
     }
   }, [isAuthenticated, refetchProfile])
+
+  // 지갑 잔액 불러오기
+  useEffect(() => {
+    let ignore = false
+    const load = async () => {
+      if (!isAuthenticated) {
+        setWalletBalance(null)
+        return
+      }
+      try {
+        const res = await fetchMyWallet()
+        if (!ignore) setWalletBalance(res.balance)
+      } catch {
+        if (!ignore) setWalletBalance(null)
+      }
+    }
+    load()
+    return () => { ignore = true }
+  }, [isAuthenticated])
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -118,13 +139,31 @@ export default function Header({ user, onLogout }: HeaderProps) {
               {/* 드롭다운 메뉴 */}
               {isDropdownOpen && (
                 <div
-                  className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
+                  className="absolute right-0 z-50 mt-2 w-auto min-w-[10rem] max-w-[18rem] bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
                   role="menu"
                 >
                   <div className="py-1">
-                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                    <div className="px-4 pt-2 pb-1 text-sm text-gray-500 truncate">
                       {profile?.nickname || profile?.displayName || user?.realName || user?.nickname}님
                     </div>
+                    {/* 잔액 표시 + 충전 버튼 */}
+                    <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-900">
+                      <span aria-label="지갑 잔액">
+                        🍿 {walletBalance !== null ? `${Math.floor(walletBalance / 100)}개` : '잔액 조회'}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                          window.location.href = '/payments/charge'
+                        }}
+                        className="px-2 py-1 text-xs font-medium text-white bg-black rounded hover:bg-black/90"
+                        role="menuitem"
+                        aria-label="충전하기"
+                      >
+                        충전
+                      </button>
+                    </div>
+                    <div className="border-t border-gray-100" />
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false)

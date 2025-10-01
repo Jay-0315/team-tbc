@@ -3,6 +3,7 @@ package com.tbc.login.adapter.in.controller;
 import com.tbc.login.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,15 @@ public class UserController {
     }
 
     @GetMapping("/check-nickname")
-    public ResponseEntity<?> checkNickname(@RequestParam String nickname) {
-        return ResponseEntity.ok(userService.isNicknameAvailable(nickname));
+    public ResponseEntity<?> checkNickname(@RequestParam String nickname, Authentication auth) {
+        Long currentUserId = null;
+        if (auth != null && auth.isAuthenticated()) {
+            try {
+                currentUserId = Long.parseLong(auth.getName());
+            } catch (NumberFormatException e) {
+                // 인증되지 않았거나 ID 파싱 실패 시 null 유지
+            }
+        }
+        return ResponseEntity.ok(userService.isNicknameAvailable(nickname, currentUserId));
     }
 }

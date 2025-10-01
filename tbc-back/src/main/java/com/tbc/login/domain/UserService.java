@@ -129,6 +129,20 @@ public class UserService {
         return !userRepository.existsByNickname(nickname);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isNicknameAvailable(String nickname, Long currentUserId) {
+        if (currentUserId == null) {
+            return isNicknameAvailable(nickname);
+        }
+        // 현재 사용자의 닉네임인지 확인
+        Optional<User> currentUser = userRepository.findById(currentUserId);
+        if (currentUser.isPresent() && nickname.equals(currentUser.get().getNickname())) {
+            return true; // 본인의 현재 닉네임이면 사용 가능
+        }
+        // 다른 사용자가 사용 중인지 확인
+        return !userRepository.existsByNickname(nickname);
+    }
+
     @Transactional
     public void updateNickname(Long userId, String newNickname) {
         if (userId == null || newNickname == null || newNickname.trim().isEmpty()) {
