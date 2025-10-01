@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
-import { useEffect, useState } from 'react'
-import { fetchMyWallet } from '@/services/events'
 import { useProfile } from '@/hooks/useProfile'
+import { useEffect, useState } from 'react'
 import { UnifiedAuthModal } from '@/components/auth/UnifiedAuthModal'
+import { fetchMyWallet } from '@/features/payments/api/useBalance'
 
 import type { User as TbcUser } from '@/types/auth'
 
@@ -15,6 +15,7 @@ interface HeaderProps {
 export default function Header({ user, onLogout }: HeaderProps) {
   const { isAuthenticated } = useAuth()
   const { data: profile, refetch: refetchProfile } = useProfile()
+  const location = useLocation()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
@@ -69,6 +70,17 @@ export default function Header({ user, onLogout }: HeaderProps) {
     setIsDropdownOpen(false)
   }
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (location.pathname === '/') {
+      // 이미 홈페이지에 있으면 새로고침만
+      window.location.reload()
+    } else {
+      // 다른 페이지에서는 홈페이지로 이동 (자동 새로고침됨)
+      window.location.href = '/'
+    }
+  }
+
   const handleUserIconClick = () => {
     if (isAuthenticated) {
       setIsDropdownOpen(!isDropdownOpen)
@@ -78,13 +90,14 @@ export default function Header({ user, onLogout }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full transition-colors duration-300 bg-white border-b border-gray-200">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white transition-colors duration-300">
       <div className="px-6">
-        <div className="flex items-center justify-between h-16 mx-auto max-w-7xl">
+        <div className="max-w-7xl mx-auto flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80"
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center space-x-3 text-xl font-bold transition-colors duration-300 hover:opacity-80 cursor-pointer"
+              aria-label="홈으로 이동"
             >
               {/* HolaPop 로고 */}
               <img 
@@ -92,7 +105,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                 alt="HolaPop" 
                 className="w-auto h-30"
               />
-            </Link>
+            </button>
           </div>
         
         <div className="flex items-center space-x-4">
@@ -101,9 +114,8 @@ export default function Header({ user, onLogout }: HeaderProps) {
             <div className="relative dropdown-container">
               <button
                 onClick={handleUserIconClick}
-                className="flex items-center justify-center w-10 h-10 overflow-hidden transition-all duration-300 bg-white border-2 border-gray-300 rounded-full hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                className="flex overflow-hidden justify-center items-center w-10 h-10 bg-white rounded-full border-2 border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 aria-haspopup="menu"
-                aria-expanded={isDropdownOpen}
                 aria-label="사용자 메뉴"
               >
                 {profile?.profileImageUrl ? (
@@ -127,17 +139,17 @@ export default function Header({ user, onLogout }: HeaderProps) {
               {/* 드롭다운 메뉴 */}
               {isDropdownOpen && (
                 <div
-                  className="absolute right-0 z-50 w-auto min-w-[10rem] max-w-[18rem] mt-2 transition-all duration-200 bg-white border border-gray-200 rounded-md shadow-lg"
+                  className="absolute right-0 z-50 mt-2 w-auto min-w-[10rem] max-w-[18rem] bg-white rounded-md border border-gray-200 shadow-lg transition-all duration-200"
                   role="menu"
                 >
-                    <div className="py-1">
+                  <div className="py-1">
                     <div className="px-4 pt-2 pb-1 text-sm text-gray-500 truncate">
                       {profile?.nickname || profile?.displayName || user?.realName || user?.nickname}님
                     </div>
-                    {/* Wallet balance and charge just under nickname */}
+                    {/* 잔액 표시 + 충전 버튼 */}
                     <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-900">
                       <span aria-label="지갑 잔액">
-                        🍿 {walletBalance !== null ? `${Math.floor(walletBalance / 100)}  ` : '잔액 조회'}
+                        🍿 {walletBalance !== null ? `${Math.floor(walletBalance / 100)}개` : '잔액 조회'}
                       </span>
                       <button
                         onClick={() => {
@@ -157,14 +169,14 @@ export default function Header({ user, onLogout }: HeaderProps) {
                         setIsDropdownOpen(false)
                         window.location.href = '/mypage'
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                      className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                       role="menuitem"
                     >
                       마이페이지
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
+                      className="flex items-center px-4 py-2 w-full text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-50"
                       role="menuitem"
                     >
                       로그아웃
@@ -181,7 +193,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                   setAuthModalMode('login')
                   setIsAuthModalOpen(true)
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
               >
                 로그인
               </button>
@@ -190,7 +202,7 @@ export default function Header({ user, onLogout }: HeaderProps) {
                   setAuthModalMode('register')
                   setIsAuthModalOpen(true)
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-800 bg-[#F5E6B3] border border-transparent rounded-lg hover:bg-[#E8D89C] focus:outline-none focus:ring-2 focus:ring-[#E8D89C] focus:ring-offset-2 transition-colors duration-200"
+                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-orange-400 to-amber-400 border border-transparent rounded-lg hover:from-orange-500 hover:to-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105"
               >
                 회원가입
               </button>

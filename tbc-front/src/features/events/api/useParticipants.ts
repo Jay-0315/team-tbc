@@ -44,6 +44,8 @@ export function useParticipants(eventId?: number) {
       }))
     },
     enabled: Boolean(eventId),
-    staleTime: 60_000,
+    staleTime: 10_000, // 10초
+    gcTime: 60_000, // 1분
+    refetchInterval: 15_000, // ✅ 15초마다 자동 갱신 (채팅방과 동일)
   })
 } 

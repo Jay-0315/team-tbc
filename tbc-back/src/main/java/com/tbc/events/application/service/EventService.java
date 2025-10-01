@@ -197,17 +197,78 @@ public class EventService {
      * 찜한 이벤트 목록 조회
      */
     public Page<EventCardDTO> findFavoriteEvents(Long userId, Pageable pageable) {
-        // TODO: 찜한 이벤트 목록 조회 구현
-        // 현재는 빈 페이지 반환
-        return new PageImpl<>(List.of(), pageable, 0);
+        // 사용자가 찜한 이벤트 ID 목록 조회
+        List<Long> favoriteEventIds = favoriteRepo.findByUserId(userId)
+                .stream()
+                .map(com.tbc.events.domain.model.Favorite::getEventId)
+                .collect(Collectors.toList());
+        
+        if (favoriteEventIds.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, 0);
+        }
+        
+        // 찜한 이벤트들 조회
+        List<GroupEntity> favoriteEvents = groupRepository.findAllById(favoriteEventIds);
+        
+        // 호스트 정보 조회
+        List<Long> hostIds = favoriteEvents.stream()
+                .map(GroupEntity::getHostId)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        Map<Long, ProfileEntity> profileMap = profileRepository.findAllById(hostIds)
+                .stream()
+                .collect(Collectors.toMap(ProfileEntity::getUserId, p -> p));
+        
+        Map<Long, User> userMap = userRepository.findAllById(hostIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        
+        // EventCardDTO 변환 (모두 favorited = true)
+        List<EventCardDTO> dtos = favoriteEvents.stream()
+                .map(e -> {
+                    ProfileEntity profile = profileMap.get(e.getHostId());
+                    User user = userMap.get(e.getHostId());
+                    String hostNickname = profile != null ? profile.getDisplayName() : (user != null ? user.getNickname() : null);
+                    String hostProfileImage = profile != null ? profile.getProfileImageUrl() : null;
+                    
+                    EventCardDTO dto = EventCardDTO.fromGroupEntity(e, true); // favorited는 항상 true
+                    dto.hostNickname = hostNickname;
+                    dto.hostProfileImage = hostProfileImage;
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        
+        // 페이징 처리
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), dtos.size());
+        List<EventCardDTO> pagedDtos = dtos.subList(start, end);
+        
+        return new PageImpl<>(pagedDtos, pageable, dtos.size());
     }
 
     /**
      * 이벤트 즐겨찾기 토글
      */
+    @Transactional
     public boolean toggleFavorite(Long userId, Long eventId) {
-        // TODO: 즐겨찾기 토글 구현
-        // 현재는 false 반환
-        return false;
+        // 이벤트 존재 확인
+        if (!groupRepository.existsById(eventId)) {
+            throw new IllegalArgumentException("이벤트를 찾을 수 없습니다.");
+        }
+        
+        // 이미 찜한 상태인지 확인
+        boolean exists = favoriteRepo.existsByUserIdAndEventId(userId, eventId);
+        
+        if (exists) {
+            // 찜 해제
+            favoriteRepo.deleteByUserIdAndEventId(userId, eventId);
+            return false;
+        } else {
+            // 찜하기
+            com.tbc.events.domain.model.Favorite favorite = new com.tbc.events.domain.model.Favorite(userId, eventId);
+            favoriteRepo.save(favorite);
+            return true;
+        }
     }
 }

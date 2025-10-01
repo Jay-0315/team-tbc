@@ -3,7 +3,6 @@ import { Copy, Star, Edit, Trash2, MapPin, Calendar, Users } from 'lucide-react'
 import { useEventDetail } from '../features/events/api/useEventDetail'
 import FavoriteButton from '../components/event/FavoriteButton'
 import JoinDialog from '../components/event/JoinDialog'
-import HostBadge from '../components/event/HostBadge'
 import { EventReviews } from '../components/review/EventReviews'
 import { ReviewFormDialog } from '../components/review/ReviewFormDialog'
 import { EditEventDialog } from '../components/event/EditEventDialog'
@@ -15,7 +14,7 @@ import { useAuth } from '../hooks/useAuth'
 import Map from '../components/Map'
 import { useParticipants } from '@/features/events/api/useParticipants'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchMyWallet } from '@/services/events'
+import { fetchMyWallet } from '@/features/payments/api/useBalance'
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
@@ -238,13 +237,9 @@ export default function EventDetailPage() {
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">{data.title}</h2>
                   <div className="flex flex-wrap gap-2 mt-3 text-xs text-gray-700">
-                    <span className="px-2 py-1 border border-gray-100 rounded bg-gray-50">{data.mode || 'OFFLINE'}</span>
                     <span className="px-2 py-1 border border-gray-100 rounded bg-gray-50">
                       {data.feeType === 'FREE' ? '무료' : `${feePopcorn} 팝콘`}
                     </span>
-                  </div>
-                  <div className="mt-4">
-                    <HostBadge host={{ name: hostNickname || data.hostName }} />
                   </div>
                 </div>
               </div>
@@ -344,7 +339,7 @@ export default function EventDetailPage() {
                     <h3 className="text-lg font-semibold text-gray-900">후기</h3>
                     {numericId && (
                       <ReviewFormDialog eventId={numericId}>
-                        <Button size="sm" className="gap-2 text-gray-900 bg-[#F5E6B3] hover:bg-[#E8D89C] border-0">
+                        <Button size="sm" className="gap-2 text-white bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 border-0 transition-all duration-200 transform hover:scale-105">
                           <Star className="w-4 h-4" />
                           후기 작성
                         </Button>
@@ -463,8 +458,8 @@ export default function EventDetailPage() {
               {!isHost && (
                 <button
                   type="button"
-                  className={`w-full h-11 font-semibold rounded-2xl transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-black/20 disabled:opacity-60 disabled:cursor-not-allowed ${
-                    isFull || alreadyJoined || joinBlocked ? 'bg-zinc-200 text-zinc-500' : 'bg-[#F5E6B3] text-gray-900 hover:bg-[#E8D89C]'
+                  className={`w-full h-11 font-semibold rounded-2xl transition-all duration-200 focus-visible:ring-2 focus-visible:ring-orange-500/20 disabled:opacity-60 disabled:cursor-not-allowed transform ${
+                    isFull || alreadyJoined || joinBlocked ? 'bg-zinc-200 text-zinc-500' : 'bg-gradient-to-r from-orange-400 to-amber-400 text-white hover:from-orange-500 hover:to-amber-500 hover:scale-105'
                   }`}
                   aria-label="참가하기"
                   aria-busy={loadingWallet}
